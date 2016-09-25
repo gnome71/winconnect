@@ -1,0 +1,26 @@
+﻿<Page
+    x:Class="kdeconnect_uwp.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:kdeconnect_uwp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Height="725" Width="1040">
+
+    <Grid x:Name="Main_Window" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Connect and sync your devices" VerticalAlignment="Top" BorderBrush="{x:Null}" FontWeight="Bold" IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False" IsTabStop="False" IsReadOnly="True" Grid.Row="1"/>
+        <TextBox x:Name="textBoxHostName" HorizontalAlignment="Left" Margin="10,47,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="259" PlaceholderText="Hostname" TextChanged="textBoxHostName_TextChanged"/>
+        <Button x:Name="buttonSetHostName" Content="Set" HorizontalAlignment="Left" Margin="274,47,0,0" VerticalAlignment="Top" IsEnabled="False" Click="buttonSetHostName_Click_1"/>
+        <ListBox x:Name="listBoxAvailableDevices" HorizontalAlignment="Left" Height="594" Margin="10,84,0,0" VerticalAlignment="Top" Width="305"/>
+        <Button x:Name="buttonRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="10,683,0,0" VerticalAlignment="Top" Width="305" Click="buttonRefresh_Click"/>
+        <TextBox x:Name="textBoxSelectedDevice" HorizontalAlignment="Left" Margin="320,47,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="549" PlaceholderText="Device"/>
+        <Button x:Name="buttonUnPair" Content="Unpair" HorizontalAlignment="Left" Margin="874,47,0,0" VerticalAlignment="Top" IsEnabled="False" Click="buttonUnPair_Click"/>
+        <Button x:Name="buttonSendPing" Content="Send Ping" HorizontalAlignment="Left" Margin="943,47,0,0" VerticalAlignment="Top" Click="buttonSendPing_Click"/>
+        <ListBox x:Name="listBoxPlugIns" HorizontalAlignment="Left" Height="631" Margin="320,84,0,0" VerticalAlignment="Top" Width="710"/>
+
+    </Grid>
+</Page>

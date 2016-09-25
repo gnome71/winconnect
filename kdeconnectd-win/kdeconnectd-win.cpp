@@ -4,15 +4,18 @@
 #define UNICODE
 #endif
 
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 
 #include "stdafx.h"
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <stdio.h>
+#include <ctype.h>
 
 // Link with ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
+
+#define MY_PORT 1716;
 
 int main()
 {
@@ -22,14 +25,13 @@ int main()
 	WSADATA wsaData;
 
 	SOCKET RecvSocket;
-	sockaddr_in RecvAddr;
+	sockaddr_in RecvAddr, SenderAddr;
 
-	unsigned short Port = 1716;
+	unsigned short Port = MY_PORT;
 
 	char RecvBuf[1024];
 	int BufLen = 1024;
 
-	sockaddr_in SenderAddr;
 	int SenderAddrSize = sizeof(SenderAddr);
 
 	//-----------------------------------------------
