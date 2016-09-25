@@ -18,6 +18,10 @@ namespace kdeconnect_uwp
 		MainPage();
 
 	private:
+		Windows::Networking::Sockets::DatagramSocket^ listenerSocket;
+
+		void StartListenerSocket();
+		void CloseListenerSocket();
 		void buttonSetHostName_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void buttonRefresh_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void buttonUnPair_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
