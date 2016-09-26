@@ -21,7 +21,9 @@
         <Button x:Name="buttonUnPair" Content="Unpair" HorizontalAlignment="Left" Margin="874,47,0,0" VerticalAlignment="Top" IsEnabled="False" Click="buttonUnPair_Click"/>
         <Button x:Name="buttonSendPing" Content="Send Ping" HorizontalAlignment="Left" Margin="943,47,0,0" VerticalAlignment="Top" Click="buttonSendPing_Click"/>
         <ListBox x:Name="listBoxPlugIns" HorizontalAlignment="Left" Height="391" Margin="320,84,0,0" VerticalAlignment="Top" Width="710"/>
-        <TextBlock x:Name="textBlockDebugOutput" HorizontalAlignment="Left" Margin="320,480,0,0" TextWrapping="Wrap" Text="Debug Output" VerticalAlignment="Top" Height="235" Width="710" FontSize="10" IsTextSelectionEnabled="True"/>
-
+        <ScrollViewer>
+            <TextBlock x:Name="textBlockDebugOutput" HorizontalAlignment="Left" Margin="320,480,0,0" TextWrapping="Wrap" Text="Debug Output" VerticalAlignment="Top" Height="235" Width="710" FontSize="10" IsTextSelectionEnabled="True" FontFamily="Source Code Pro"/>
+        </ScrollViewer>
+        
     </Grid>
 </Page>
