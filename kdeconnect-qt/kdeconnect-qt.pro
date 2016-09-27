@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network concurrent
+QT       += core gui network concurrent crypto
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    core/kdeconnectconfig.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    core/kdeconnectconfig.h
 
 FORMS    += mainwindow.ui
+
+LIBS     += lqca
+
