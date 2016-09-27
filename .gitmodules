@@ -1,0 +1,6 @@
+[submodule "kdeconnect-kde"]
+	path = kdeconnect-kde
+	url = git://anongit.kde.org/kdeconnect-kde.git
+[submodule "kdeconnect-android"]
+	path = kdeconnect-android
+	url = git://anongit.kde.org/kdeconnect-android.git
