@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->plainTextEditDebug->setHidden(true);
     ui->radioButtonLog->setChecked(false);
 
-    KdeConnectConfig* config = new KdeConnectConfig();
+    //KdeConnectConfig* config = new KdeConnectConfig();
 }
 
 MainWindow::~MainWindow()
