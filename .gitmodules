@@ -10,3 +10,6 @@
 [submodule "kdeconnect-win/openssl-master"]
 	path = kdeconnect-win/openssl-master
 	url = https://github.com/openssl/openssl.git
+[submodule "kdeconnect-win/qca"]
+	path = kdeconnect-win/qca
+	url = git://anongit.kde.org/qca.git
