@@ -4,3 +4,9 @@
 [submodule "kdeconnect-android"]
 	path = kdeconnect-android
 	url = git://anongit.kde.org/kdeconnect-android.git
+[submodule "OpenSSL_1_0_1-stable"]
+	path = OpenSSL_1_0_1-stable
+	url = https://github.com/openssl/openssl.git
+[submodule "kdeconnect-win/openssl-master"]
+	path = kdeconnect-win/openssl-master
+	url = https://github.com/openssl/openssl.git
