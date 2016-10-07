@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "core/kdeconnectconfig.h"
+#include "core/logger.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->plainTextEditDebug->setHidden(true);
     ui->radioButtonLog->setChecked(false);
 
-    //KdeConnectConfig* config = new KdeConnectConfig();
+    Logger* logger = new Logger();
+    KdeConnectConfig* config = new KdeConnectConfig();
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +31,7 @@ void MainWindow::on_radioButtonLog_toggled(bool checked)
 
 void MainWindow::on_pushButtonMyName_clicked()
 {
-
+    logger->debug("pushButtonMyName clicked");
 }
 
 void MainWindow::on_pushButtonUnPair_clicked()
