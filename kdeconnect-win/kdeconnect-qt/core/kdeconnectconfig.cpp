@@ -32,54 +32,52 @@ KdeConnectConfig::KdeConnectConfig()
 {
     //qCDebug(KDECONNECT_CORE) << "QCA supported capabilities:" << QCA::supportedFeatures().join(",");
     if(!QCA::isSupported("rsa")) {
-        Daemon::instance()->reportError(
-                             i18n("KDE Connect failed to start"),
-                             i18n("Could not find support for RSA in your QCA installation. If your "
-                                  "distribution provides separate packages for QCA-ossl and QCA-gnupg, "
-                                  "make sure you have them installed and try again."));
+        qDebug() << "RSA not supported";
         return;
   }
 }
 
 QString KdeConnectConfig::deviceId()
 {
-
+    return "todo";
 }
 
 QString KdeConnectConfig::name()
 {
-
+    return "todo";
 }
 
 QString KdeConnectConfig::deviceType()
 {
-
+    return "todo";
 }
 
 QString KdeConnectConfig::privateKeyPath()
 {
-
+    return "todo";
 }
 
 QCA::PrivateKey KdeConnectConfig::privateKey()
 {
-
+    QCA::PrivateKey privatekey;
+    return privatekey;
 }
 
 QCA::PublicKey KdeConnectConfig::publicKey()
 {
-
+    QCA::PublicKey pubkey;
+    return pubkey;
 }
 
 QString KdeConnectConfig::certificatePath()
 {
-
+    return "todo";
 }
 
-QsslCertificate KdeConnectConfig::certificate()
-{
-
-}
+//QsslCertificate KdeConnectConfig::certificate()
+//{
+//
+//}
 
 void KdeConnectConfig::setName(QString name)
 {
@@ -88,7 +86,9 @@ void KdeConnectConfig::setName(QString name)
 
 QStringList KdeConnectConfig::trustedDevices()
 {
-
+    QStringList todo;
+    todo << "to" << "do";
+    return todo;
 }
 
 void KdeConnectConfig::removeTrustedDevice(const QString &id)
@@ -103,7 +103,8 @@ void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, 
 
 KdeConnectConfig::DeviceInfo KdeConnectConfig::getTrustedDevice(const QString &id)
 {
-
+    KdeConnectConfig::DeviceInfo trustdevice;
+    return trustdevice;
 }
 
 void KdeConnectConfig::setDeviceProperty(QString deviceId, QString name, QString value)
@@ -113,20 +114,20 @@ void KdeConnectConfig::setDeviceProperty(QString deviceId, QString name, QString
 
 QString KdeConnectConfig::getDeviceProperty(QString deviceId, QString name, QString defaultValue)
 {
-
+    return "todo";
 }
 
 QDir KdeConnectConfig::baseConfigDir()
 {
-
+    return QDir("todo");
 }
 
 QDir KdeConnectConfig::deviceConfigDir(const QString &deviceId)
 {
-
+    return QDir("todo");
 }
 
 QDir KdeConnectConfig::pluginConfigDir(const QString &deviceId, const QString &pluginName)
 {
-
+    return QDir("todo");
 }

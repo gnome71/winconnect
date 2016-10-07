@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<valuelist type="QVariantList" key="CMake.Configuration">
+  <value type="QString">CMAKE_BUILD_TYPE:STRING=Debug</value>
+  <value type="QString">CMAKE_CXX_COMPILER:STRING=%{Compiler:Executable}</value>
+  <value type="QString">CMAKE_INSTALL_PREFIX:PATH=F:/BuildQca-qt5d-shared</value>
+  <value type="QString">LIB_EAY_DEBUG:FILEPATH=F:/openssl-1.0.2j/shared/lib/libeay32d.lib</value>
+  <value type="QString">LIB_EAY_RELEASE:FILEPATH=F:/openssl-1.0.2j/shared/lib/libeay32.lib</value>
+  <value type="QString">OPENSSL_ROOT_DIR:PATH=F:/openssl-1.0.2j/shared</value>
+  <value type="QString">QT_QMAKE_EXECUTABLE:STRING=%{Qt:qmakeExecutable}</value>
+  <value type="QString">SSL_EAY_DEBUG:FILEPATH=F:/openssl-1.0.2j/shared/lib/ssleay32d.lib</value>
+  <value type="QString">SSL_EAY_RELEASE:FILEPATH=F:/openssl-1.0.2j/shared/lib/ssleay32.lib</value>
+  <value type="QString">USE_RELATIVE_PATHS:BOOL=ON</value>
+</valuelist>

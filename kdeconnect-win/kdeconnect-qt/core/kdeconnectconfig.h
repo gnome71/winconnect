@@ -29,7 +29,7 @@ public:
     QCA::PrivateKey privateKey();
     QCA::PublicKey publicKey();
     QString certificatePath();
-    QsslCertificate certificate();
+//    QsslCertificate certificate();
 
     void setName(QString name);
 
