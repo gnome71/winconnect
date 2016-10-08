@@ -35,6 +35,10 @@ KdeConnectConfig::KdeConnectConfig()
 
 	QCA::Initializer mQcaInitializer;
 
+    QCA::scanForPlugins();
+
+    qCDebug(kcQca) << "QCA Diagnostic: " << QCA::pluginDiagnosticText();
+
 	emit logMe(QtMsgType::QtDebugMsg, "QCA supported capabilities: "
 		+ QCA::supportedFeatures().join(","));
 

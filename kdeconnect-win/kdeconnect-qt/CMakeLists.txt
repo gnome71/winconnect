@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8.12)
 # Instruct CMake to run moc/uic automatically when needed.
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # At home
@@ -54,7 +55,8 @@ set(FORMS
 )
 
 # What to do
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES} res/resources.qrc)
+
 # Show all files in project view
 add_custom_target(headers SOURCES ${HEADERS})
 add_custom_target(forms SOURCES ${FORMS})

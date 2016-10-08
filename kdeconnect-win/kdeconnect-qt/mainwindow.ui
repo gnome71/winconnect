@@ -14,8 +14,8 @@
    <string>KDE Connect</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>F:/Projekte/Image Libraries/VS2015/2015_VSIcon/BlankPhone/BlankPhone_16x.svg</normaloff>F:/Projekte/Image Libraries/VS2015/2015_VSIcon/BlankPhone/BlankPhone_16x.svg</iconset>
+   <iconset resource="res/resources.qrc">
+    <normaloff>:/icons/BlankPhone_16x.svg</normaloff>:/icons/BlankPhone_16x.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -149,10 +149,50 @@
         <item>
          <widget class="QPlainTextEdit" name="plainTextEditDebug">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
+          </property>
+          <property name="palette">
+           <palette>
+            <active>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>235</red>
+                <green>235</green>
+                <blue>235</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </active>
+            <inactive>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>235</red>
+                <green>235</green>
+                <blue>235</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </inactive>
+            <disabled>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </disabled>
+           </palette>
           </property>
           <property name="acceptDrops">
            <bool>false</bool>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
           </property>
           <property name="undoRedoEnabled">
            <bool>false</bool>
@@ -215,7 +255,9 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="res/resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pushButtonOk</sender>
