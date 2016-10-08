@@ -1,12 +1,15 @@
 project(kdeconnect-qt)
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Instruct CMake to run moc/uic automatically when needed.
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# At home
 set(CMAKE_PREFIX_PATH D:/Qt/5.7/msvc2015)
+# At work
+set(CMAKE_PREFIX_PATH F:/Qt/Qt5.7.0/5.7/msvc2015)
 
 # Find Qca-qt5 in build tree
 set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/lib/cmake/Qca-qt5)
@@ -39,12 +42,12 @@ set(SOURCES
     main.cpp
     mainwindow.cpp
     core/kdeconnectconfig.cpp
-    core/logger.cpp
+    core/kclogger.cpp
 )
 set(HEADERS
     mainwindow.h
     core/kdeconnectconfig.h
-    core/logger.h
+    core/kclogger.h
 )
 set(FORMS
     mainwindow.ui

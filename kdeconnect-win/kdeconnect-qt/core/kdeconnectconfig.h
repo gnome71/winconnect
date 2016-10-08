@@ -1,6 +1,7 @@
 #ifndef KDECONNECTCONFIG_H
 #define KDECONNECTCONFIG_H
 
+#include <QObject>
 #include <QDir>
 
 class QsslCertificate;
@@ -11,7 +12,10 @@ namespace QCA {
 
 //! KdeConnectConfig class definition
 class KdeConnectConfig
+	: public QObject
 {
+	Q_OBJECT
+
 public:
     KdeConnectConfig();
 
@@ -48,8 +52,10 @@ public:
     QDir deviceConfigDir(const QString &deviceId);
     QDir pluginConfigDir(const QString &deviceId, const QString &pluginName); //Used by KdeConnectPluginConfig
 
- private:
-
+signals:
+	void logMe(QtMsgType type, const QString &msg);
+ 
+private:
     struct KdeConnectConfigPrivate* d;
 };
 

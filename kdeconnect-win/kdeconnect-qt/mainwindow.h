@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "core\logger.h"
+#include "core\kclogger.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,6 +16,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+	void displayDebugMessage(QtMsgType type, const QString &msg);
+
 private slots:
     void on_radioButtonLog_toggled(bool checked);
     void on_pushButtonMyName_clicked();
@@ -25,7 +28,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-	Logger *logger;
+
 };
 
 #endif // MAINWINDOW_H

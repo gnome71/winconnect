@@ -1,7 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "core/kdeconnectconfig.h"
-#include "core/logger.h"
+#include "core/kclogger.h"
+
+#include <QLoggingCategory>
+#include <QDateTime>
+#include <QDebug>
+#include <QThread>
+#include <cassert>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,8 +18,53 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->plainTextEditDebug->setHidden(true);
     ui->radioButtonLog->setChecked(false);
 
-    Logger* logger = new Logger();
     KdeConnectConfig* config = new KdeConnectConfig();
+
+	// Signal/Slots connections
+	connect(config, &KdeConnectConfig::logMe,
+		this, &MainWindow::displayDebugMessage);
+}
+
+void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
+{
+	bool do_abort = false;
+	const char* msgTypeStr = NULL;
+	switch (type) {
+	case QtDebugMsg:
+		msgTypeStr = "Debug";
+		break;
+	case QtWarningMsg:
+		msgTypeStr = "Warning";
+		break;
+	case QtCriticalMsg:
+		msgTypeStr = "Critical";
+		break;
+	case QtFatalMsg:
+		msgTypeStr = "Fatal";
+		do_abort = true;
+	default:
+		assert(0);
+		return;
+	}
+	QTime now = QTime::currentTime();
+	QString formattedMessage =
+		QString::fromLatin1("%1 %2 %3")
+		.arg(now.toString("hh:mm:ss:zzz"))
+		.arg(msgTypeStr).arg(msg);
+	// print on console:
+	fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
+	// print in debug log window
+	{
+
+		bool isMainThread = QThread::currentThread() == QApplication::instance()->thread();
+		if (ui->plainTextEditDebug != 0)
+		{
+			if (isMainThread)
+				ui->plainTextEditDebug->appendPlainText(formattedMessage);
+			else // additional code, so that qDebug calls in threads will work aswell
+				QMetaObject::invokeMethod(ui->plainTextEditDebug, "appendPlainText", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
+		}
+	}
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +82,8 @@ void MainWindow::on_radioButtonLog_toggled(bool checked)
 
 void MainWindow::on_pushButtonMyName_clicked()
 {
-    logger->debug("pushButtonMyName clicked");
+	qCDebug(kcCore) << "pushButtonMyName clicked.";
+	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonMyName clicked.");
 }
 
 void MainWindow::on_pushButtonUnPair_clicked()
@@ -41,7 +93,8 @@ void MainWindow::on_pushButtonUnPair_clicked()
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
-
+	qCDebug(kcCore) << "pushButtonRefresh clicked.";
+	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked.");
 }
 
 void MainWindow::on_lineEditMyName_textChanged(const QString &arg1)
