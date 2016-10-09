@@ -13,7 +13,8 @@ set(CMAKE_PREFIX_PATH D:/Qt/5.7/msvc2015)
 set(CMAKE_PREFIX_PATH F:/Qt/Qt5.7.0/5.7/msvc2015)
 
 # Find Qca-qt5 in build tree
-set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/lib/cmake/Qca-qt5)
+#set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/lib/cmake/Qca-qt5)
+set(Qca-qt5_DIR d:/qca/msvc2015/lib/cmake/Qca-qt5)
 
 # Search needed libs
 find_package(Qt5Widgets REQUIRED)

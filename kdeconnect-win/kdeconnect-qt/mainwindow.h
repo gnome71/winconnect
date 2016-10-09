@@ -16,11 +16,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
-	void displayDebugMessage(QtMsgType type, const QString &msg);
-
 private slots:
-    void on_radioButtonLog_toggled(bool checked);
+	void displayDebugMessage(QtMsgType type, const QString &msg);
+	
+	void on_radioButtonLog_toggled(bool checked);
     void on_pushButtonMyName_clicked();
     void on_pushButtonUnPair_clicked();
     void on_pushButtonRefresh_clicked();

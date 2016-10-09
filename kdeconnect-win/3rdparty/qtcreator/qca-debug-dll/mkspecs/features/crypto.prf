@@ -1,0 +1,26 @@
+QCA_INCDIR = $$PWD/../../include/Qca-qt5
+QCA_LIBDIR = $$PWD/../../libd
+
+CONFIG *= qt
+
+LINKAGE =
+
+exists($$QCA_LIBDIR/qca.framework) {
+	QMAKE_CXXFLAGS += -F$$QCA_LIBDIR
+	LIBS *= -F$$QCA_LIBDIR
+	INCLUDEPATH += $$QCA_LIBDIR/qca.framework/Headers
+	LINKAGE = -framework qca
+}
+
+# else, link normally
+isEmpty(LINKAGE) {
+	INCLUDEPATH += $$QCA_INCDIR/QtCrypto
+	LIBS += -L$$QCA_LIBDIR
+	LINKAGE = -lqca-qt5
+	CONFIG(debug, debug|release) {
+		windows:LINKAGE = -lqca-qt5d
+		mac:LINKAGE = -lqca-qt5_debug
+	}
+}
+
+LIBS += $$LINKAGE

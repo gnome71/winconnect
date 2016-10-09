@@ -26,7 +26,6 @@ struct KdeConnectConfigPrivate {
 
     QSettings* config;
     QSettings* trusted_devices;
-
 };
 
 KdeConnectConfig::KdeConnectConfig()
@@ -35,20 +34,19 @@ KdeConnectConfig::KdeConnectConfig()
 
 	QCA::Initializer mQcaInitializer;
 
-    QCA::scanForPlugins();
-
-    qCDebug(kcQca) << "QCA Diagnostic: " << QCA::pluginDiagnosticText();
-
-	emit logMe(QtMsgType::QtDebugMsg, "QCA supported capabilities: "
-		+ QCA::supportedFeatures().join(","));
-
-	qCDebug(kcQca) << "QCA supported capabilities: " 
-		<< QCA::supportedFeatures().join(",");
-
 	if(!QCA::isSupported("rsa")) {
 		qCDebug(kcQca) << "RSA not supported";
-        return;
-  }
+		qCDebug(kcQca) << "QCA Diagnostic: " << QCA::pluginDiagnosticText();
+		return;
+	}
+	else {
+		qCDebug(kcQca) << "RSA supported.";
+		qCDebug(kcQca) << "QCA supported capabilities: "
+			<< QCA::supportedFeatures().join(", ");
+	}
+
+	emit logMe(QtMsgType::QtDebugMsg, "EMITTED: QCA supported capabilities: "
+		+ QCA::supportedFeatures().join(","));
 }
 
 QString KdeConnectConfig::deviceId()

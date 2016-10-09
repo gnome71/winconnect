@@ -22,21 +22,17 @@ MainWindow::MainWindow(QWidget *parent) :
     KdeConnectConfig* config = new KdeConnectConfig();
 
 	// Signal/Slots connections
-	connect(config, &KdeConnectConfig::logMe,
-		this, &MainWindow::displayDebugMessage);
+    connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
+    //connect(config, SIGNAL(logMe()), this, SLOT(displayDebugMessage()));
 
 	QCA::Initializer mQcaInitializer;
 	QCA::scanForPlugins();
 
-	ui->plainTextEditDebug->appendPlainText("QCA Diagnostic Text:\n"); 
-	ui->plainTextEditDebug->appendPlainText(QCA::pluginDiagnosticText());
-	ui->plainTextEditDebug->appendPlainText("QCA Supported Features:\n"); 
-	ui->plainTextEditDebug->appendPlainText(QCA::supportedFeatures().join(","));
+//	ui->plainTextEditDebug->appendPlainText("QCA Diagnostic Text:\n"); 
+//	ui->plainTextEditDebug->appendPlainText(QCA::pluginDiagnosticText());
+//	ui->plainTextEditDebug->appendPlainText("QCA Supported Features:\n"); 
+//	ui->plainTextEditDebug->appendPlainText(QCA::supportedFeatures().join(","));
 	
-	qCDebug(kcQca) << "QCA Diagnostic: " << QCA::pluginDiagnosticText();
-	qCDebug(kcQca) << "QCA supported capabilities: "
-		<< QCA::supportedFeatures().join(",");
-
 }
 
 void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
