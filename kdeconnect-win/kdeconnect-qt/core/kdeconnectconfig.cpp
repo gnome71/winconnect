@@ -17,15 +17,11 @@
 
 struct KdeConnectConfigPrivate {
 
-    // The Initializer object sets things up, and also does cleanup when it goes out of scope
-    // Note it's not being used anywhere. That's intended
-    QCA::Initializer mQcaInitializer;
+	QCA::PrivateKey privateKey;
+	QSslCertificate certificate; // Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
 
-    QCA::PrivateKey privateKey;
-    QSslCertificate certificate; // Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
-
-    QSettings* config;
-    QSettings* trusted_devices;
+	QSettings* config;
+	QSettings* trusted_devices;
 };
 
 KdeConnectConfig::KdeConnectConfig()
@@ -35,56 +31,62 @@ KdeConnectConfig::KdeConnectConfig()
 	QCA::Initializer mQcaInitializer;
 
 	if(!QCA::isSupported("rsa")) {
-		qCDebug(kcQca) << "RSA not supported";
-		qCDebug(kcQca) << "QCA Diagnostic: " << QCA::pluginDiagnosticText();
+		emit logMe(QtMsgType::QtCriticalMsg, "RSA not supported");
 		return;
 	}
-	else {
-		qCDebug(kcQca) << "RSA supported.";
-		qCDebug(kcQca) << "QCA supported capabilities: "
-			<< QCA::supportedFeatures().join(", ");
+
+	QSettings::setDefaultFormat(QSettings::IniFormat);
+
+	QSettings config;
+	config.sync();
+
+	//Register my own id if not there yet
+	if (!config.contains("my/id")) {
+		QString uuid = QUuid::createUuid().toString();
+		config.setValue("my/id", uuid);
+		config.sync();
+		qCDebug(kcQca) << "My id:" << uuid;
 	}
 
-	emit logMe(QtMsgType::QtDebugMsg, "EMITTED: QCA supported capabilities: "
-		+ QCA::supportedFeatures().join(","));
 }
 
 QString KdeConnectConfig::deviceId()
 {
-    return "todo";
+	return "todo";
 }
 
 QString KdeConnectConfig::name()
 {
-    return "todo";
+	return "todo";
 }
 
 QString KdeConnectConfig::deviceType()
 {
-    return "todo";
+	return "todo";
 }
 
 QString KdeConnectConfig::privateKeyPath()
 {
-    return "todo";
+
+	return "todo";
 }
 
 QCA::PrivateKey KdeConnectConfig::privateKey()
 {
 	qCDebug(kcQca) << "privateKey()";
-    QCA::PrivateKey privatekey;
-    return privatekey;
+	QCA::PrivateKey privatekey;
+	return privatekey;
 }
 
 QCA::PublicKey KdeConnectConfig::publicKey()
 {
-    QCA::PublicKey pubkey;
-    return pubkey;
+	QCA::PublicKey pubkey;
+	return pubkey;
 }
 
 QString KdeConnectConfig::certificatePath()
 {
-    return "todo";
+	return "todo";
 }
 
 //QsslCertificate KdeConnectConfig::certificate()
@@ -99,9 +101,9 @@ void KdeConnectConfig::setName(QString name)
 
 QStringList KdeConnectConfig::trustedDevices()
 {
-    QStringList todo;
-    todo << "to" << "do";
-    return todo;
+	QStringList todo;
+	todo << "to" << "do";
+	return todo;
 }
 
 void KdeConnectConfig::removeTrustedDevice(const QString &id)
@@ -116,8 +118,8 @@ void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, 
 
 KdeConnectConfig::DeviceInfo KdeConnectConfig::getTrustedDevice(const QString &id)
 {
-    KdeConnectConfig::DeviceInfo trustdevice;
-    return trustdevice;
+	KdeConnectConfig::DeviceInfo trustdevice;
+	return trustdevice;
 }
 
 void KdeConnectConfig::setDeviceProperty(QString deviceId, QString name, QString value)
@@ -127,21 +129,51 @@ void KdeConnectConfig::setDeviceProperty(QString deviceId, QString name, QString
 
 QString KdeConnectConfig::getDeviceProperty(QString deviceId, QString name, QString defaultValue)
 {
-    return "todo";
+	return "todo";
 }
 
+QString KdeConnectConfig::getQcaInfo() {
+	QString msg = "QCA Diagnostic:\n" + QCA::pluginDiagnosticText();
+	msg += "QCA capabilities:\n" + QCA::supportedFeatures().join(", ");
+	return msg;
+
+}
+
+/**
+ * @brief KdeConnectConfig::baseConfigDir
+ * @return QDir
+ */
 QDir KdeConnectConfig::baseConfigDir()
 {
-    return QDir("todo");
+	QSettings config;
+	config.sync();
+
+	// base configuration directory
+	qDebug() << config.fileName();
+	QDir bcd(config.fileName());
+
+	return bcd;
 }
 
+/**
+ * @brief KdeConnectConfig::deviceConfigDir
+ * returns also the base path (using one config file)
+ * @param deviceId
+ * @return QDir
+ */
 QDir KdeConnectConfig::deviceConfigDir(const QString &deviceId)
 {
-    return QDir("todo");
+	QSettings config;
+	config.sync();
+
+	// device configuration directory
+	QDir dcd(baseConfigDir().path());
+
+	return dcd;
 }
 
 QDir KdeConnectConfig::pluginConfigDir(const QString &deviceId, const QString &pluginName)
 {
-    return QDir("todo");
+	return QDir("todo");
 }
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>702</width>
-    <height>672</height>
+    <width>982</width>
+    <height>717</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,14 +71,54 @@
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="radioButtonLog">
-               <property name="text">
-                <string>show log</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QRadioButton" name="radioButtonLog">
+                 <property name="text">
+                  <string>Debug</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButtonQcaInfo">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>QCA</string>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButtonSettingInfo">
+                 <property name="text">
+                  <string>Settings</string>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -247,8 +287,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>702</width>
-     <height>21</height>
+     <width>982</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>

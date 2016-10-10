@@ -16,23 +16,24 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+#ifdef QT_DEBUG
+    ui->plainTextEditDebug->setHidden(false);
+    ui->radioButtonLog->setChecked(true);
+	ui->pushButtonQcaInfo->setHidden(false);
+	ui->pushButtonSettingInfo->setHidden(false);
+#else
     ui->plainTextEditDebug->setHidden(true);
     ui->radioButtonLog->setChecked(false);
+	ui->pushButtonQcaInfo->setHidden(true);
+	ui->pushButtonSettingInfo->setHidden(true);
+#endif
 
-    KdeConnectConfig* config = new KdeConnectConfig();
+	config = new KdeConnectConfig();
 
 	// Signal/Slots connections
-    connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
-    //connect(config, SIGNAL(logMe()), this, SLOT(displayDebugMessage()));
+    QObject::connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
 
-	QCA::Initializer mQcaInitializer;
-	QCA::scanForPlugins();
 
-//	ui->plainTextEditDebug->appendPlainText("QCA Diagnostic Text:\n"); 
-//	ui->plainTextEditDebug->appendPlainText(QCA::pluginDiagnosticText());
-//	ui->plainTextEditDebug->appendPlainText("QCA Supported Features:\n"); 
-//	ui->plainTextEditDebug->appendPlainText(QCA::supportedFeatures().join(","));
-	
 }
 
 void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
@@ -84,27 +85,31 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_radioButtonLog_toggled(bool checked)
 {
-    if(checked)
+	if(checked) {
         ui->plainTextEditDebug->setHidden(false);
-    else
+		ui->pushButtonQcaInfo->setHidden(false);
+		ui->pushButtonSettingInfo->setHidden(false);
+	}
+	else {
         ui->plainTextEditDebug->setHidden(true);
+		ui->pushButtonQcaInfo->setHidden(true);
+		ui->pushButtonSettingInfo->setHidden(true);
+	}
 }
 
 void MainWindow::on_pushButtonMyName_clicked()
 {
-	qCDebug(kcCore) << "pushButtonMyName clicked.";
 	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonMyName clicked.");
 }
 
 void MainWindow::on_pushButtonUnPair_clicked()
 {
-
+	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonUnPair clicked.");
 }
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
-	qCDebug(kcCore) << "pushButtonRefresh clicked.";
-	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked.");
+	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked");
 }
 
 void MainWindow::on_lineEditMyName_textChanged(const QString &arg1)
@@ -112,3 +117,15 @@ void MainWindow::on_lineEditMyName_textChanged(const QString &arg1)
 
 }
 
+void MainWindow::on_pushButtonQcaInfo_clicked()
+{
+	displayDebugMessage(QtMsgType::QtDebugMsg, config->getQcaInfo());
+}
+
+void MainWindow::on_pushButtonSettingInfo_clicked()
+{
+	QDir bcd = config->baseConfigDir();
+	QDir dcd = config->deviceConfigDir("1234");
+	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir:    " + bcd.path());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "DeviceConfigDir: " + dcd.path());
+}
