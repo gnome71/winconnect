@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "core\kclogger.h"
+#include "core/kdeconnectconfig.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,6 +17,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+	void getQcaInfo();
+
 private slots:
 	void displayDebugMessage(QtMsgType type, const QString &msg);
 	
@@ -25,8 +29,13 @@ private slots:
     void on_pushButtonRefresh_clicked();
     void on_lineEditMyName_textChanged(const QString &arg1);
 
+	void on_pushButtonQcaInfo_clicked();
+
+	void on_pushButtonSettingInfo_clicked();
+
 private:
     Ui::MainWindow *ui;
+	KdeConnectConfig* config;
 
 };
 
