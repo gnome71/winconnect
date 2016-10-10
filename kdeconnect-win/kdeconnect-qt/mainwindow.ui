@@ -288,7 +288,7 @@
      <x>0</x>
      <y>0</y>
      <width>982</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -306,8 +306,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>582</x>
-     <y>627</y>
+     <x>889</x>
+     <y>685</y>
     </hint>
     <hint type="destinationlabel">
      <x>469</x>
@@ -322,8 +322,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>653</x>
-     <y>626</y>
+     <x>970</x>
+     <y>685</y>
     </hint>
     <hint type="destinationlabel">
      <x>356</x>

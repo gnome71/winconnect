@@ -16,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+	config = new KdeConnectConfig();
+
+	ui->lineEditMyName->setText(config->name());
 #ifdef QT_DEBUG
     ui->plainTextEditDebug->setHidden(false);
     ui->radioButtonLog->setChecked(true);
@@ -28,12 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->pushButtonSettingInfo->setHidden(true);
 #endif
 
-	config = new KdeConnectConfig();
-
 	// Signal/Slots connections
-    QObject::connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
-
-
+    connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
 }
 
 void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
@@ -112,9 +111,15 @@ void MainWindow::on_pushButtonRefresh_clicked()
 	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked");
 }
 
+/**
+ * @brief MainWindow::on_lineEditMyName_textChanged
+ * TODO: signal/slot
+ *
+ */
 void MainWindow::on_lineEditMyName_textChanged(const QString &arg1)
 {
-
+	ui->pushButtonMyName->isEnabled();
+	config->setName(ui->lineEditMyName->text());
 }
 
 void MainWindow::on_pushButtonQcaInfo_clicked()
@@ -126,6 +131,8 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 {
 	QDir bcd = config->baseConfigDir();
 	QDir dcd = config->deviceConfigDir("1234");
-	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir:    " + bcd.path());
-	displayDebugMessage(QtMsgType::QtDebugMsg, "DeviceConfigDir: " + dcd.path());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MyName: " + config->name());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MyId: " + config->deviceId());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MyDeviceType: " + config->deviceType());
 }

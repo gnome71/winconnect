@@ -13,8 +13,7 @@ set(CMAKE_PREFIX_PATH D:/Qt/5.7/msvc2015)
 set(CMAKE_PREFIX_PATH F:/Qt/Qt5.7.0/5.7/msvc2015)
 
 # Find Qca-qt5 in build tree
-#set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/lib/cmake/Qca-qt5)
-set(Qca-qt5_DIR d:/qca/qtcreator/qca-debug-dll/libd/cmake/Qca-qt5)
+set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/lib/cmake/Qca-qt5)
 
 # Search needed libs
 find_package(Qt5Widgets REQUIRED)
@@ -35,31 +34,38 @@ if(Qca-qt5_FOUND)
     message(STATUS "Qca-qt5 found v" ${Qca-qt5_VERSION})
     get_target_property(Qca_Location qca-qt5 LOCATION)
     message(STATUS "at: " ${Qca_Location})
+    message(STATUS "includes: " ${Qca-qt5_INCLUDES})
 endif(Qca-qt5_FOUND)
 include_directories(${Qca-qt5_INCLUDES})
 add_definitions(${Qca-qt5_DEFINITIONS})
 
-# Set file globs
+# Set files
 set(SOURCES
     main.cpp
     mainwindow.cpp
-    core/kdeconnectconfig.cpp
-    core/kclogger.cpp
 )
 set(HEADERS
     mainwindow.h
-    core/kdeconnectconfig.h
-    core/kclogger.h
 )
 set(FORMS
     mainwindow.ui
 )
 
+add_subdirectory(core)
+
 # What to do
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES} res/resources.qrc)
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${RESOURCES})
 
 # Show all files in project view
-add_custom_target(headers SOURCES ${HEADERS})
+# Dummy Project to show all files in project view
+add_executable(headers EXCLUDE_FROM_ALL ${HEADERS})
+target_link_libraries(headers
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Network
+    Qt5::Concurrent
+    qca-qt5)
 add_custom_target(forms SOURCES ${FORMS})
 
 # Linker commands

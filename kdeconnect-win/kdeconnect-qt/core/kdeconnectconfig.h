@@ -58,6 +58,7 @@ public slots:
 
 signals:
 	void logMe(QtMsgType type, const QString &msg);
+	void nameChanged(QString &name);
 
 private:
 	struct KdeConnectConfigPrivate* d;

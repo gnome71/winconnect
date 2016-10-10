@@ -41,28 +41,51 @@ KdeConnectConfig::KdeConnectConfig()
 	config.sync();
 
 	//Register my own id if not there yet
-	if (!config.contains("my/id")) {
+	if(!config.contains("my/id")) {
 		QString uuid = QUuid::createUuid().toString();
 		config.setValue("my/id", uuid);
 		config.sync();
 		qCDebug(kcQca) << "My id:" << uuid;
 	}
 
+	// Register my own name if not there yet
+	if(!config.contains("my/name")) {
+		QString n = qgetenv("USERNAME");
+		QString h = qgetenv("COMPUTERNAME");
+		QString name = n + "@" + h;
+		config.setValue("my/name", name);
+		config.sync();
+	}
+
+	// Register my own deviceType as Desktop hardcoded
+	if (!config.contains("my/deviceType")) {
+		QString deviceType = "Desktop";
+		qCDebug(kcQca) << "My deviceType: " << deviceType;
+		config.setValue("my/deviceType", deviceType);
+		config.sync();
+	}
 }
 
 QString KdeConnectConfig::deviceId()
 {
-	return "todo";
+	QSettings config;
+	config.sync();
+	QString ret = config.value("my/id").toString();
+	return ret;
 }
 
 QString KdeConnectConfig::name()
 {
-	return "todo";
+	QSettings config;
+	config.sync();
+	return config.value("my/name").toString();
 }
 
 QString KdeConnectConfig::deviceType()
 {
-	return "todo";
+	QSettings config;
+	config.sync();
+	return config.value("my/deviceType").toString();
 }
 
 QString KdeConnectConfig::privateKeyPath()
@@ -96,7 +119,11 @@ QString KdeConnectConfig::certificatePath()
 
 void KdeConnectConfig::setName(QString name)
 {
-
+	QSettings config;
+	config.sync();
+	config.setValue("my/name", name);
+	config.sync();
+	emit nameChanged(name);
 }
 
 QStringList KdeConnectConfig::trustedDevices()
