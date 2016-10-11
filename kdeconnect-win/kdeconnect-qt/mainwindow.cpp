@@ -11,28 +11,30 @@
 #include <cassert>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+	QMainWindow(parent),
+	ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
 	config = new KdeConnectConfig();
 
 	ui->lineEditMyName->setText(config->name());
 #ifdef QT_DEBUG
-    ui->plainTextEditDebug->setHidden(false);
-    ui->radioButtonLog->setChecked(true);
+	ui->plainTextEditDebug->setHidden(false);
+	ui->radioButtonLog->setChecked(true);
 	ui->pushButtonQcaInfo->setHidden(false);
 	ui->pushButtonSettingInfo->setHidden(false);
 #else
-    ui->plainTextEditDebug->setHidden(true);
-    ui->radioButtonLog->setChecked(false);
+	ui->plainTextEditDebug->setHidden(true);
+	ui->radioButtonLog->setChecked(false);
 	ui->pushButtonQcaInfo->setHidden(true);
 	ui->pushButtonSettingInfo->setHidden(true);
 #endif
 
 	// Signal/Slots connections
-    connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
+	connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
+	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
+
 }
 
 void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
@@ -58,9 +60,9 @@ void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
 	}
 	QTime now = QTime::currentTime();
 	QString formattedMessage =
-		QString::fromLatin1("%1 %2 %3")
-		.arg(now.toString("hh:mm:ss:zzz"))
-		.arg(msgTypeStr).arg(msg);
+			QString::fromLatin1("%1 %2 %3")
+			.arg(now.toString("hh:mm:ss:zzz"))
+			.arg(msgTypeStr).arg(msg);
 	// print on console:
 	fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
 	// print in debug log window
@@ -79,18 +81,18 @@ void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+	delete ui;
 }
 
 void MainWindow::on_radioButtonLog_toggled(bool checked)
 {
 	if(checked) {
-        ui->plainTextEditDebug->setHidden(false);
+		ui->plainTextEditDebug->setHidden(false);
 		ui->pushButtonQcaInfo->setHidden(false);
 		ui->pushButtonSettingInfo->setHidden(false);
 	}
 	else {
-        ui->plainTextEditDebug->setHidden(true);
+		ui->plainTextEditDebug->setHidden(true);
 		ui->pushButtonQcaInfo->setHidden(true);
 		ui->pushButtonSettingInfo->setHidden(true);
 	}
@@ -98,7 +100,7 @@ void MainWindow::on_radioButtonLog_toggled(bool checked)
 
 void MainWindow::on_pushButtonMyName_clicked()
 {
-	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonMyName clicked.");
+	ui->pushButtonMyName->setEnabled(false);
 }
 
 void MainWindow::on_pushButtonUnPair_clicked()
@@ -116,10 +118,12 @@ void MainWindow::on_pushButtonRefresh_clicked()
  * TODO: signal/slot
  *
  */
-void MainWindow::on_lineEditMyName_textChanged(const QString &arg1)
+void MainWindow::on_lineEditMyName_textChanged()
 {
-	ui->pushButtonMyName->isEnabled();
-	config->setName(ui->lineEditMyName->text());
+	if(ui->lineEditMyName->isModified()) {
+		ui->pushButtonMyName->setEnabled(true);
+		config->setName(ui->lineEditMyName->text());
+	}
 }
 
 void MainWindow::on_pushButtonQcaInfo_clicked()
@@ -130,9 +134,9 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
 	QDir bcd = config->baseConfigDir();
-	QDir dcd = config->deviceConfigDir("1234");
+	//QDir dcd = config->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MyName: " + config->name());
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MyId: " + config->deviceId());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MyId: " + QString(config->deviceId()));
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MyDeviceType: " + config->deviceType());
 }

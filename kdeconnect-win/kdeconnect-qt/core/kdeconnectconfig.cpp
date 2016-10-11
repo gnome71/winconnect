@@ -15,10 +15,13 @@
 #include <QtCrypto>
 #include <QSslCertificate>
 
+// not used
 struct KdeConnectConfigPrivate {
+	QCA::Initializer mQcaInitializer;
 
 	QCA::PrivateKey privateKey;
-	QSslCertificate certificate; // Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
+	// Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
+	QSslCertificate certificate;
 
 	QSettings* config;
 	QSettings* trusted_devices;
@@ -26,7 +29,6 @@ struct KdeConnectConfigPrivate {
 
 KdeConnectConfig::KdeConnectConfig()
 {
-	//QLoggingCategory kcQca("kc.qca");
 
 	QCA::Initializer mQcaInitializer;
 
@@ -36,13 +38,21 @@ KdeConnectConfig::KdeConnectConfig()
 	}
 
 	QSettings::setDefaultFormat(QSettings::IniFormat);
-
 	QSettings config;
 	config.sync();
 
 	//Register my own id if not there yet
 	if(!config.contains("my/id")) {
-		QString uuid = QUuid::createUuid().toString();
+		QString uuid = "";
+		QString tmpUuid = QUuid::createUuid().toString();
+		foreach(QChar c, tmpUuid) {
+			if(!c.isLetterOrNumber()) {
+				c = '_';
+				uuid += c;
+			}
+			else
+				uuid += c;
+		}
 		config.setValue("my/id", uuid);
 		config.sync();
 		qCDebug(kcQca) << "My id:" << uuid;
@@ -59,10 +69,55 @@ KdeConnectConfig::KdeConnectConfig()
 
 	// Register my own deviceType as Desktop hardcoded
 	if (!config.contains("my/deviceType")) {
-		QString deviceType = "Desktop";
+		QString deviceType = "desktop";
 		qCDebug(kcQca) << "My deviceType: " << deviceType;
 		config.setValue("my/deviceType", deviceType);
 		config.sync();
+	}
+
+	// Register new private key if not there
+	QString keyPath = privateKeyPath();
+	QFile privKey(keyPath);
+	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
+		privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
+	}
+	else {
+		privateKey = QCA::KeyGenerator().createRSA(2048);
+		if(!privKey.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+			emit logMe(QtMsgType::QtCriticalMsg, "Could not store private key file: " + privKey.fileName());
+		}
+		else {
+			privKey.write(privateKey.toPEM().toLatin1());
+		}
+	}
+
+	// Register certificate if not there
+	QString certPath = certificatePath();
+	QFile cert(certPath);
+	if(cert.exists() && cert.open(QIODevice::ReadOnly)) {
+		certificate() = QSslCertificate::fromPath(certPath).at(0);
+	}
+	else {
+		QCA::CertificateOptions certificateOptions = QCA::CertificateOptions();
+		QDateTime startTime = QDateTime::currentDateTime().addYears(-1);
+		QDateTime endTime = startTime.addYears(10);
+		QCA::CertificateInfo certificateInfo;
+		certificateInfo.insert(QCA::CommonName,deviceId());
+		certificateInfo.insert(QCA::Organization, "KCW");
+		certificateInfo.insert(QCA::OrganizationalUnit,"Kde connect win");
+		certificateOptions.setInfo(certificateInfo);
+		certificateOptions.setFormat(QCA::PKCS10);
+		certificateOptions.setSerialNumber(QCA::BigInteger(10));
+		certificateOptions.setValidityPeriod(startTime, endTime);
+
+		certificate = QSslCertificate(QCA::Certificate(certificateOptions, privateKey).toPEM().toLatin1());
+
+		if(!cert.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+			emit logMe(QtMsgType::QtCriticalMsg, "Could not store certificate file: " + cert.fileName());
+		}
+		else {
+			cert.write(certificate.toPem());
+		}
 	}
 }
 
@@ -91,10 +146,10 @@ QString KdeConnectConfig::deviceType()
 QString KdeConnectConfig::privateKeyPath()
 {
 
-	return "todo";
+	return this->baseConfigDir().absoluteFilePath("privateKey.pem");
 }
 
-QCA::PrivateKey KdeConnectConfig::privateKey()
+QCA::PrivateKey KdeConnectConfig::getPrivateKey()
 {
 	qCDebug(kcQca) << "privateKey()";
 	QCA::PrivateKey privatekey;
@@ -109,7 +164,7 @@ QCA::PublicKey KdeConnectConfig::publicKey()
 
 QString KdeConnectConfig::certificatePath()
 {
-	return "todo";
+	return this->baseConfigDir().absoluteFilePath("certificate.pem");
 }
 
 //QsslCertificate KdeConnectConfig::certificate()
@@ -175,9 +230,10 @@ QDir KdeConnectConfig::baseConfigDir()
 	QSettings config;
 	config.sync();
 
-	// base configuration directory
+	// base configuration directory without filename
 	qDebug() << config.fileName();
-	QDir bcd(config.fileName());
+	QFileInfo info(config.fileName());
+	QDir bcd(info.absolutePath());
 
 	return bcd;
 }

@@ -27,10 +27,8 @@ private slots:
     void on_pushButtonMyName_clicked();
     void on_pushButtonUnPair_clicked();
     void on_pushButtonRefresh_clicked();
-    void on_lineEditMyName_textChanged(const QString &arg1);
-
+	void on_lineEditMyName_textChanged();
 	void on_pushButtonQcaInfo_clicked();
-
 	void on_pushButtonSettingInfo_clicked();
 
 private:

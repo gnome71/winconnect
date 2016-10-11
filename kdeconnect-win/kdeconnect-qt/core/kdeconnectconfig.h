@@ -6,10 +6,11 @@
 #include <QDir>
 #include <QtCrypto>
 
-class QsslCertificate;
+// TODO:
+class QSslCertificate;
 namespace QCA {
-class PrivateKey;
-class PublicKey;
+	class PrivateKey;
+	class PublicKey;
 }
 
 //! KdeConnectConfig class definition
@@ -31,11 +32,13 @@ public:
 	QString name();
 	QString deviceType();
 
+	QCA::PrivateKey privateKey;
 	QString privateKeyPath();
-	QCA::PrivateKey privateKey();
+	QCA::PrivateKey getPrivateKey();
 	QCA::PublicKey publicKey();
 	QString certificatePath();
-	//    QsslCertificate certificate();
+	QSslCertificate certificate;
+	QSslCertificate getCertificate();
 
 	void setName(QString name);
 
