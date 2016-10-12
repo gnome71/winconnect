@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
+#include "kdeconnect-version.h"
 
 #include <QtCrypto>
 #include <QLoggingCategory>
@@ -64,7 +65,7 @@ void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
 			.arg(now.toString("hh:mm:ss:zzz"))
 			.arg(msgTypeStr).arg(msg);
 	// print on console:
-	fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
+	//fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
 	// print in debug log window
 	{
 
@@ -115,7 +116,6 @@ void MainWindow::on_pushButtonRefresh_clicked()
 
 /**
  * @brief MainWindow::on_lineEditMyName_textChanged
- * TODO: signal/slot
  *
  */
 void MainWindow::on_lineEditMyName_textChanged()
@@ -133,6 +133,7 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
+	displayDebugMessage(QtMsgType::QtDebugMsg, "KdeConnect-Win Version: " + QLatin1String(KDECONNECT_VERSION_STRING));
 	QDir bcd = config->baseConfigDir();
 	//QDir dcd = config->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());

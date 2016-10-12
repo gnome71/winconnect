@@ -1,4 +1,10 @@
 project(kdeconnect-qt)
+
+set(KDECONNECT_VERSION_MAJOR 0)
+set(KDECONNECT_VERSION_MINOR 1)
+set(KDECONNECT_VERSION_PATCH 0)
+set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.${KDECONNECT_VERSION_PATCH}")
+
 cmake_minimum_required(VERSION 2.8.12)
 
 # Instruct CMake to run moc/uic automatically when needed.
@@ -34,10 +40,12 @@ if(Qca-qt5_FOUND)
     message(STATUS "Qca-qt5 found v" ${Qca-qt5_VERSION})
     get_target_property(Qca_Location qca-qt5 LOCATION)
     message(STATUS "at: " ${Qca_Location})
-    message(STATUS "includes: " ${Qca-qt5_INCLUDES})
 endif(Qca-qt5_FOUND)
 include_directories(${Qca-qt5_INCLUDES})
 add_definitions(${Qca-qt5_DEFINITIONS})
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+configure_file(kdeconnect-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/kdeconnect-version.h)
 
 # Set files
 set(SOURCES

@@ -33,7 +33,12 @@ KdeConnectConfig::KdeConnectConfig()
 	QCA::Initializer mQcaInitializer;
 
 	if(!QCA::isSupported("rsa")) {
-		emit logMe(QtMsgType::QtCriticalMsg, "RSA not supported");
+		qCDebug(kcQca) << "RSA not supported";
+		return;
+	}
+	else if(!QCA::isSupported("pkey") ||
+			!QCA::PKey::supportedIOTypes().contains(QCA::PKey::RSA)) {
+		qCDebug(kcQca) << "PKEY not supported";
 		return;
 	}
 
@@ -75,29 +80,42 @@ KdeConnectConfig::KdeConnectConfig()
 		config.sync();
 	}
 
-	// Register new private key if not there
+	// Load or register new private key if not there
 	QString keyPath = privateKeyPath();
 	QFile privKey(keyPath);
 	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
 		privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
+		qCDebug(kcQca) << "Opened private key: " << keyPath;
+		if(privateKey.isNull())
+			qCDebug(kcQca) << "load: privateKey.isNull";
 	}
 	else {
 		privateKey = QCA::KeyGenerator().createRSA(2048);
 		if(!privKey.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			emit logMe(QtMsgType::QtCriticalMsg, "Could not store private key file: " + privKey.fileName());
+			qCDebug(kcQca) << "Could not store private key file: " << privKey.fileName();
 		}
 		else {
-			privKey.write(privateKey.toPEM().toLatin1());
+			int len = privKey.write(privateKey.toPEM().toLatin1());
+			qCDebug(kcQca) << "write private key length: " << len;
 		}
 	}
 
-	// Register certificate if not there
+	publicKey = privateKey.toPublicKey();
+	if(publicKey.isNull())
+		qCDebug(kcQca) << "create; publicKey.isNull";
+
+	// Load or register certificate if not there
 	QString certPath = certificatePath();
 	QFile cert(certPath);
 	if(cert.exists() && cert.open(QIODevice::ReadOnly)) {
-		certificate() = QSslCertificate::fromPath(certPath).at(0);
+		if(!QSslCertificate::fromPath(certPath, QSsl::Pem).at(0).isNull()) {
+			certificate = QSslCertificate::fromPath(certPath).at(0);
+			qCDebug(kcQca) << "Opened Cert: " << certPath;
+		}
+		else { qCDebug(kcQca) << "Unable to open: " + certPath; }
 	}
 	else {
+		// create certificate
 		QCA::CertificateOptions certificateOptions = QCA::CertificateOptions();
 		QDateTime startTime = QDateTime::currentDateTime().addYears(-1);
 		QDateTime endTime = startTime.addYears(10);
@@ -113,11 +131,9 @@ KdeConnectConfig::KdeConnectConfig()
 		certificate = QSslCertificate(QCA::Certificate(certificateOptions, privateKey).toPEM().toLatin1());
 
 		if(!cert.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			emit logMe(QtMsgType::QtCriticalMsg, "Could not store certificate file: " + cert.fileName());
+			qCDebug(kcQca) << "Could not store certificate file: " + cert.fileName();
 		}
-		else {
-			cert.write(certificate.toPem());
-		}
+		else { cert.write(certificate.toPem()); }
 	}
 }
 
@@ -151,15 +167,13 @@ QString KdeConnectConfig::privateKeyPath()
 
 QCA::PrivateKey KdeConnectConfig::getPrivateKey()
 {
-	qCDebug(kcQca) << "privateKey()";
-	QCA::PrivateKey privatekey;
-	return privatekey;
+	return privateKey;
 }
 
-QCA::PublicKey KdeConnectConfig::publicKey()
+QCA::PublicKey KdeConnectConfig::getPublicKey()
 {
-	QCA::PublicKey pubkey;
-	return pubkey;
+	return privateKey.toPublicKey();
+	//return publicKey.toPrivateKey();
 }
 
 QString KdeConnectConfig::certificatePath()
@@ -167,10 +181,10 @@ QString KdeConnectConfig::certificatePath()
 	return this->baseConfigDir().absoluteFilePath("certificate.pem");
 }
 
-//QsslCertificate KdeConnectConfig::certificate()
-//{
-//
-//}
+QSslCertificate KdeConnectConfig::getCertificate()
+{
+	return certificate;
+}
 
 void KdeConnectConfig::setName(QString name)
 {
@@ -217,8 +231,21 @@ QString KdeConnectConfig::getDeviceProperty(QString deviceId, QString name, QStr
 QString KdeConnectConfig::getQcaInfo() {
 	QString msg = "QCA Diagnostic:\n" + QCA::pluginDiagnosticText();
 	msg += "QCA capabilities:\n" + QCA::supportedFeatures().join(", ");
+	msg += "\n";
+	msg += privateKey.toPEM().toLatin1();
+	msg += privateKey.toPublicKey().toPEM().toLatin1();
+	msg += certificate.toPem();
+	msg += "\n";
+	if(privateKey.canDecrypt())
+		msg += "privateKey canDecrypt ";
+	if(privateKey.canEncrypt())
+		msg += "canEncrypt ";
+	if(privateKey.canExport())
+		msg += "canExport ";
+	if(privateKey.canSign())
+		msg += "canSign ";
+	msg += "\n";
 	return msg;
-
 }
 
 /**
@@ -231,7 +258,6 @@ QDir KdeConnectConfig::baseConfigDir()
 	config.sync();
 
 	// base configuration directory without filename
-	qDebug() << config.fileName();
 	QFileInfo info(config.fileName());
 	QDir bcd(info.absolutePath());
 

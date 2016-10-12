@@ -5,9 +5,10 @@
 #include <QString>
 #include <QDir>
 #include <QtCrypto>
+#include <QSslCertificate>
 
 // TODO:
-class QSslCertificate;
+//class QSslCertificate;
 namespace QCA {
 	class PrivateKey;
 	class PublicKey;
@@ -35,7 +36,8 @@ public:
 	QCA::PrivateKey privateKey;
 	QString privateKeyPath();
 	QCA::PrivateKey getPrivateKey();
-	QCA::PublicKey publicKey();
+	QCA::PublicKey publicKey;
+	QCA::PublicKey getPublicKey();
 	QString certificatePath();
 	QSslCertificate certificate;
 	QSslCertificate getCertificate();
