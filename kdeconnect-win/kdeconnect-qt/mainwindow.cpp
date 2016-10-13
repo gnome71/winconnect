@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
-//#include "kdeconnect-version.h"
+#include "core/networkpackage.h"
 
 #include <QtCrypto>
 #include <QLoggingCategory>
@@ -110,6 +110,8 @@ void MainWindow::on_pushButtonUnPair_clicked()
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
+    NetworkPackage np("");
+    NetworkPackage::createIdentityPackage(&np);
 	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked");
 }
 
@@ -132,7 +134,8 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
-//TODO:	displayDebugMessage(QtMsgType::QtDebugMsg, "KdeConnect-Win Version: " + QLatin1String(KDECONNECT_VERSION_STRING));
+    QString version = QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD);
+    displayDebugMessage(QtMsgType::QtDebugMsg, "KdeConnect-Win Version: " + version);
 	QDir bcd = config->baseConfigDir();
 	//QDir dcd = config->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());
