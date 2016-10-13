@@ -1,7 +1,0 @@
-qtcreator 32bit console:
-
-D:\qca\src\openssl-1.0.2j\openssl-1.0.2j>"d:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"
-D:\qca\src\openssl-1.0.2j\openssl-1.0.2j>perl Configure debug-VC-WIN32 --prefix=D:\qca\qtcreator\ossl-debug-dll
-D:\qca\src\openssl-1.0.2j\openssl-1.0.2j>ms\do_nasm
-D:\qca\src\openssl-1.0.2j\openssl-1.0.2j>nmake -f ms\ntdll.mak
-D:\qca\src\openssl-1.0.2j\openssl-1.0.2j>nmake -f ms\ntdll.mak install

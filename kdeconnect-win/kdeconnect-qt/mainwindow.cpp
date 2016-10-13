@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
-#include "kdeconnect-version.h"
+//#include "kdeconnect-version.h"
 
 #include <QtCrypto>
 #include <QLoggingCategory>
@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	config = new KdeConnectConfig();
+    config = new KdeConnectConfig();
 
 	ui->lineEditMyName->setText(config->name());
 #ifdef QT_DEBUG
@@ -68,7 +68,6 @@ void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
 	//fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
 	// print in debug log window
 	{
-
 		bool isMainThread = QThread::currentThread() == QApplication::instance()->thread();
 		if (ui->plainTextEditDebug != 0)
 		{
@@ -133,7 +132,7 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
-	displayDebugMessage(QtMsgType::QtDebugMsg, "KdeConnect-Win Version: " + QLatin1String(KDECONNECT_VERSION_STRING));
+//TODO:	displayDebugMessage(QtMsgType::QtDebugMsg, "KdeConnect-Win Version: " + QLatin1String(KDECONNECT_VERSION_STRING));
 	QDir bcd = config->baseConfigDir();
 	//QDir dcd = config->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());
