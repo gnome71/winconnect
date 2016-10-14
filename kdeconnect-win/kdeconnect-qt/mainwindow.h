@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "core\kclogger.h"
+
+#include "core/kclogger.h"
 #include "core/kdeconnectconfig.h"
 
 namespace Ui {

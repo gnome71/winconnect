@@ -1,5 +1,5 @@
 #include "kdeconnectconfig.h"
-#include "core/kclogger.h"
+#include "kclogger.h"
 
 #include <QFile>
 #include <QDebug>

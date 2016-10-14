@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "kdeconnect-version.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
 //#include "core/networkpackage.h"
@@ -134,8 +135,8 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
-    QString version = QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD);
-    displayDebugMessage(QtMsgType::QtDebugMsg, "KdeConnect-Win Version: " + version);
+	QString versionString = QString("KdeConnect-Win Version: %1").arg(KDECONNECT_VERSION_STRING);
+	displayDebugMessage(QtMsgType::QtDebugMsg, versionString);
 	QDir bcd = config->baseConfigDir();
 	//QDir dcd = config->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());
