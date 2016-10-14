@@ -26,14 +26,14 @@ VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 SOURCES += main.cpp\
         mainwindow.cpp \
     core/kclogger.cpp \
-    core/kdeconnectconfig.cpp \
-    core/networkpackage.cpp
+	core/kdeconnectconfig.cpp
+	#core/networkpackage.cpp
 
 HEADERS  += mainwindow.h \
     core/kclogger.h \
-    core/kdeconnectconfig.h \
-    core/networkpackage.h \
-    core/networkpackagetypes.h
+	core/kdeconnectconfig.h
+	#core/networkpackage.h
+	#core/networkpackagetypes.h
 
 FORMS    += mainwindow.ui
 
