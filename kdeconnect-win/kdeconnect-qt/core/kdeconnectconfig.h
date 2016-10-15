@@ -7,7 +7,8 @@
 #include <QtCrypto>
 #include <QSslCertificate>
 
-// TODO:
+#include "core/kdeconnectcore_Export.h"
+
 //class QSslCertificate;
 namespace QCA {
 	class PrivateKey;
@@ -15,7 +16,7 @@ namespace QCA {
 }
 
 //! KdeConnectConfig class definition
-class KdeConnectConfig
+class __declspec(dllexport) KdeConnectConfig
 		: public QObject
 {
 	Q_OBJECT

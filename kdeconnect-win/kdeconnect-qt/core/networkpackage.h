@@ -21,8 +21,6 @@
 #ifndef NETWORKPACKAGE_H
 #define NETWORKPACKAGE_H
 
-#include "networkpackagetypes.h"
-
 #include <QObject>
 #include <QString>
 #include <QVariant>
@@ -31,18 +29,20 @@
 #include <QSharedPointer>
 #include <QUrl>
 
-//#include "kdeconnectcore_export.h"
+#include "core/kdeconnectcore_Export.h"
+#include "networkpackagetypes.h"
+#include "kdeconnectconfig.h"
 
 class FileTransferJob;
 
-class NetworkPackage
+class __declspec(dllexport) NetworkPackage
 {
     Q_GADGET
     Q_PROPERTY( QString id READ id WRITE setId )
     Q_PROPERTY( QString type READ type WRITE setType )
     Q_PROPERTY( QVariantMap body READ body WRITE setBody )
-    Q_PROPERTY( QVariantMap payloadTransferInfo READ payloadTransferInfo WRITE setPayloadTransferInfo )
-    Q_PROPERTY( qint64 payloadSize READ payloadSize WRITE setPayloadSize )
+	//Q_PROPERTY( QVariantMap payloadTransferInfo READ payloadTransferInfo WRITE setPayloadTransferInfo )
+	//Q_PROPERTY( qint64 payloadSize READ payloadSize WRITE setPayloadSize )
 
 public:
 
@@ -53,8 +53,8 @@ public:
 
     static void createIdentityPackage(NetworkPackage*);
 
-    QByteArray serialize() const;
-    static bool unserialize(const QByteArray& json, NetworkPackage* out);
+	QByteArray serialize() const;
+	//static bool unserialize(const QByteArray& json, NetworkPackage* out);
 
     const QString& id() const { return mId; }
     const QString& type() const { return mType; }
@@ -62,24 +62,27 @@ public:
     const QVariantMap& body() const { return mBody; }
 
     //Get and set info from body. Note that id and type can not be accessed through these.
-    template<typename T> T get(const QString& key, const T& defaultValue = {}) const {
-        return mBody.value(key,defaultValue).template value<T>(); //Important note: Awesome template syntax is awesome
-    }
-    template<typename T> void set(const QString& key, const T& value) { mBody[key] = QVariant(value); }
-    bool has(const QString& key) const { return mBody.contains(key); }
+	//template<typename T> T get(const QString& key, const T& defaultValue = {}) const {
+	//    return mBody.value(key,defaultValue).template value<T>(); //Important note: Awesome template syntax is awesome
+	//}
+	template<typename T> void set(const QString& key, const T& value) { mBody[key] = QVariant(value); }
+	//bool has(const QString& key) const { return mBody.contains(key); }
 
-    QSharedPointer<QIODevice> payload() const { return mPayload; }
-    void setPayload(const QSharedPointer<QIODevice>& device, qint64 payloadSize) { mPayload = device; mPayloadSize = payloadSize; Q_ASSERT(mPayloadSize >= -1); }
-    bool hasPayload() const { return (mPayloadSize != 0); }
-    qint64 payloadSize() const { return mPayloadSize; } //-1 means it is an endless stream
-    FileTransferJob* createPayloadTransferJob(const QUrl &destination) const;
+	//QSharedPointer<QIODevice> payload() const { return mPayload; }
+	//void setPayload(const QSharedPointer<QIODevice>& device, qint64 payloadSize) { mPayload = device; mPayloadSize = payloadSize; Q_ASSERT(mPayloadSize >= -1); }
+	bool hasPayload() const { return (mPayloadSize != 0); }
+	qint64 payloadSize() const { return mPayloadSize; } //-1 means it is an endless stream
+	//FileTransferJob* createPayloadTransferJob(const QUrl &destination) const;
 
     //To be called by a particular DeviceLink
-    QVariantMap payloadTransferInfo() const { return mPayloadTransferInfo; }
-    void setPayloadTransferInfo(const QVariantMap& map) { mPayloadTransferInfo = map; }
-    bool hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
+	//QVariantMap payloadTransferInfo() const { return mPayloadTransferInfo; }
+	//void setPayloadTransferInfo(const QVariantMap& map) { mPayloadTransferInfo = map; }
+	bool hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
 
-private:
+signals:
+	//void logMe(QtMsgType type, const QString &msg);
+
+	private:
 
     void setId(const QString& id) { mId = id; }
     void setType(const QString& t) { mType = t; }
@@ -90,9 +93,9 @@ private:
     QString mType;
     QVariantMap mBody;
 	
-    QSharedPointer<QIODevice> mPayload;
-    qint64 mPayloadSize;
-    QVariantMap mPayloadTransferInfo;
+	//QSharedPointer<QIODevice> mPayload;
+	qint64 mPayloadSize;
+	QVariantMap mPayloadTransferInfo;
 
 };
 

@@ -3,7 +3,7 @@
 #include "kdeconnect-version.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
-//#include "core/networkpackage.h"
+#include "core/networkpackage.h"
 
 #include <QtCrypto>
 #include <QLoggingCategory>
@@ -111,9 +111,12 @@ void MainWindow::on_pushButtonUnPair_clicked()
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
-//    NetworkPackage np("");
-//    NetworkPackage::createIdentityPackage(&np);
-	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked");
+	NetworkPackage np("");
+	//connect(np, &NetworkPackage::logMe, this, &MainWindow::displayDebugMessage);
+
+	NetworkPackage::createIdentityPackage(&np);
+
+	//displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked");
 }
 
 /**

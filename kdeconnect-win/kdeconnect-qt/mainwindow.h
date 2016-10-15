@@ -5,6 +5,7 @@
 
 #include "core/kclogger.h"
 #include "core/kdeconnectconfig.h"
+#include "core/networkpackage.h"
 
 namespace Ui {
 class MainWindow;

@@ -19,6 +19,7 @@
  */
 
 #include "networkpackage.h"
+#include "kclogger.h"
 //#include "core_debug.h"
 
 #include <QMetaObject>
@@ -50,27 +51,28 @@ NetworkPackage::NetworkPackage(const QString& type, const QVariantMap &body)
     : mId(QString::number(QDateTime::currentMSecsSinceEpoch()))
     , mType(type)
     , mBody(body)
-    , mPayload()
-    , mPayloadSize(0)
+//    , mPayload()
+//    , mPayloadSize(0)
 {
 }
 
 void NetworkPackage::createIdentityPackage(NetworkPackage* np)
 {
-    KdeConnectConfig* config;
-    const QString id = config->deviceId();
+	KdeConnectConfig* config = new KdeConnectConfig();
+	const QString id = config->deviceId();
     np->mId = QString::number(QDateTime::currentMSecsSinceEpoch());
     np->mType = PACKAGE_TYPE_IDENTITY;
-    np->mPayload = QSharedPointer<QIODevice>();
-    np->mPayloadSize = 0;
+	//np->mPayload = QSharedPointer<QIODevice>();
+	np->mPayloadSize = 0;
     np->set("deviceId", id);
     np->set("deviceName", config->name());
     np->set("deviceType", config->deviceType());
     np->set("protocolVersion",  NetworkPackage::ProtocolVersion);
-    np->set("incomingCapabilities", PluginLoader::instance()->incomingCapabilities());
-    np->set("outgoingCapabilities", PluginLoader::instance()->outgoingCapabilities());
+	//np->set("incomingCapabilities", PluginLoader::instance()->incomingCapabilities());
+	//np->set("outgoingCapabilities", PluginLoader::instance()->outgoingCapabilities());
 
     qCDebug(kcCore) << "createIdentityPackage" << np->serialize();
+	//emit logMe(QtMsgType::QtDebugMsg, np->serialize());
 }
 
 template<class T>
@@ -89,10 +91,10 @@ QVariantMap qobject2qvariant(const T* object)
 QByteArray NetworkPackage::serialize() const
 {
     //Object -> QVariant
-    //QVariantMap variant;
-    //variant["id"] = mId;
-    //variant["type"] = mType;
-    //variant["body"] = mBody;
+	//QVariantMap variant;
+	//variant["id"] = mId;
+	//variant["type"] = mType;
+	//variant["body"] = mBody;
     QVariantMap variant = qobject2qvariant(this);
 
     if (hasPayload()) {
@@ -135,6 +137,7 @@ void qvariant2qobject(const QVariantMap& variant, T* object)
     }
 }
 
+/*
 bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
 {
     //Json -> QVariant
@@ -170,4 +173,4 @@ FileTransferJob* NetworkPackage::createPayloadTransferJob(const QUrl &destinatio
 {
     return new FileTransferJob(payload(), payloadSize(), destination);
 }
-
+*/

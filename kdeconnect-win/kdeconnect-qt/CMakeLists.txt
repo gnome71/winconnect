@@ -13,6 +13,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(BUILD_SHARED_LIBS TRUE)
 
 set(INSTALL_TARGETS_DEFAULT_ARGS
 	RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
@@ -61,12 +62,15 @@ set(SOURCES
     mainwindow.cpp
 	core/kclogger.cpp
 	core/kdeconnectconfig.cpp
+	core/networkpackage.cpp
 )
 set(HEADERS
 	dlldefines.h
     mainwindow.h
 	core/kclogger.h
 	core/kdeconnectconfig.h
+#	core/networkpackage.h
+	core/networkpackagetypes.h
 )
 set(FORMS
     mainwindow.ui
@@ -75,6 +79,8 @@ set(RESOURCES
 	res/resources.qrc
 )
 
+# Include subdirectories
+include(GenerateExportHeader)
 add_subdirectory(core)
 
 # Build the project

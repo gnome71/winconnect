@@ -15,17 +15,19 @@
 #include <QtCrypto>
 #include <QSslCertificate>
 
+#define KDECONNECT_EXPORTS
+
 // not used
-struct KdeConnectConfigPrivate {
-	QCA::Initializer mQcaInitializer;
+//struct KdeConnectConfigPrivate {
+//	QCA::Initializer mQcaInitializer;
 
-	QCA::PrivateKey privateKey;
-	// Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
-	QSslCertificate certificate;
+//	QCA::PrivateKey privateKey;
+//	// Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
+//	QSslCertificate certificate;
 
-	QSettings* config;
-	QSettings* trusted_devices;
-};
+//	QSettings* config;
+//	QSettings* trusted_devices;
+//};
 
 KdeConnectConfig::KdeConnectConfig()
 {
