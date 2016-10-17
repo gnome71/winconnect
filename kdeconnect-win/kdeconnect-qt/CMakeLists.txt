@@ -15,12 +15,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(BUILD_SHARED_LIBS TRUE)
-
-set(INSTALL_TARGETS_DEFAULT_ARGS
-	RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
-	LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-	ARCHIVE DESTINATION "${LIB_INSTALL_DIR}" COMPONENT Devel )
+set(BUILD_SHARED_LIBS ON)
 
 # Find Qca-qt5 in build tree
 set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/qca64-debug-dll/libd/cmake/Qca-qt5)
@@ -55,7 +50,9 @@ include_directories(${Qca-qt5_INCLUDES})
 add_definitions(${Qca-qt5_DEFINITIONS})
 
 include(GenerateExportHeader)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+)
 configure_file(kdeconnect-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/kdeconnect-version.h)
 
 # Set files
@@ -66,6 +63,8 @@ set(SOURCES
 	core/deviceidhelper.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
+	core/daemon.cpp
+	core/device.cpp
 )
 set(HEADERS
 	dlldefines.h
@@ -75,7 +74,10 @@ set(HEADERS
 	core/kdeconnectconfig.h
 	core/networkpackage.h
 	core/networkpackagetypes.h
+	core/daemon.h
+	core/device.h
 )
+
 set(FORMS
     mainwindow.ui
 )

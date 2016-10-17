@@ -2,14 +2,14 @@
 #define KDECONNECTCONFIG_H
 
 #include <QObject>
-#include <QString>
+//#include <QString>
 #include <QDir>
-#include <QtCrypto>
-#include <QSslCertificate>
+//#include <QtCrypto>
+//#include <QSslCertificate>
 
-#include "core/kdeconnectcore_Export.h"
+#include "core/kdeconnectcore_export.h"
 
-//class QSslCertificate;
+class QSslCertificate;
 namespace QCA {
 	class PrivateKey;
 	class PublicKey;
@@ -22,25 +22,25 @@ class KdeConnectConfig
 	Q_OBJECT
 
 public:
-	KdeConnectConfig();
-
 	struct DeviceInfo {
 		QString deviceName;
 		QString deviceType;
 	};
+
+	static KdeConnectConfig* instance();
 
 	// our own info
 	QString deviceId();
 	QString name();
 	QString deviceType();
 
-	QCA::PrivateKey privateKey;
+	QCA::PrivateKey privateKey();
 	QString privateKeyPath();
 	QCA::PrivateKey getPrivateKey();
-	QCA::PublicKey publicKey;
+	QCA::PublicKey publicKey();
 	QCA::PublicKey getPublicKey();
 	QString certificatePath();
-	QSslCertificate certificate;
+	QSslCertificate certificate();
 	QSslCertificate getCertificate();
 
 	void setName(QString name);
@@ -59,16 +59,16 @@ public:
 	QDir deviceConfigDir(const QString &deviceId);
 	QDir pluginConfigDir(const QString &deviceId, const QString &pluginName); //Used by KdeConnectPluginConfig
 
-public slots:
+public Q_SLOTS:
 	QString getQcaInfo();
 
-signals:
+Q_SIGNALS:
 	void logMe(QtMsgType type, const QString &msg);
-	void nameChanged(QString &name);
 
 private:
+	KdeConnectConfig();
 	struct KdeConnectConfigPrivate* d;
-	QCA::Initializer mQcaInitializer;	// Note it's not being used anywhere. That's intended
+//	QCA::Initializer mQcaInitializer;	// Note it's not being used anywhere. That's intended
 };
 
 #endif // KDECONNECTCONFIG_H

@@ -54,11 +54,11 @@ NetworkPackage::NetworkPackage(const QString& type, const QVariantMap &body)
 	, mPayload()
 	, mPayloadSize(0)
 {
-	config = new KdeConnectConfig();
 }
 
 void NetworkPackage::createIdentityPackage(NetworkPackage* np)
 {
+	KdeConnectConfig* config = KdeConnectConfig::instance();
 	const QString id = config->deviceId();
     np->mId = QString::number(QDateTime::currentMSecsSinceEpoch());
     np->mType = PACKAGE_TYPE_IDENTITY;
@@ -72,7 +72,7 @@ void NetworkPackage::createIdentityPackage(NetworkPackage* np)
 	//np->set("outgoingCapabilities", PluginLoader::instance()->outgoingCapabilities());
 
 	qCDebug(kcCore) << "createIdentityPackage" << np->serialize();
-	emit logMe(QtMsgType::QtDebugMsg, np->serialize());
+	//TODO: emit logMe(QtMsgType::QtDebugMsg, np->serialize());
 }
 
 template<class T>

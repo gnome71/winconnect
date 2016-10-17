@@ -36,7 +36,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
 	KdeConnectConfig* config;
-
 };
 
 #endif // MAINWINDOW_H

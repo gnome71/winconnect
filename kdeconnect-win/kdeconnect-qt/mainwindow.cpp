@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-    config = new KdeConnectConfig();
+	config = KdeConnectConfig::instance();
 
 	ui->lineEditMyName->setText(config->name());
 #ifdef QT_DEBUG

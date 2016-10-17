@@ -25,19 +25,19 @@
 #include <QString>
 #include <QVariant>
 #include <QIODevice>
-//#include <QtCrypto>
 #include <QSharedPointer>
 #include <QUrl>
 
-#include "core/kdeconnectcore_Export.h"
+#include "core/kdeconnectcore_export.h"
 #include "networkpackagetypes.h"
 #include "kdeconnectconfig.h"
 
 class FileTransferJob;
 
 class NetworkPackage
+		: public QObject
 {
-    Q_GADGET
+	Q_OBJECT
     Q_PROPERTY( QString id READ id WRITE setId )
     Q_PROPERTY( QString type READ type WRITE setType )
     Q_PROPERTY( QVariantMap body READ body WRITE setBody )
@@ -79,7 +79,7 @@ public:
 	void setPayloadTransferInfo(const QVariantMap& map) { mPayloadTransferInfo = map; }
 	bool hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
 
-signals:
+Q_SIGNALS:
 	void logMe(QtMsgType, const QString);
 
 private:
