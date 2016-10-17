@@ -245,5 +245,5 @@ ModelManifest.xml
 
 # Own additions
 **/Generated*
-_build/
-
+_build*/
+_deploy*/
