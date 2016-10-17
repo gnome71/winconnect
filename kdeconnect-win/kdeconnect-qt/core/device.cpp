@@ -123,7 +123,7 @@ void Device::pairStatusChanged(DeviceLink::PairStatus status)
 		KdeConnectConfig::instance()->addTrustedDevice(id(), name(), type());
 	}
 
-	reloadPlugins(); //Will load/unload plugins
+	//reloadPlugins(); //Will load/unload plugins
 
 	bool isTrusted = (status == DeviceLink::Paired);
 	Q_EMIT trustedChanged(isTrusted? Trusted : NotTrusted);
@@ -175,14 +175,14 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 //		m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
 	}
 
-	reloadPlugins();
+	//reloadPlugins();
 
 	if (m_deviceLinks.size() == 1) {
 		Q_EMIT reachableStatusChanged();
 	}
 
-	connect(link, &DeviceLink::pairStatusChanged, this, &Device::pairStatusChanged);
-	connect(link, &DeviceLink::pairingError, this, &Device::pairingError);
+//	connect(link, &DeviceLink::pairStatusChanged, this, &Device::pairStatusChanged);
+//	connect(link, &DeviceLink::pairingError, this, &Device::pairingError);
 }
 
 void Device::linkDestroyed(QObject* o)
@@ -197,7 +197,7 @@ void Device::removeLink(DeviceLink* link)
 	//qCDebug(KDECONNECT_CORE) << "RemoveLink" << m_deviceLinks.size() << "links remaining";
 
 	if (m_deviceLinks.isEmpty()) {
-		reloadPlugins();
+		//reloadPlugins();
 		Q_EMIT reachableStatusChanged();
 	}
 }
@@ -219,10 +219,10 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 {
 	Q_ASSERT(np.type() != PACKAGE_TYPE_PAIR);
 	if (isTrusted()) {
-		const QList<KdeConnectPlugin*> plugins = m_pluginsByIncomingCapability.values(np.type());
-		if (plugins.isEmpty()) {
-			qWarning() << "discarding unsupported package" << np.type() << "for" << name();
-		}
+//		const QList<KdeConnectPlugin*> plugins = m_pluginsByIncomingCapability.values(np.type());
+//		if (plugins.isEmpty()) {
+//			qWarning() << "discarding unsupported package" << np.type() << "for" << name();
+//		}
 //		Q_FOREACH (KdeConnectPlugin* plugin, plugins) {
 //			plugin->receivePackage(np);
 //		}

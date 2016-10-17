@@ -32,7 +32,7 @@
 #include "backends/devicelink.h"
 
 class DeviceLink;
-class KdeConnectPlugin;
+//class KdeConnectPlugin;
 
 class Device
 	: public QObject
@@ -45,7 +45,7 @@ class Device
 	Q_PROPERTY(QString statusIconName READ statusIconName)
 	Q_PROPERTY(bool isReachable READ isReachable NOTIFY reachableStatusChanged)
 	Q_PROPERTY(bool isTrusted READ isTrusted NOTIFY trustedChanged)
-	Q_PROPERTY(QStringList supportedPlugins READ supportedPlugins NOTIFY pluginsChanged)
+//	Q_PROPERTY(QStringList supportedPlugins READ supportedPlugins NOTIFY pluginsChanged)
 
 public:
 
@@ -95,19 +95,19 @@ public:
 	Q_SCRIPTABLE QStringList availableLinks() const;
 	bool isReachable() const { return !m_deviceLinks.isEmpty(); }
 
-	Q_SCRIPTABLE QStringList loadedPlugins() const;
-	Q_SCRIPTABLE bool hasPlugin(const QString& name) const;
+//	Q_SCRIPTABLE QStringList loadedPlugins() const;
+//	Q_SCRIPTABLE bool hasPlugin(const QString& name) const;
 
-	Q_SCRIPTABLE QString pluginsConfigFile() const;
+//	Q_SCRIPTABLE QString pluginsConfigFile() const;
 
-	KdeConnectPlugin* plugin(const QString& pluginName) const;
-	void setPluginEnabled(const QString& pluginName, bool enabled);
-	bool isPluginEnabled(const QString& pluginName) const;
+	//KdeConnectPlugin* plugin(const QString& pluginName) const;
+	//void setPluginEnabled(const QString& pluginName, bool enabled);
+	//bool isPluginEnabled(const QString& pluginName) const;
 
 	void cleanUnneededLinks();
 
 	int protocolVersion() { return m_protocolVersion; }
-	QStringList supportedPlugins() const { return m_supportedPlugins.toList(); }
+	//QStringList supportedPlugins() const { return m_supportedPlugins.toList(); }
 
 public Q_SLOTS:
 	///sends a @p np package to the device
@@ -118,7 +118,7 @@ public Q_SLOTS:
 public Q_SLOTS:
 	Q_SCRIPTABLE void requestPair(); //to all links
 	Q_SCRIPTABLE void unpair(); //from all links
-	Q_SCRIPTABLE void reloadPlugins(); //from kconf
+	//Q_SCRIPTABLE void reloadPlugins(); //from kconf
 
 private Q_SLOTS:
 	void privateReceivedPackage(const NetworkPackage& np);
@@ -146,11 +146,11 @@ private: //Fields (TODO: dPointer!)
 	int m_protocolVersion;
 
 	QVector<DeviceLink*> m_deviceLinks;
-	QHash<QString, KdeConnectPlugin*> m_plugins;
+//	QHash<QString, KdeConnectPlugin*> m_plugins;
 
 	//Capabilities stuff
-	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;
-	QSet<QString> m_supportedPlugins;
+//	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;
+//	QSet<QString> m_supportedPlugins;
 };
 
 Q_DECLARE_METATYPE(Device*)

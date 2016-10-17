@@ -160,7 +160,7 @@ QString KdeConnectConfig::privateKeyPath()
 	return this->baseConfigDir().absoluteFilePath("privateKey.pem");
 }
 
-QCA::PrivateKey KdeConnectConfig::getPrivateKey()
+QCA::PrivateKey KdeConnectConfig::privateKey()
 {
 	return d->privateKey;
 }

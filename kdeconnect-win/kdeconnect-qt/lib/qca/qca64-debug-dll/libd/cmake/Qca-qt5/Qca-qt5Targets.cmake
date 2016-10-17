@@ -48,7 +48,7 @@ get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
 add_library(qca-qt5 SHARED IMPORTED)
 
 set_target_properties(qca-qt5 PROPERTIES
-	INTERFACE_INCLUDE_DIRECTORIES "C:/Users/devel/Projects/cpp/kdeconnect/kdeconnect-win/kdeconnect-qt/lib/qca/qca64-debug-dll/include/Qca-qt5/QtCrypto"
+	INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/Qca-qt5/QtCrypto"
   INTERFACE_LINK_LIBRARIES "Qt5::Core;crypt32;ws2_32"
 )
 

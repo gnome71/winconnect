@@ -36,9 +36,9 @@ public:
 
 	QCA::PrivateKey privateKey();
 	QString privateKeyPath();
-	QCA::PrivateKey getPrivateKey();
+	//QCA::PrivateKey getPrivateKey();
 	QCA::PublicKey publicKey();
-	QCA::PublicKey getPublicKey();
+	//QCA::PublicKey getPublicKey();
 	QString certificatePath();
 	QSslCertificate certificate();
 	QSslCertificate getCertificate();
