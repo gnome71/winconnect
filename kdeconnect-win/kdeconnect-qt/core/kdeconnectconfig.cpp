@@ -1,5 +1,6 @@
 #include "kdeconnectconfig.h"
 #include "kclogger.h"
+#include "deviceidhelper.h"
 
 #include <QFile>
 #include <QDebug>
@@ -14,8 +15,6 @@
 #include <QSslCertificate>
 #include <QtCrypto>
 #include <QSslCertificate>
-
-#define KDECONNECT_EXPORTS
 
 // not used
 //struct KdeConnectConfigPrivate {
@@ -51,15 +50,8 @@ KdeConnectConfig::KdeConnectConfig()
 	//Register my own id if not there yet
 	if(!config.contains("my/id")) {
 		QString uuid = "";
-		QString tmpUuid = QUuid::createUuid().toString();
-		foreach(QChar c, tmpUuid) {
-			if(!c.isLetterOrNumber()) {
-				c = '_';
-				uuid += c;
-			}
-			else
-				uuid += c;
-		}
+		uuid = QUuid::createUuid().toString();
+		DeviceIdHelper::filterNonExportableCharacters(uuid);
 		config.setValue("my/id", uuid);
 		config.sync();
 		qCDebug(kcQca) << "My id:" << uuid;

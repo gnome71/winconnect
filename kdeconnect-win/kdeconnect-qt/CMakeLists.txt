@@ -7,6 +7,8 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 
 cmake_minimum_required(VERSION 2.8.12)
 
+set(CMAKE_CXX_FLAGS "-Wno-microsoft-enum-value")
+
 # Instruct CMake to run moc/uic automatically when needed.
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -61,6 +63,7 @@ set(SOURCES
     main.cpp
     mainwindow.cpp
 	core/kclogger.cpp
+	core/deviceidhelper.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
 )
@@ -68,8 +71,9 @@ set(HEADERS
 	dlldefines.h
     mainwindow.h
 	core/kclogger.h
+	core/deviceidhelper.h
 	core/kdeconnectconfig.h
-#	core/networkpackage.h
+	core/networkpackage.h
 	core/networkpackagetypes.h
 )
 set(FORMS
@@ -78,7 +82,11 @@ set(FORMS
 set(RESOURCES
 	res/resources.qrc
 )
-
+set(DEPLOY_FILES
+	lib/libeay32.dll
+	lib/ssleay32.dll
+	lib/qca-qt5d.dll
+)
 # Include subdirectories
 include(GenerateExportHeader)
 add_subdirectory(core)
@@ -94,9 +102,23 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::Concurrent
 	qca-qt5)
 
-install(PROGRAMS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(FILES README.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+# Install targets to deploy dir
+install(TARGETS kdeconnect-qt
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+)
+install(DIRECTORY lib/crypto/ DESTINATION bin/crypto)
+install(FILES ${DEPLOY_FILES} DESTINATION bin)
+# Install targets to binary dir
+install(TARGETS kdeconnect-qt
+	RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+	LIBRARY DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib
+	ARCHIVE DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib
+)
+install(DIRECTORY lib/crypto/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/crypto)
+install(FILES ${DEPLOY_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 
 # Show all files in qtcreator projects
-add_custom_target(headers EXCLUDE_FROM_ALL ${HEADERS})
 add_custom_target(forms EXCLUDE_FROM_ALL SOURCES ${FORMS})

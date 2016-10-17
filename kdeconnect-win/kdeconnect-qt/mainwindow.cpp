@@ -39,6 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
+/**
+ * @brief MainWindow::displayDebugMessage
+ * @param type
+ * @param msg
+ */
 void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
 {
 	bool do_abort = false;
@@ -112,7 +117,7 @@ void MainWindow::on_pushButtonUnPair_clicked()
 void MainWindow::on_pushButtonRefresh_clicked()
 {
 	NetworkPackage np("");
-	//connect(np, &NetworkPackage::logMe, this, &MainWindow::displayDebugMessage);
+	connect(&np, &NetworkPackage::logMe, this, &MainWindow::displayDebugMessage);
 
 	NetworkPackage::createIdentityPackage(&np);
 

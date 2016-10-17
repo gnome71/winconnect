@@ -1,5 +1,6 @@
 /**
  * Copyright 2013 Albert Vaca <albertvaka@gmail.com>
+ * Modified for Windows by Alexander Kaspar <alexander.kaspar@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -20,7 +21,10 @@
 
 #include "networkpackage.h"
 #include "kclogger.h"
-//#include "core_debug.h"
+#include "deviceidhelper.h"
+//#include "filetransferjob.h"
+//#include "pluginloader.h"
+#include "kdeconnectconfig.h"
 
 #include <QMetaObject>
 #include <QMetaProperty>
@@ -30,10 +34,6 @@
 #include <QJsonDocument>
 #include <QDebug>
 
-//#include "dbushelper.h"
-//#include "filetransferjob.h"
-//#include "pluginloader.h"
-#include "kdeconnectconfig.h"
 
 QDebug operator<<(QDebug s, const NetworkPackage& pkg)
 {
@@ -51,18 +51,18 @@ NetworkPackage::NetworkPackage(const QString& type, const QVariantMap &body)
     : mId(QString::number(QDateTime::currentMSecsSinceEpoch()))
     , mType(type)
     , mBody(body)
-//    , mPayload()
-//    , mPayloadSize(0)
+	, mPayload()
+	, mPayloadSize(0)
 {
+	config = new KdeConnectConfig();
 }
 
 void NetworkPackage::createIdentityPackage(NetworkPackage* np)
 {
-	KdeConnectConfig* config = new KdeConnectConfig();
 	const QString id = config->deviceId();
     np->mId = QString::number(QDateTime::currentMSecsSinceEpoch());
     np->mType = PACKAGE_TYPE_IDENTITY;
-	//np->mPayload = QSharedPointer<QIODevice>();
+	np->mPayload = QSharedPointer<QIODevice>();
 	np->mPayloadSize = 0;
     np->set("deviceId", id);
     np->set("deviceName", config->name());
@@ -71,8 +71,8 @@ void NetworkPackage::createIdentityPackage(NetworkPackage* np)
 	//np->set("incomingCapabilities", PluginLoader::instance()->incomingCapabilities());
 	//np->set("outgoingCapabilities", PluginLoader::instance()->outgoingCapabilities());
 
-    qCDebug(kcCore) << "createIdentityPackage" << np->serialize();
-	//emit logMe(QtMsgType::QtDebugMsg, np->serialize());
+	qCDebug(kcCore) << "createIdentityPackage" << np->serialize();
+	emit logMe(QtMsgType::QtDebugMsg, np->serialize());
 }
 
 template<class T>
@@ -98,7 +98,7 @@ QByteArray NetworkPackage::serialize() const
     QVariantMap variant = qobject2qvariant(this);
 
     if (hasPayload()) {
-        //qCDebug(kcCore) << "Serializing payloadTransferInfo";
+		qCDebug(kcCore) << "Serializing payloadTransferInfo";
         variant["payloadSize"] = payloadSize();
         variant["payloadTransferInfo"] = mPayloadTransferInfo;
     }
@@ -137,7 +137,7 @@ void qvariant2qobject(const QVariantMap& variant, T* object)
     }
 }
 
-/*
+
 bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
 {
     //Json -> QVariant
@@ -161,7 +161,7 @@ bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
     if (np->mBody.contains("deviceId"))
     {
         QString deviceId = np->get<QString>("deviceId");
-        DbusHelper::filterNonExportableCharacters(deviceId);
+		DeviceIdHelper::filterNonExportableCharacters(deviceId);
         np->set("deviceId", deviceId);
     }
 
@@ -169,6 +169,7 @@ bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
 
 }
 
+/*
 FileTransferJob* NetworkPackage::createPayloadTransferJob(const QUrl &destination) const
 {
     return new FileTransferJob(payload(), payloadSize(), destination);

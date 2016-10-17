@@ -1,11 +1,13 @@
 set(SOURCES
 	kclogger.cpp
 	kdeconnectconfig.cpp
+	deviceidhelper.cpp
 )
 
 set(HEADERS
 	kclogger.h
 	kdeconnectconfig.h
+	deviceidhelper.h
 )
 
 # Allow the developer to select if Dynamic or Static libraries are built
@@ -32,3 +34,8 @@ GENERATE_EXPORT_HEADER( kdeconnectcore
 #			 STATIC_DEFINE KDECONNECTCORE_BUILT_AS_STATIC
 )
 
+install(TARGETS kdeconnectcore
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+)

@@ -16,7 +16,7 @@ namespace QCA {
 }
 
 //! KdeConnectConfig class definition
-class __declspec(dllexport) KdeConnectConfig
+class KdeConnectConfig
 		: public QObject
 {
 	Q_OBJECT
