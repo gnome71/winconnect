@@ -16,7 +16,7 @@ namespace QCA {
 }
 
 //! KdeConnectConfig class definition
-class KdeConnectConfig
+class  KdeConnectConfig
 		: public QObject
 {
 	Q_OBJECT
