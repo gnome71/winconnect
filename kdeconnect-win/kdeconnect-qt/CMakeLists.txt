@@ -18,6 +18,7 @@ set(CMAKE_AUTORCC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_SHARED_LIBS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # Find Qca-qt5 in build tree
 set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/qca64-debug-dll/libd/cmake/Qca-qt5)
