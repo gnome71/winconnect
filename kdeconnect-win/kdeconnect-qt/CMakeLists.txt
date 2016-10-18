@@ -7,7 +7,9 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 
 cmake_minimum_required(VERSION 2.8.12)
 
-set(CMAKE_CXX_FLAGS "-Wno-microsoft-enum-value")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang --Wno-microsoft-enum-value")
+endif()
 
 # Instruct CMake to run moc/uic automatically when needed.
 set(CMAKE_AUTOMOC ON)
