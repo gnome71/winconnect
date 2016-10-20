@@ -228,6 +228,11 @@
             </disabled>
            </palette>
           </property>
+          <property name="font">
+           <font>
+            <family>Lucida Console</family>
+           </font>
+          </property>
           <property name="acceptDrops">
            <bool>false</bool>
           </property>
@@ -288,7 +293,7 @@
      <x>0</x>
      <y>0</y>
      <width>982</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

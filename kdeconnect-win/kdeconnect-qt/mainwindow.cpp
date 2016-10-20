@@ -49,24 +49,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::showDeviceIdentity(const QString &device)
 {
-	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket", device);
+	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket ", device);
 }
 
 void MainWindow::displayError(int socketError, const QString &message) {
 	switch(socketError) {
 	case QAbstractSocket::HostNotFoundError:
-		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket", "Host not found.");
+		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket ", "Host not found.");
 		break;
 	case QAbstractSocket::ConnectionRefusedError:
-		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket", "Connection refused.");
+		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket ", "Connection refused.");
 		break;
 	default:
-		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket", message);
+		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket ", message);
 	}
 }
 
 void MainWindow::displayStatus(QString status) {
-	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket", status);
+	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket ", status);
 }
 
 
@@ -151,7 +151,7 @@ void MainWindow::on_pushButtonRefresh_clicked()
 
 	//NetworkPackage::createIdentityPackage(&np);
 
-	//displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonRefresh clicked");
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonRefresh clicked");
 }
 
 /**
@@ -173,12 +173,14 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
+
 	QString versionString = QString("KdeConnect-Win Version: %1").arg(KDECONNECT_VERSION_STRING);
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", versionString);
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", versionString);
 	QDir bcd = config->baseConfigDir();
-	//QDir dcd = config->deviceConfigDir("1234");
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "BaseConfigDir: " + bcd.path());
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "MyName: " + config->name());
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "MyId: " + QString(config->deviceId()));
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "MyDeviceType: " + config->deviceType());
+	QDir dcd = config->deviceConfigDir("1234");
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "BaseConfigDir: " + bcd.path());
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "DeviceConfigDir: " + dcd.path());
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyName: " + config->name());
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyId: " + QString(config->deviceId()));
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyDeviceType: " + config->deviceType());
 }

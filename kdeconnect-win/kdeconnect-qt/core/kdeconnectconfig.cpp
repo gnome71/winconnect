@@ -17,7 +17,6 @@
 #include <QSslCertificate>
 
 
-
 struct KdeConnectConfigPrivate {
 	QCA::Initializer mQcaInitializer;
 
@@ -29,17 +28,9 @@ struct KdeConnectConfigPrivate {
 	//QSettings* config;
 	QSettings* trusted_devices;
 };
-/*
-KdeConnectConfig* KdeConnectConfig::instance()
-{
-	static KdeConnectConfig* kcc = new KdeConnectConfig();
-	return kcc;
-}
-*/
 
 KdeConnectConfig::KdeConnectConfig()
 {
-
 	//QCA::Initializer mQcaInitializer;
 
 	if(!QCA::isSupported("rsa")) {

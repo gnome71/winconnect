@@ -26,18 +26,14 @@ public:
 	};
 
 	KdeConnectConfig();
-//	static KdeConnectConfig* instance();
 
 	// our own info
 	QString deviceId();
 	QString name();
 	QString deviceType();
-
 	QCA::PrivateKey privateKey();
 	QString privateKeyPath();
-	//QCA::PrivateKey getPrivateKey();
 	QCA::PublicKey publicKey();
-	//QCA::PublicKey getPublicKey();
 	QString certificatePath();
 	QSslCertificate certificate();
 	QSslCertificate getCertificate();
