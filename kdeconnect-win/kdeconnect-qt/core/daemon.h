@@ -26,7 +26,6 @@
 #include <QSet>
 #include <QMap>
 
-#include "core/kdeconnectcore_export.h"
 #include "device.h"
 
 class NetworkPackage;

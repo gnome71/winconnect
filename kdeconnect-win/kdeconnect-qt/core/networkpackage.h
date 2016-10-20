@@ -28,7 +28,6 @@
 #include <QSharedPointer>
 #include <QUrl>
 
-#include "core/kdeconnectcore_export.h"
 #include "networkpackagetypes.h"
 #include "kdeconnectconfig.h"
 
@@ -47,54 +46,54 @@ class NetworkPackage
 public:
 
     //const static QCA::EncryptionAlgorithm EncryptionAlgorithm;
-    const static int ProtocolVersion;
+	const static int	ProtocolVersion;
 
-    explicit NetworkPackage(const QString& type, const QVariantMap &body = {});
+	explicit			NetworkPackage(const QString& type, const QVariantMap &body = {});
 
-    static void createIdentityPackage(NetworkPackage*);
+	void				createIdentityPackage(NetworkPackage*);
 
-	QByteArray serialize() const;
-	static bool unserialize(const QByteArray& json, NetworkPackage* out);
+	QByteArray			serialize() const;
+	static bool			unserialize(const QByteArray& json, NetworkPackage* out);
 
-    const QString& id() const { return mId; }
-    const QString& type() const { return mType; }
-    QVariantMap& body() { return mBody; }
-    const QVariantMap& body() const { return mBody; }
+	const QString&		id() const { return mId; }
+	const QString&		type() const { return mType; }
+	QVariantMap&		body() { return mBody; }
+	const QVariantMap&	body() const { return mBody; }
 
     //Get and set info from body. Note that id and type can not be accessed through these.
 	template<typename T> T get(const QString& key, const T& defaultValue = {}) const {
 		return mBody.value(key,defaultValue).template value<T>(); //Important note: Awesome template syntax is awesome
 	}
 	template<typename T> void set(const QString& key, const T& value) { mBody[key] = QVariant(value); }
-	bool has(const QString& key) const { return mBody.contains(key); }
+	bool			has(const QString& key) const { return mBody.contains(key); }
 
 	QSharedPointer<QIODevice> payload() const { return mPayload; }
-	void setPayload(const QSharedPointer<QIODevice>& device, qint64 payloadSize) { mPayload = device; mPayloadSize = payloadSize; Q_ASSERT(mPayloadSize >= -1); }
-	bool hasPayload() const { return (mPayloadSize != 0); }
-	qint64 payloadSize() const { return mPayloadSize; } //-1 means it is an endless stream
+	void			setPayload(const QSharedPointer<QIODevice>& device, qint64 payloadSize) { mPayload = device; mPayloadSize = payloadSize; Q_ASSERT(mPayloadSize >= -1); }
+	bool			hasPayload() const { return (mPayloadSize != 0); }
+	qint64			payloadSize() const { return mPayloadSize; } //-1 means it is an endless stream
 	//FileTransferJob* createPayloadTransferJob(const QUrl &destination) const;
 
     //To be called by a particular DeviceLink
-	QVariantMap payloadTransferInfo() const { return mPayloadTransferInfo; }
-	void setPayloadTransferInfo(const QVariantMap& map) { mPayloadTransferInfo = map; }
-	bool hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
+	QVariantMap		payloadTransferInfo() const { return mPayloadTransferInfo; }
+	void			setPayloadTransferInfo(const QVariantMap& map) { mPayloadTransferInfo = map; }
+	bool			hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
 
 Q_SIGNALS:
-	void logMe(QtMsgType, const QString);
+	void			logMe(QtMsgType, const QString &prefix, const QString &msg);
 
 private:
-	KdeConnectConfig* config;
+	KdeConnectConfig config;
     void setId(const QString& id) { mId = id; }
     void setType(const QString& t) { mType = t; }
     void setBody(const QVariantMap& b) { mBody = b; }
     void setPayloadSize(qint64 s) { mPayloadSize = s; }
 
-    QString mId;
-    QString mType;
+	QString		mId;
+	QString		mType;
     QVariantMap mBody;
 	
 	QSharedPointer<QIODevice> mPayload;
-	qint64 mPayloadSize;
+	qint64		mPayloadSize;
 	QVariantMap mPayloadTransferInfo;
 
 };

@@ -1,4 +1,4 @@
-#project(sharedLibs)
+project(sharedLibsDLL)
 
 # create the shared library
 add_library(shared SHARED shared.cpp)

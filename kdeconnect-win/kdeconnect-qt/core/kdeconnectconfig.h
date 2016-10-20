@@ -4,10 +4,8 @@
 #include <QObject>
 //#include <QString>
 #include <QDir>
-//#include <QtCrypto>
+#include <QtCrypto>
 //#include <QSslCertificate>
-
-#include "core/kdeconnectcore_export.h"
 
 class QSslCertificate;
 namespace QCA {
@@ -27,7 +25,8 @@ public:
 		QString deviceType;
 	};
 
-	static KdeConnectConfig* instance();
+	KdeConnectConfig();
+//	static KdeConnectConfig* instance();
 
 	// our own info
 	QString deviceId();
@@ -63,12 +62,11 @@ public Q_SLOTS:
 	QString getQcaInfo();
 
 Q_SIGNALS:
-	void logMe(QtMsgType type, const QString &msg);
+	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
 
 private:
-	KdeConnectConfig();
 	struct KdeConnectConfigPrivate* d;
-//	QCA::Initializer mQcaInitializer;	// Note it's not being used anywhere. That's intended
+	QCA::Initializer mQcaInitializer;	// Note it's not being used anywhere. That's intended
 };
 
 #endif // KDECONNECTCONFIG_H

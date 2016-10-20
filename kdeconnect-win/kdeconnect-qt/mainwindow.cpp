@@ -3,7 +3,8 @@
 #include "kdeconnect-version.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
-#include "core/networkpackage.h"
+//#include "core/networkpackage.h"
+#include "core/udplistener.h"
 
 #include <QtCrypto>
 #include <QLoggingCategory>
@@ -18,8 +19,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	config = KdeConnectConfig::instance();
+	// Access to configuration
+	KdeConnectConfig* config = new KdeConnectConfig();
 
+	// Setup GUI
 	ui->lineEditMyName->setText(config->name());
 #ifdef QT_DEBUG
 	ui->plainTextEditDebug->setHidden(false);
@@ -33,43 +36,70 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->pushButtonSettingInfo->setHidden(true);
 #endif
 
+	// Start UDP Socket watcher
+	UdpListenerThread* udpListener = new UdpListenerThread();
+
 	// Signal/Slots connections
+	connect(udpListener, SIGNAL(newIdentification(QString)), this, SLOT(displayStatus(QString)));
+	connect(udpListener, SIGNAL(error(int,QString)), this, SLOT(displayError(int,QString)));
+	connect(udpListener, SIGNAL(status(QString)), this, SLOT(displayStatus(QString)));
 	connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
-
 }
+
+void MainWindow::showDeviceIdentity(const QString &device)
+{
+	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket", device);
+}
+
+void MainWindow::displayError(int socketError, const QString &message) {
+	switch(socketError) {
+	case QAbstractSocket::HostNotFoundError:
+		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket", "Host not found.");
+		break;
+	case QAbstractSocket::ConnectionRefusedError:
+		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket", "Connection refused.");
+		break;
+	default:
+		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket", message);
+	}
+}
+
+void MainWindow::displayStatus(QString status) {
+	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket", status);
+}
+
 
 /**
  * @brief MainWindow::displayDebugMessage
  * @param type
  * @param msg
  */
-void MainWindow::displayDebugMessage(QtMsgType type, const QString &msg)
+void MainWindow::displayDebugMessage(QtMsgType type, const QString &prefix, const QString &msg)
 {
-	bool do_abort = false;
-	const char* msgTypeStr = NULL;
+	const char* msgTypeStr = "";
 	switch (type) {
+	case QtInfoMsg:
+		msgTypeStr = "[I]";
+		break;
 	case QtDebugMsg:
-		msgTypeStr = "Debug";
+		msgTypeStr = "[D]";
 		break;
 	case QtWarningMsg:
-		msgTypeStr = "Warning";
+		msgTypeStr = "[W]";
 		break;
 	case QtCriticalMsg:
-		msgTypeStr = "Critical";
+		msgTypeStr = "[C]";
 		break;
 	case QtFatalMsg:
-		msgTypeStr = "Fatal";
-		do_abort = true;
-	default:
-		assert(0);
-		return;
+		msgTypeStr = "[E]";
+		break;
 	}
 	QTime now = QTime::currentTime();
 	QString formattedMessage =
-			QString::fromLatin1("%1 %2 %3")
+			QString::fromLatin1("%1 %2 %3 %4")
 			.arg(now.toString("hh:mm:ss:zzz"))
-			.arg(msgTypeStr).arg(msg);
+			.arg(prefix).arg(msgTypeStr).arg(msg);
 	// print on console:
 	//fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
 	// print in debug log window
@@ -111,17 +141,17 @@ void MainWindow::on_pushButtonMyName_clicked()
 
 void MainWindow::on_pushButtonUnPair_clicked()
 {
-	displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonUnPair clicked.");
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonUnPair clicked.");
 }
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
-	NetworkPackage np("");
-	connect(&np, &NetworkPackage::logMe, this, &MainWindow::displayDebugMessage);
+	//NetworkPackage np("");
+	//connect(&np, &NetworkPackage::logMe, this, &MainWindow::displayDebugMessage);
 
-	NetworkPackage::createIdentityPackage(&np);
+	//NetworkPackage::createIdentityPackage(&np);
 
-	//displayDebugMessage(QtMsgType::QtDebugMsg, "pushButtonRefresh clicked");
+	//displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonRefresh clicked");
 }
 
 /**
@@ -138,17 +168,17 @@ void MainWindow::on_lineEditMyName_textChanged()
 
 void MainWindow::on_pushButtonQcaInfo_clicked()
 {
-	displayDebugMessage(QtMsgType::QtDebugMsg, config->getQcaInfo());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", config->getQcaInfo());
 }
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
 	QString versionString = QString("KdeConnect-Win Version: %1").arg(KDECONNECT_VERSION_STRING);
-	displayDebugMessage(QtMsgType::QtDebugMsg, versionString);
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", versionString);
 	QDir bcd = config->baseConfigDir();
 	//QDir dcd = config->deviceConfigDir("1234");
-	displayDebugMessage(QtMsgType::QtDebugMsg, "BaseConfigDir: " + bcd.path());
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MyName: " + config->name());
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MyId: " + QString(config->deviceId()));
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MyDeviceType: " + config->deviceType());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "BaseConfigDir: " + bcd.path());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "MyName: " + config->name());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "MyId: " + QString(config->deviceId()));
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "MyDeviceType: " + config->deviceType());
 }

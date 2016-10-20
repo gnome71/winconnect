@@ -66,8 +66,9 @@ set(SOURCES
 	core/deviceidhelper.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
-	core/daemon.cpp
-	core/device.cpp
+	core/udplistener.cpp
+	#	core/daemon.cpp
+#	core/device.cpp
 )
 set(HEADERS
 	dlldefines.h
@@ -77,8 +78,9 @@ set(HEADERS
 	core/kdeconnectconfig.h
 	core/networkpackage.h
 	core/networkpackagetypes.h
-	core/daemon.h
-	core/device.h
+	core/udplistener.h
+	#	core/daemon.h
+#	core/device.h
 )
 
 set(FORMS
@@ -93,7 +95,6 @@ set(DEPLOY_FILES
 	lib/qca-qt5d.dll
 )
 # Include subdirectories
-include(GenerateExportHeader)
 add_subdirectory(core)
 
 # Build the project

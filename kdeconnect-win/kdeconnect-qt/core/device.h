@@ -29,7 +29,6 @@
 #include <QSet>
 
 #include "networkpackage.h"
-#include "backends/devicelink.h"
 
 class DeviceLink;
 //class KdeConnectPlugin;
