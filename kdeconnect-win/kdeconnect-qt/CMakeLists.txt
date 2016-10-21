@@ -63,13 +63,15 @@ set(SOURCES
     main.cpp
     mainwindow.cpp
 	core/kclogger.cpp
+	core/device.cpp
 	core/deviceidhelper.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
 	core/udplistener.cpp
-	#	core/daemon.cpp
-#	core/device.cpp
-)
+	core/backends/linkprovider.cpp
+	core/backends/devicelink.cpp
+	core/backends/pairinghandler.cpp
+	)
 set(HEADERS
 	dlldefines.h
     mainwindow.h

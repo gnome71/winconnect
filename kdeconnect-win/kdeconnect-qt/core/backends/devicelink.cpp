@@ -19,17 +19,20 @@
  */
 
 #include "devicelink.h"
-#include "kdeconnectconfig.h"
+#include "core/kdeconnectconfig.h"
 #include "linkprovider.h"
 
 DeviceLink::DeviceLink(const QString& deviceId, LinkProvider* parent)
     : QObject(parent)
-    , mPrivateKey(KdeConnectConfig::instance()->privateKey())
+//	, mPrivateKey(KdeConnectConfig::privateKey())
     , mDeviceId(deviceId)
     , mLinkProvider(parent)
     , mPairStatus(NotPaired)
 {
     Q_ASSERT(!deviceId.isEmpty());
+
+	KdeConnectConfig config;
+	mPrivateKey = config.privateKey();
 
     setProperty("deviceId", deviceId);
 }
