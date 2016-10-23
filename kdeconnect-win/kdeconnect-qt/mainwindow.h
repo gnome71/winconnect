@@ -41,7 +41,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 	KdeConnectConfig* config;
-	//UdpListenerThread udpListener;
+	UdpListenerThread* udpListener;
 };
 
 #endif // MAINWINDOW_H

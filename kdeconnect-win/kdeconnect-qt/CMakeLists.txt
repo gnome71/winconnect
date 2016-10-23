@@ -64,23 +64,13 @@ set(SOURCES
     mainwindow.cpp
 	core/kclogger.cpp
 	core/deviceidhelper.cpp
+	core/device.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
 	core/udplistener.cpp
-	#	core/daemon.cpp
-#	core/device.cpp
-)
-set(HEADERS
-	dlldefines.h
-    mainwindow.h
-	core/kclogger.h
-	core/deviceidhelper.h
-	core/kdeconnectconfig.h
-	core/networkpackage.h
-	core/networkpackagetypes.h
-	core/udplistener.h
-	#	core/daemon.h
-#	core/device.h
+	core/backends/devicelink.cpp
+	core/backends/lan/server.cpp
+#	core/daemon.cpp
 )
 
 set(FORMS
@@ -124,7 +114,6 @@ install(TARGETS kdeconnect-qt
 )
 install(DIRECTORY lib/crypto/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/crypto)
 install(FILES ${DEPLOY_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 
 # Show all files in qtcreator projects
 add_custom_target(forms EXCLUDE_FROM_ALL SOURCES ${FORMS})

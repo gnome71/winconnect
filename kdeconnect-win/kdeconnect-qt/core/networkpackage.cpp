@@ -58,20 +58,22 @@ NetworkPackage::NetworkPackage(const QString& type, const QVariantMap &body)
 
 void NetworkPackage::createIdentityPackage(NetworkPackage* np)
 {
-	const QString id = config.deviceId();
+	const QString id = KdeConnectConfig::deviceId();
     np->mId = QString::number(QDateTime::currentMSecsSinceEpoch());
     np->mType = PACKAGE_TYPE_IDENTITY;
 	np->mPayload = QSharedPointer<QIODevice>();
 	np->mPayloadSize = 0;
     np->set("deviceId", id);
-	np->set("deviceName", config.name());
-	np->set("deviceType", config.deviceType());
+	np->set("deviceName", KdeConnectConfig::name());
+	np->set("deviceType", KdeConnectConfig::deviceType());
     np->set("protocolVersion",  NetworkPackage::ProtocolVersion);
-	//np->set("incomingCapabilities", PluginLoader::instance()->incomingCapabilities());
-	//np->set("outgoingCapabilities", PluginLoader::instance()->outgoingCapabilities());
+	//TODO:
+	QStringList tmpList;
+	tmpList << "kdeconnect.ping";
+	np->set("incomingCapabilities", tmpList);
+	np->set("outgoingCapabilities", tmpList);
 
-	qCDebug(kcCore) << "createIdentityPackage" << np->serialize();
-	//TODO: emit logMe(QtMsgType::QtDebugMsg, np->serialize());
+	//qDebug() << "createIdentityPackage" << np;
 }
 
 template<class T>
@@ -94,7 +96,7 @@ QByteArray NetworkPackage::serialize() const
 	//variant["id"] = mId;
 	//variant["type"] = mType;
 	//variant["body"] = mBody;
-    QVariantMap variant = qobject2qvariant(this);
+	QVariantMap variant = qobject2qvariant(this);
 
     if (hasPayload()) {
 		qCDebug(kcCore) << "Serializing payloadTransferInfo";
@@ -106,11 +108,11 @@ QByteArray NetworkPackage::serialize() const
     auto jsonDocument = QJsonDocument::fromVariant(variant);
     QByteArray json = jsonDocument.toJson(QJsonDocument::Compact);
     if (json.isEmpty()) {
-        qCDebug(kcCore) << "Serialization error:";
+		qDebug() << "Serialization error:";
     } else {
-        /*if (!isEncrypted()) {
-            //qCDebug(kcCore) << "Serialized package:" << json;
-        }*/
+		//if (!isEncrypted()) {
+		//	qDebug() << "Serialized package:" << json;
+		//}
         json.append('\n');
     }
 
@@ -124,14 +126,14 @@ void qvariant2qobject(const QVariantMap& variant, T* object)
     {
         const int propertyIndex = T::staticMetaObject.indexOfProperty(iter.key().toLatin1());
         if (propertyIndex < 0) {
-            qCWarning(kcCore) << "missing property" << object << iter.key();
+			qWarning(kcCore) << "missing property" << object << iter.key();
             continue;
         }
 
         QMetaProperty property = T::staticMetaObject.property(propertyIndex);
         bool ret = property.writeOnGadget(object, *iter);
         if (!ret) {
-            qCWarning(kcCore) << "couldn't set" << object << "->" << property.name() << '=' << *iter;
+			qWarning(kcCore) << "couldn't set" << object << "->" << property.name() << '=' << *iter;
         }
     }
 }
@@ -143,7 +145,7 @@ bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
     QJsonParseError parseError;
     auto parser = QJsonDocument::fromJson(a, &parseError);
     if (parser.isNull()) {
-        qCDebug(kcCore) << "Unserialization error:" << parseError.errorString();
+		qDebug(kcCore) << "Unserialization error:" << parseError.errorString();
         return false;
     }
 

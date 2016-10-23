@@ -46,12 +46,18 @@ static void warn(const QString &info)
 	qWarning() << "Device pairing error" << info;
 }
 
+/**
+ * @brief Device::Device known, trusted but waiting for link
+ * @param parent
+ * @param id
+ */
 Device::Device(QObject* parent, const QString& id)
 	: QObject(parent)
 	, m_deviceId(id)
 	, m_protocolVersion(NetworkPackage::ProtocolVersion) //We don't know it yet
 {
-	KdeConnectConfig::DeviceInfo info = KdeConnectConfig::instance()->getTrustedDevice(id);
+	KdeConnectConfig* config = new KdeConnectConfig();
+	KdeConnectConfig::DeviceInfo info = config->getTrustedDevice(id);
 
 	m_deviceName = info.deviceName;
 	m_deviceType = str2type(info.deviceType);
@@ -65,6 +71,12 @@ Device::Device(QObject* parent, const QString& id)
 	connect(this, &Device::pairingError, this, &warn);
 }
 
+/**
+ * @brief Device::Device known but not trusted
+ * @param parent
+ * @param identityPackage
+ * @param dl
+ */
 Device::Device(QObject* parent, const NetworkPackage& identityPackage, DeviceLink* dl)
 	: QObject(parent)
 	, m_deviceId(identityPackage.get<QString>("deviceId"))
@@ -103,16 +115,18 @@ void Device::requestPair()
 
 void Device::unpair()
 {
+	KdeConnectConfig* config = new KdeConnectConfig();
 	Q_FOREACH(DeviceLink* dl, m_deviceLinks) {
 		dl->userRequestsUnpair();
 	}
-	KdeConnectConfig::instance()->removeTrustedDevice(id());
+	config->removeTrustedDevice(id());
 }
 
 void Device::pairStatusChanged(DeviceLink::PairStatus status)
 {
+	KdeConnectConfig* config = new KdeConnectConfig();
 	if (status == DeviceLink::NotPaired) {
-		KdeConnectConfig::instance()->removeTrustedDevice(id());
+		config->removeTrustedDevice(id());
 
 		Q_FOREACH(DeviceLink* dl, m_deviceLinks) {
 			if (dl != sender()) {
@@ -120,7 +134,7 @@ void Device::pairStatusChanged(DeviceLink::PairStatus status)
 			}
 		}
 	} else {
-		KdeConnectConfig::instance()->addTrustedDevice(id(), name(), type());
+		config->addTrustedDevice(id(), name(), type());
 	}
 
 	//reloadPlugins(); //Will load/unload plugins
@@ -137,13 +151,13 @@ static bool lessThan(DeviceLink* p1, DeviceLink* p2)
 
 void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 {
-	//qCDebug(KDECONNECT_CORE) << "Adding link to" << id() << "via" << link->provider();
+	qDebug() << "Adding link to" << id() << "via" << link->provider();
 
 	Q_ASSERT(!m_deviceLinks.contains(link));
 
 	m_protocolVersion = identityPackage.get<int>("protocolVersion", -1);
 	if (m_protocolVersion != NetworkPackage::ProtocolVersion) {
-		qCWarning(kcCore) << m_deviceName << "- warning, device uses a different protocol version" << m_protocolVersion << "expected" << NetworkPackage::ProtocolVersion;
+		qWarning() << m_deviceName << "- warning, device uses a different protocol version" << m_protocolVersion << "expected" << NetworkPackage::ProtocolVersion;
 	}
 
 	connect(link, SIGNAL(destroyed(QObject*)),
@@ -235,7 +249,8 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 
 bool Device::isTrusted() const
 {
-	return KdeConnectConfig::instance()->trustedDevices().contains(id());
+	KdeConnectConfig* config = new KdeConnectConfig();
+	return config->trustedDevices().contains(id());
 }
 
 QStringList Device::availableLinks() const
@@ -285,7 +300,6 @@ QString Device::statusIconName() const
 
 QString Device::iconName() const
 {
-
 	return iconForStatus(true, false);
 }
 
@@ -314,16 +328,17 @@ void Device::setName(const QString &name)
 
 QString Device::encryptionInfo() const
 {
+	KdeConnectConfig* config = new KdeConnectConfig();
 	QString result;
 	QCryptographicHash::Algorithm digestAlgorithm = QCryptographicHash::Algorithm::Sha1;
 
-	QString localSha1 = QString::fromLatin1(KdeConnectConfig::instance()->certificate().digest(digestAlgorithm).toHex());
+	QString localSha1 = QString::fromLatin1(config->certificate().digest(digestAlgorithm).toHex());
 	for (int i=2 ; i<localSha1.size() ; i+=3) {
 		localSha1.insert(i, ':'); // Improve readability
 	}
 	result += "SHA1 fingerprint of your device certificate is: %1\n", localSha1;
 
-	std::string  remotePem = KdeConnectConfig::instance()->getDeviceProperty(id(), "certificate").toStdString();
+	std::string  remotePem = config->getDeviceProperty(id(), "certificate").toStdString();
 	QSslCertificate remoteCertificate = QSslCertificate(QByteArray(remotePem.c_str(), remotePem.size()));
 	QString remoteSha1 = QString::fromLatin1(remoteCertificate.digest(digestAlgorithm).toHex());
 	for (int i=2 ; i<remoteSha1.size() ; i+=3) {

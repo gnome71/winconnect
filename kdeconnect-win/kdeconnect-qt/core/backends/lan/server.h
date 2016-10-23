@@ -24,10 +24,8 @@
 #include <QTcpServer>
 #include <QSslSocket>
 
-#include "kdeconnectcore_export.h"
-
 // This class overrides QTcpServer to bind QSslSocket to native socket descriptor instead of QTcpSocket
-class KDECONNECTCORE_EXPORT Server
+class Server
     : public QTcpServer
 {
 

@@ -29,6 +29,7 @@
 #include <QSet>
 
 #include "networkpackage.h"
+#include "backends/devicelink.h"
 
 class DeviceLink;
 //class KdeConnectPlugin;
@@ -145,6 +146,7 @@ private: //Fields (TODO: dPointer!)
 	int m_protocolVersion;
 
 	QVector<DeviceLink*> m_deviceLinks;
+
 //	QHash<QString, KdeConnectPlugin*> m_plugins;
 
 	//Capabilities stuff

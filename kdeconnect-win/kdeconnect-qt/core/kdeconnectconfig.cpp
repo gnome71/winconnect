@@ -26,7 +26,7 @@ struct KdeConnectConfigPrivate {
 	QSslCertificate certificate;
 
 	//QSettings* config;
-	QSettings* trusted_devices;
+	//QSettings* trusted_devices;
 };
 
 KdeConnectConfig::KdeConnectConfig()
@@ -45,6 +45,8 @@ KdeConnectConfig::KdeConnectConfig()
 
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 	QSettings config;
+	QSettings trusted_devices;
+
 	config.sync();
 
 	//Register my own id if not there yet
@@ -80,7 +82,7 @@ KdeConnectConfig::KdeConnectConfig()
 	QCA::PrivateKey privateKey;
 	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
 		privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
-		qCDebug(kcQca) << "Opened private key: " << keyPath;
+		//qCDebug(kcQca) << "Opened private key: " << keyPath;
 		if(privateKey.isNull())
 			qCDebug(kcQca) << "load: privateKey.isNull";
 		privKey.close();
@@ -92,14 +94,10 @@ KdeConnectConfig::KdeConnectConfig()
 		}
 		else {
 			int len = privKey.write(privateKey.toPEM().toLatin1());
-			qCDebug(kcQca) << "write private key length: " << len;
+			qCDebug(kcQca) << "Created private key with length: " << len;
 			privKey.close();
 		}
 	}
-
-	//publicKey = privateKey.toPublicKey();
-	//if(d->publicKey.isNull())
-	//	qCDebug(kcQca) << "create; publicKey.isNull";
 
 	// Load or register certificate if not there
 	QString certPath = certificatePath();
@@ -108,7 +106,7 @@ KdeConnectConfig::KdeConnectConfig()
 	if(cert.exists() && cert.open(QIODevice::ReadOnly)) {
 		if(!QSslCertificate::fromPath(certPath, QSsl::Pem).at(0).isNull()) {
 			certificate = QSslCertificate::fromPath(certPath).at(0);
-			qCDebug(kcQca) << "Opened Cert: " << certPath;
+			//qCDebug(kcQca) << "Opened Cert: " << certPath;
 		}
 		else { qCDebug(kcQca) << "Unable to open: " + certPath; }
 
@@ -164,7 +162,6 @@ QString KdeConnectConfig::deviceType()
 
 QString KdeConnectConfig::privateKeyPath()
 {
-
 	return this->baseConfigDir().absoluteFilePath("privateKey.pem");
 }
 
@@ -174,7 +171,7 @@ QCA::PrivateKey KdeConnectConfig::privateKey()
 	QCA::PrivateKey pk;
 	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
 		pk = QCA::PrivateKey::fromPEM(privKey.readAll());
-		qCDebug(kcQca) << "Opened private key: " << privateKeyPath();
+		//qCDebug(kcQca) << "Opened private key: " << privateKeyPath();
 		if(pk.isNull())
 			qCDebug(kcQca) << "load: privateKey.isNull";
 	}
@@ -188,7 +185,7 @@ QCA::PublicKey KdeConnectConfig::publicKey()
 	QCA::PrivateKey privateKey;
 	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
 		privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
-		qCDebug(kcQca) << "Opened private key: " << privateKeyPath();
+		//qCDebug(kcQca) << "Opened private key: " << privateKeyPath();
 		if(privateKey.isNull())
 			qCDebug(kcQca) << "load: privateKey.isNull";
 	}
@@ -208,7 +205,7 @@ QSslCertificate KdeConnectConfig::certificate()
 	if(cert.exists() && cert.open(QIODevice::ReadOnly)) {
 		if(!QSslCertificate::fromPath(certificatePath(), QSsl::Pem).at(0).isNull()) {
 			certificate = QSslCertificate::fromPath(certificatePath()).at(0);
-			qCDebug(kcQca) << "Opened Cert: " << certificatePath();
+			//qCDebug(kcQca) << "Opened Cert: " << certificatePath();
 		}
 		else { qCDebug(kcQca) << "Unable to open: " + certificatePath(); }
 
@@ -227,59 +224,64 @@ void KdeConnectConfig::setName(QString name)
 
 QStringList KdeConnectConfig::trustedDevices()
 {
-	//TODO:
-	const QStringList& list = d->trusted_devices->childGroups();
+	QSettings trusted_devices;
+	trusted_devices.sync();
+	const QStringList& list = trusted_devices.childGroups();
 	return list;
 }
 
 void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, const QString &type)
 {
-	//TODO:
-	d->trusted_devices->beginGroup(id);
-	d->trusted_devices->setValue("name", name);
-	d->trusted_devices->setValue("type", type);
-	d->trusted_devices->endGroup();
-	d->trusted_devices->sync();
+	QSettings trusted_devices;
+	trusted_devices.sync();
+	trusted_devices.beginGroup("trustedDevices");
+	trusted_devices.setValue("id/name", name);
+	trusted_devices.setValue("id/type", type);
+	trusted_devices.endGroup();
 
 	QDir().mkpath(deviceConfigDir(id).path());
 }
 
 KdeConnectConfig::DeviceInfo KdeConnectConfig::getTrustedDevice(const QString &id)
 {
-	//TODO:
-	d->trusted_devices->beginGroup(id);
+	QSettings trusted_devices;
+	trusted_devices.sync();
+	trusted_devices.beginGroup("trustedDevices");
 	KdeConnectConfig::DeviceInfo info;
-	info.deviceName = d->trusted_devices->value("name", QLatin1String("unnamed")).toString();
-	info.deviceType = d->trusted_devices->value("type", QLatin1String("unknown")).toString();
-	d->trusted_devices->endGroup();
+	info.deviceName = trusted_devices.value("id/name", QLatin1String("unnamed")).toString();
+	info.deviceType = trusted_devices.value("id/type", QLatin1String("unknown")).toString();
+	trusted_devices.endGroup();
 
 	return info;
 }
 
 void KdeConnectConfig::removeTrustedDevice(const QString &deviceId)
 {
-	//TODO:
-	d->trusted_devices->remove(deviceId);
-	d->trusted_devices->sync();
+	QSettings trusted_devices;
+	trusted_devices.sync();
+	trusted_devices.remove(deviceId);
+	trusted_devices.sync();
 	// We do not remove the config files
 }
 
 void KdeConnectConfig::setDeviceProperty(QString deviceId, QString key, QString value)
 {
-	//TODO:
-	d->trusted_devices->beginGroup(deviceId);
-	d->trusted_devices->setValue(key, value);
-	d->trusted_devices->endGroup();
-	d->trusted_devices->sync();
+	QSettings trusted_devices;
+	trusted_devices.sync();
+	trusted_devices.beginGroup("trustedDevices");
+	trusted_devices.setValue("deviceId/" + key, value);
+	trusted_devices.endGroup();
+	trusted_devices.sync();
 }
 
 QString KdeConnectConfig::getDeviceProperty(QString deviceId, QString key, QString defaultValue)
 {
-	//TODO::
+	QSettings trusted_devices;
+	trusted_devices.sync();
 	QString value;
-	d->trusted_devices->beginGroup(deviceId);
-	value = d->trusted_devices->value(key, defaultValue).toString();
-	d->trusted_devices->endGroup();
+	trusted_devices.beginGroup("trustedDevices/" + deviceId);
+	value = trusted_devices.value(key, defaultValue).toString();
+	trusted_devices.endGroup();
 	return value;
 }
 

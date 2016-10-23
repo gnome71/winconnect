@@ -36,7 +36,7 @@ class FileTransferJob;
 class NetworkPackage
 		: public QObject
 {
-	Q_OBJECT
+	Q_GADGET
     Q_PROPERTY( QString id READ id WRITE setId )
     Q_PROPERTY( QString type READ type WRITE setType )
     Q_PROPERTY( QVariantMap body READ body WRITE setBody )
@@ -50,7 +50,7 @@ public:
 
 	explicit			NetworkPackage(const QString& type, const QVariantMap &body = {});
 
-	void				createIdentityPackage(NetworkPackage*);
+	static void				createIdentityPackage(NetworkPackage*);
 
 	QByteArray			serialize() const;
 	static bool			unserialize(const QByteArray& json, NetworkPackage* out);
@@ -78,9 +78,6 @@ public:
 	void			setPayloadTransferInfo(const QVariantMap& map) { mPayloadTransferInfo = map; }
 	bool			hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
 
-Q_SIGNALS:
-	void			logMe(QtMsgType, const QString &prefix, const QString &msg);
-
 private:
 	KdeConnectConfig config;
     void setId(const QString& id) { mId = id; }
@@ -95,7 +92,6 @@ private:
 	QSharedPointer<QIODevice> mPayload;
 	qint64		mPayloadSize;
 	QVariantMap mPayloadTransferInfo;
-
 };
 
 #endif // NETWORKPACKAGE_H

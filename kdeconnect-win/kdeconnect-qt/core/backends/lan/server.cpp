@@ -20,8 +20,8 @@
 
 #include "server.h"
 
-#include "kdeconnectconfig.h"
-#include "lanlinkprovider.h"
+#include "core/kdeconnectconfig.h"
+//#include "lanlinkprovider.h"
 
 #include <QSslKey>
 #include <QSslSocket>

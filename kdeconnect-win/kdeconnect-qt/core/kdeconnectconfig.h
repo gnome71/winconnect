@@ -28,9 +28,9 @@ public:
 	KdeConnectConfig();
 
 	// our own info
-	QString deviceId();
-	QString name();
-	QString deviceType();
+	static QString deviceId();
+	static QString name();
+	static QString deviceType();
 	QCA::PrivateKey privateKey();
 	QString privateKeyPath();
 	QCA::PublicKey publicKey();
@@ -44,7 +44,7 @@ public:
 	QStringList trustedDevices(); //list of ids
 	void removeTrustedDevice(const QString &id);
 	void addTrustedDevice(const QString &id, const QString &name, const QString &type);
-	KdeConnectConfig::DeviceInfo getTrustedDevice(const QString &id);
+	static KdeConnectConfig::DeviceInfo getTrustedDevice(const QString &id);
 
 	void setDeviceProperty(QString deviceId, QString name, QString value);
 	QString getDeviceProperty(QString deviceId, QString name, QString defaultValue = QString());
