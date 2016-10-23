@@ -1,5 +1,3 @@
-# Not used
-
 project(kdeconnectcore)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -7,14 +5,19 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #add_subdirectory(backends/loopback)
 
 set(SOURCES
+#	${backends_SOURCES}
+
+#	backends/linkprovider.cpp
+#	backends/devicelink.cpp
+#	backends/pairinghandler.cpp
+
 	kclogger.cpp
 	kdeconnectconfig.cpp
 	deviceidhelper.cpp
 	networkpackage.cpp
 	udplistener.cpp
-	device.cpp
-	backends/linkprovider.cpp
-	backends/devicelink.cpp
+#	daemon.cpp
+#	device.cpp
 	)
 
 set(HEADERS
@@ -22,9 +25,8 @@ set(HEADERS
 	kdeconnectconfig.h
 	deviceidhelper.h
 	networkpackage.h
-	device.h
-	backends/linkprovider.h
-	backends/devicelink.h
+#	daemon.h
+#	device.h
 )
 
 # Create a target for the library
