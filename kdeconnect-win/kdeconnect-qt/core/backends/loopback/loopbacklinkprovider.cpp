@@ -19,7 +19,6 @@
  */
 
 #include "loopbacklinkprovider.h"
-
 #include "core/kclogger.h"
 
 LoopbackLinkProvider::LoopbackLinkProvider()

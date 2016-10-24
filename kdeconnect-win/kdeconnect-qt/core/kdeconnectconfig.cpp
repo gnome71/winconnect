@@ -1,6 +1,7 @@
 #include "kdeconnectconfig.h"
 #include "kclogger.h"
 #include "deviceidhelper.h"
+#include "daemon.h"
 
 #include <QFile>
 #include <QDebug>

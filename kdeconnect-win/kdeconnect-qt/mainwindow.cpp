@@ -4,6 +4,7 @@
 #include "kdeconnect-version.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
+#include "core/daemon.h"
 #include "core/networkpackage.h"
 #include "core/udplistener.h"
 
@@ -20,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
+	// Start daemon
+	Daemon* daemon = new Daemon(this, false);
 	// Access to configuration
 	KdeConnectConfig* config = new KdeConnectConfig();
 
@@ -41,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	udpListener = new UdpListenerThread();
 
 	// Signal/Slots connections
+	connect(daemon, SIGNAL(deviceAdded(QString)), this, SLOT(displayStatus(QString)));
 	connect(udpListener, SIGNAL(newIdentification(QString)), this, SLOT(displayStatus(QString)));
 	connect(udpListener, SIGNAL(error(int,QString)), this, SLOT(displayError(int,QString)));
 	//connect(udpListener, SIGNAL(status(QString)), this, SLOT(displayStatus(QString)));

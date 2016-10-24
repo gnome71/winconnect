@@ -48,9 +48,9 @@ public:
 
 	QList<Device*> devicesList() const;
 
-	virtual void askPairingConfirmation(PairingHandler *d) = 0;
-	virtual void reportError(const QString &title, const QString &description) = 0;
-	virtual QNetworkAccessManager* networkAccessManager();
+	void askPairingConfirmation(PairingHandler *d);
+	void reportError(const QString &title, const QString &description);
+	QNetworkAccessManager* networkAccessManager();
 
 	Device* getDevice(const QString& deviceId);
 

@@ -3,6 +3,8 @@
 
 #include "udplistener.h"
 #include "core/kdeconnectconfig.h"
+#include "core/daemon.h"
+#include "core/backends/loopback/loopbackdevicelink.h"
 
 #define MIN_VERSION_WITH_SSL_SUPPORT 6
 
@@ -159,7 +161,8 @@ void UdpListenerThread::encrypted()
 	disconnect(socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(sslErrors(QList<QSslError>)));
 
 	Q_ASSERT(socket->mode() != QSslSocket::UnencryptedMode);
-	//LanDeviceLink::ConnectionStarted connectionOrigin = (socket->mode() == QSslSocket::SslClientMode)? LanDeviceLink::Locally : LanDeviceLink::Remotely;
+
+	//TODO: LanDeviceLink::ConnectionStarted connectionOrigin = (socket->mode() == QSslSocket::SslClientMode)? LanDeviceLink::Locally : LanDeviceLink::Remotely;
 
 	NetworkPackage* receivedPackage = receivedIdentityPackages[socket].np;
 	const QString& deviceId = receivedPackage->get<QString>("deviceId");
@@ -188,10 +191,10 @@ void UdpListenerThread::sslErrors(const QList<QSslError>& errors)
 				qDebug() << "Failing due to " << error.errorString();
 				emit logMe(QtMsgType::QtCriticalMsg, "UdpListen ", "SSL error: " + error.errorString());
 				// Due to simultaneous multiple connections, it may be possible that device instance does not exist anymore
-				//Device *device = Daemon::instance()->getDevice(socket->peerVerifyName());
-				//if (device != Q_NULLPTR) {
-				//    device->unpair();
-				//}
+				Device *device = Daemon::instance()->getDevice(socket->peerVerifyName());
+				if (device != Q_NULLPTR) {
+					device->unpair();
+				}
 				break;
 			}
 			default:

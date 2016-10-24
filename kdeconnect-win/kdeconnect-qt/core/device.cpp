@@ -195,8 +195,8 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 		Q_EMIT reachableStatusChanged();
 	}
 
-//	connect(link, &DeviceLink::pairStatusChanged, this, &Device::pairStatusChanged);
-//	connect(link, &DeviceLink::pairingError, this, &Device::pairingError);
+	connect(link, &DeviceLink::pairStatusChanged, this, &Device::pairStatusChanged);
+	connect(link, &DeviceLink::pairingError, this, &Device::pairingError);
 }
 
 void Device::linkDestroyed(QObject* o)
@@ -241,7 +241,7 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 //			plugin->receivePackage(np);
 //		}
 	} else {
-		qCDebug(kcCore) << "device" << name() << "not paired, ignoring package" << np.type();
+		qDebug() << "device" << name() << "not paired, ignoring package" << np.type();
 		unpair();
 	}
 
@@ -336,7 +336,7 @@ QString Device::encryptionInfo() const
 	for (int i=2 ; i<localSha1.size() ; i+=3) {
 		localSha1.insert(i, ':'); // Improve readability
 	}
-	result += "SHA1 fingerprint of your device certificate is: %1\n", localSha1;
+	result += "SHA1 fingerprint of your device certificate is: " + localSha1 + "\n";
 
 	std::string  remotePem = config->getDeviceProperty(id(), "certificate").toStdString();
 	QSslCertificate remoteCertificate = QSslCertificate(QByteArray(remotePem.c_str(), remotePem.size()));
@@ -344,7 +344,9 @@ QString Device::encryptionInfo() const
 	for (int i=2 ; i<remoteSha1.size() ; i+=3) {
 		remoteSha1.insert(i, ':'); // Improve readability
 	}
-	result += "SHA1 fingerprint of remote device certificate is: %1\n", remoteSha1;
+	result += "SHA1 fingerprint of remote device certificate is: " + remoteSha1 + "\n";
+
+	qDebug() << "EncryptionInfo:" << result;
 
 	return result;
 }

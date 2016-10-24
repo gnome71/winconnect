@@ -19,7 +19,6 @@
  */
 
 #include "loopbackdevicelink.h"
-
 #include "loopbacklinkprovider.h"
 
 LoopbackDeviceLink::LoopbackDeviceLink(const QString& deviceId, LoopbackLinkProvider* provider)

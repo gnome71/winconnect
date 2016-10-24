@@ -65,13 +65,17 @@ set(SOURCES
 	core/kclogger.cpp
 	core/deviceidhelper.cpp
 	core/device.cpp
+	core/daemon.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
 	core/udplistener.cpp
 	core/backends/devicelink.cpp
+	core/backends/pairinghandler.cpp
+	core/backends/linkprovider.cpp
 	core/backends/lan/server.cpp
-#	core/daemon.cpp
-)
+	core/backends/loopback/loopbacklinkprovider.cpp
+	core/backends/loopback/loopbackdevicelink.cpp
+	)
 
 set(FORMS
     mainwindow.ui

@@ -59,11 +59,13 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	, d(new DaemonPrivate)
 {
 	//TODO:
-	testMode = true;
+	//testMode = true;
+
+	KdeConnectConfig* config = new KdeConnectConfig();
 
 	Q_ASSERT(!s_instance.exists());
 	*s_instance = this;
-	qCDebug(kcCore) << "KdeConnect daemon starting";
+	qDebug() << "KdeConnect daemon starting";
 
 	//Load backends
 	if (testMode)
@@ -72,7 +74,7 @@ Daemon::Daemon(QObject *parent, bool testMode)
 		;//d->mLinkProviders.insert(new LanLinkProvider());
 
 	//Read remebered paired devices
-	const QStringList& list = KdeConnectConfig::instance()->trustedDevices();
+	const QStringList& list = config->trustedDevices();
 	Q_FOREACH (const QString& id, list) {
 		Device* device = new Device(this, id);
 		connect(device, SIGNAL(reachableStatusChanged()), this, SLOT(onDeviceStatusChanged()));
@@ -92,7 +94,7 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	//QDBusConnection::sessionBus().registerService("org.kde.kdeconnect");
 	//QDBusConnection::sessionBus().registerObject("/modules/kdeconnect", this, QDBusConnection::ExportScriptableContents);
 
-	qCDebug(kcCore) << "KdeConnect daemon started";
+	qDebug() << "KdeConnect daemon started";
 }
 
 void Daemon::acquireDiscoveryMode(const QString &key)
@@ -140,7 +142,7 @@ void Daemon::cleanDevices()
 
 void Daemon::forceOnNetworkChange()
 {
-	qCDebug(kcCore) << "Sending onNetworkChange to " << d->mLinkProviders.size() << " LinkProviders";
+	qDebug() << "Sending onNetworkChange to " << d->mLinkProviders.size() << " LinkProviders";
 	Q_FOREACH (LinkProvider* a, d->mLinkProviders) {
 		a->onNetworkChange();
 	}
@@ -171,10 +173,10 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 {
 	const QString& id = identityPackage.get<QString>("deviceId");
 
-	//qCDebug(kcCore) << "Device discovered" << id << "via" << dl->provider()->name();
+	qDebug() << "Device discovered" << id << "via" << dl->provider()->name();
 
 	if (d->mDevices.contains(id)) {
-		qCDebug(kcCore) << "It is a known device" << identityPackage.get<QString>("deviceName");
+		qDebug() << "It is a known device" << identityPackage.get<QString>("deviceName");
 		Device* device = d->mDevices[id];
 		bool wasReachable = device->isReachable();
 		device->addLink(identityPackage, dl);
@@ -182,7 +184,7 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 			Q_EMIT deviceVisibilityChanged(id, true);
 		}
 	} else {
-		qCDebug(kcCore) << "It is a new device" << identityPackage.get<QString>("deviceName");
+		qDebug() << "It is a new device" << identityPackage.get<QString>("deviceName");
 		Device* device = new Device(this, identityPackage, dl);
 
 		//we discard the connections that we created but it's not paired.
@@ -202,10 +204,10 @@ void Daemon::onDeviceStatusChanged()
 {
 	Device* device = (Device*)sender();
 
-	//qCDebug(kcCore) << "Device" << device->name() << "status changed. Reachable:" << device->isReachable() << ". Paired: " << device->isPaired();
+	//qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable() << ". Paired: " << device->isPaired();
 
 	if (!device->isReachable() && !device->isTrusted()) {
-		//qCDebug(kcCore) << "Destroying device" << device->name();
+		qDebug() << "Destroying device" << device->name();
 		removeDevice(device);
 	} else {
 		Q_EMIT deviceVisibilityChanged(device->id(), device->isReachable());
@@ -215,15 +217,17 @@ void Daemon::onDeviceStatusChanged()
 
 void Daemon::setAnnouncedName(const QString &name)
 {
-	qCDebug(kcCore()) << "Announcing name";
-	KdeConnectConfig::instance()->setName(name);
+	qDebug() << "Announcing name";
+	KdeConnectConfig* config = new KdeConnectConfig();
+	config->setName(name);
 	forceOnNetworkChange();
 	Q_EMIT announcedNameChanged(name);
 }
 
 QString Daemon::announcedName()
 {
-	return KdeConnectConfig::instance()->name();
+	KdeConnectConfig* config = new KdeConnectConfig();
+	return config->name();
 }
 
 QNetworkAccessManager* Daemon::networkAccessManager()
@@ -252,6 +256,16 @@ QString Daemon::deviceIdByName(const QString &name) const
 			return d->id();
 	}
 	return {};
+}
+
+void Daemon::askPairingConfirmation(PairingHandler *d)
+{
+	qDebug() << "askPairingConfirmation()";
+}
+
+void Daemon::reportError(const QString &title, const QString &description)
+{
+	qDebug() << "Daemon: " << title << description;
 }
 
 Daemon::~Daemon()
