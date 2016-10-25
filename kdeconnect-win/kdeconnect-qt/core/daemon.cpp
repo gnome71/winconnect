@@ -25,6 +25,7 @@
 #include <QNetworkAccessManager>
 #include <QDebug>
 #include <QPointer>
+#include <QMessageBox>
 
 #include "kclogger.h"
 #include "kdeconnectconfig.h"
@@ -276,6 +277,21 @@ void Daemon::askPairingConfirmation(PairingHandler *d)
 {
 	qDebug() << "askPairingConfirmation()";
 	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", "Asking for pairing confirmation");
+
+	QMessageBox msgBox;
+	msgBox.setText("Pairing request");
+	msgBox.setInformativeText("Accept pairing?");
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Discard);
+	msgBox.setDefaultButton(QMessageBox::Ok);
+	int ret = msgBox.exec();
+	switch(ret) {
+		case QMessageBox::Ok:
+			d->acceptPairing();
+			break;
+		case QMessageBox::Discard:
+			d->rejectPairing();
+			break;
+	}
 }
 
 void Daemon::reportError(const QString &title, const QString &description)

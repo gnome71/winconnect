@@ -140,6 +140,7 @@ void MainWindow::on_pushButtonMyName_clicked()
 
 void MainWindow::on_pushButtonUnPair_clicked()
 {
+
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonUnPair clicked.");
 }
 

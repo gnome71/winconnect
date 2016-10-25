@@ -261,7 +261,7 @@ void LanLinkProvider::connected()
 
 void LanLinkProvider::encrypted()
 {
-	qDebug() << "Socket succesfully stablished an SSL connection";
+	qDebug() << "Socket succesfully established an SSL connection";
 
     QSslSocket* socket = qobject_cast<QSslSocket*>(sender());
     if (!socket) return;

@@ -235,10 +235,12 @@ void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, 
 {
 	QSettings trusted_devices;
 	trusted_devices.sync();
-	trusted_devices.beginGroup("trustedDevices");
-	trusted_devices.setValue("id/name", name);
-	trusted_devices.setValue("id/type", type);
-	trusted_devices.endGroup();
+//	trusted_devices.beginGroup("trustedDevices");
+//	trusted_devices.beginGroup(id);
+	trusted_devices.setValue(id + "/name", name);
+	trusted_devices.setValue(id + "/type", type);
+//	trusted_devices.endGroup();
+//	trusted_devices.endGroup();
 
 	QDir().mkpath(deviceConfigDir(id).path());
 }
@@ -247,11 +249,13 @@ KdeConnectConfig::DeviceInfo KdeConnectConfig::getTrustedDevice(const QString &i
 {
 	QSettings trusted_devices;
 	trusted_devices.sync();
-	trusted_devices.beginGroup("trustedDevices");
+//	trusted_devices.beginGroup("trustedDevices");
+//	trusted_devices.beginGroup(id);
 	KdeConnectConfig::DeviceInfo info;
-	info.deviceName = trusted_devices.value("id/name", QLatin1String("unnamed")).toString();
-	info.deviceType = trusted_devices.value("id/type", QLatin1String("unknown")).toString();
-	trusted_devices.endGroup();
+	info.deviceName = trusted_devices.value(id + "/name", QLatin1String("unnamed")).toString();
+	info.deviceType = trusted_devices.value(id + "/type", QLatin1String("unknown")).toString();
+//	trusted_devices.endGroup();
+//	trusted_devices.endGroup();
 
 	return info;
 }
@@ -269,9 +273,11 @@ void KdeConnectConfig::setDeviceProperty(QString deviceId, QString key, QString 
 {
 	QSettings trusted_devices;
 	trusted_devices.sync();
-	trusted_devices.beginGroup("trustedDevices");
-	trusted_devices.setValue("deviceId/" + key, value);
+//	trusted_devices.beginGroup("trustedDevices");
+	trusted_devices.beginGroup(deviceId);
+	trusted_devices.setValue(key, value);
 	trusted_devices.endGroup();
+//	trusted_devices.endGroup();
 	trusted_devices.sync();
 }
 
@@ -280,7 +286,7 @@ QString KdeConnectConfig::getDeviceProperty(QString deviceId, QString key, QStri
 	QSettings trusted_devices;
 	trusted_devices.sync();
 	QString value;
-	trusted_devices.beginGroup("trustedDevices/" + deviceId);
+	trusted_devices.beginGroup(deviceId);
 	value = trusted_devices.value(key, defaultValue).toString();
 	trusted_devices.endGroup();
 	return value;
