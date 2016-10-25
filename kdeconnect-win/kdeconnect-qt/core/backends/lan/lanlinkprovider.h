@@ -29,13 +29,12 @@
 #include <QNetworkSession>
 #include <QSslSocket>
 
-#include "kdeconnectcore_export.h"
-#include "backends/linkprovider.h"
+#include "core/backends/linkprovider.h"
 #include "server.h"
 #include "landevicelink.h"
 
 class LanPairingHandler;
-class KDECONNECTCORE_EXPORT LanLinkProvider
+class LanLinkProvider
     : public LinkProvider
 {
     Q_OBJECT

@@ -24,9 +24,9 @@
 #include <QObject>
 #include <QTimer>
 
-#include "device.h"
-#include "backends/devicelink.h"
-#include "backends/pairinghandler.h"
+#include "core/device.h"
+#include "core/backends/devicelink.h"
+#include "core/backends/pairinghandler.h"
 
 // This class is used pairing related stuff. It has direct access to links and can directly send packages
 class LanPairingHandler

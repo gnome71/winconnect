@@ -18,14 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <KLocalizedString>
-
 #include "landevicelink.h"
-#include "core_debug.h"
-#include "kdeconnectconfig.h"
-#include "backends/linkprovider.h"
-#include "uploadjob.h"
-#include "downloadjob.h"
+#include "core/kdeconnectconfig.h"
+#include "core/backends/linkprovider.h"
+//#include "uploadjob.h"
+//#include "downloadjob.h"
 #include "socketlinereader.h"
 #include "lanlinkprovider.h"
 
@@ -56,7 +53,8 @@ void LanDeviceLink::reset(QSslSocket* socket, ConnectionStarted connectionSource
 
     mConnectionSource = connectionSource;
 
-    QString certString = KdeConnectConfig::instance()->getDeviceProperty(deviceId(), "certificate");
+	KdeConnectConfig* config = new KdeConnectConfig();
+	QString certString = config->getDeviceProperty(deviceId(), "certificate");
     DeviceLink::setPairStatus(certString.isEmpty()? PairStatus::NotPaired : PairStatus::Paired);
 }
 
@@ -68,7 +66,7 @@ QString LanDeviceLink::name()
 bool LanDeviceLink::sendPackage(NetworkPackage& np)
 {
     if (np.hasPayload()) {
-        np.setPayloadTransferInfo(sendPayload(np)->transferInfo());
+		//TODO: np.setPayloadTransferInfo(sendPayload(np)->transferInfo());
     }
 
     int written = mSocketLineReader->write(np.serialize());
@@ -79,12 +77,12 @@ bool LanDeviceLink::sendPackage(NetworkPackage& np)
     return (written != -1);
 }
 
-UploadJob* LanDeviceLink::sendPayload(const NetworkPackage& np)
-{
-    UploadJob* job = new UploadJob(np.payload(), deviceId());
-    job->start();
-    return job;
-}
+//TODO: UploadJob* LanDeviceLink::sendPayload(const NetworkPackage& np)
+//{
+//    UploadJob* job = new UploadJob(np.payload(), deviceId());
+//    job->start();
+//    return job;
+//}
 
 void LanDeviceLink::dataReceived()
 {
@@ -94,7 +92,7 @@ void LanDeviceLink::dataReceived()
     NetworkPackage package(QString::null);
     NetworkPackage::unserialize(serializedPackage, &package);
 
-    //qCDebug(KDECONNECT_CORE) << "LanDeviceLink dataReceived" << serializedPackage;
+	qDebug() << "LanDeviceLink dataReceived" << serializedPackage;
 
     if (package.type() == PACKAGE_TYPE_PAIR) {
         //TODO: Handle pair/unpair requests and forward them (to the pairing handler?)
@@ -102,16 +100,16 @@ void LanDeviceLink::dataReceived()
         return;
     }
 
-    if (package.hasPayloadTransferInfo()) {
-        //qCDebug(KDECONNECT_CORE) << "HasPayloadTransferInfo";
-        QVariantMap transferInfo = package.payloadTransferInfo();
-        //FIXME: The next two lines shouldn't be needed! Why are they here?
-        transferInfo.insert("useSsl", true);
-        transferInfo.insert("deviceId", deviceId());
-        DownloadJob* job = new DownloadJob(mSocketLineReader->peerAddress(), transferInfo);
-        job->start();
-        package.setPayload(job->getPayload(), package.payloadSize());
-    }
+//TODO:    if (package.hasPayloadTransferInfo()) {
+//        //qDebug() << "HasPayloadTransferInfo";
+//        QVariantMap transferInfo = package.payloadTransferInfo();
+//        //FIXME: The next two lines shouldn't be needed! Why are they here?
+//        transferInfo.insert("useSsl", true);
+//        transferInfo.insert("deviceId", deviceId());
+//        DownloadJob* job = new DownloadJob(mSocketLineReader->peerAddress(), transferInfo);
+//        job->start();
+//        package.setPayload(job->getPayload(), package.payloadSize());
+//    }
 
     Q_EMIT receivedPackage(package);
 
@@ -124,7 +122,7 @@ void LanDeviceLink::dataReceived()
 void LanDeviceLink::userRequestsPair()
 {
     if (mSocketLineReader->peerCertificate().isNull()) {
-        Q_EMIT pairingError(i18n("This device cannot be paired because it is running an old version of KDE Connect."));
+		Q_EMIT pairingError("This device cannot be paired because it is running an old version of KDE Connect.");
     } else {
         qobject_cast<LanLinkProvider*>(provider())->userRequestsPair(deviceId());
     }
@@ -138,15 +136,16 @@ void LanDeviceLink::userRequestsUnpair()
 void LanDeviceLink::setPairStatus(PairStatus status)
 {
     if (status == Paired && mSocketLineReader->peerCertificate().isNull()) {
-        Q_EMIT pairingError(i18n("This device cannot be paired because it is running an old version of KDE Connect."));
+		Q_EMIT pairingError("This device cannot be paired because it is running an old version of KDE Connect.");
         return;
     }
 
     DeviceLink::setPairStatus(status);
     if (status == Paired) {
-        Q_ASSERT(KdeConnectConfig::instance()->trustedDevices().contains(deviceId()));
+		KdeConnectConfig* config = new KdeConnectConfig();
+		Q_ASSERT(config->trustedDevices().contains(deviceId()));
         Q_ASSERT(!mSocketLineReader->peerCertificate().isNull());
-        KdeConnectConfig::instance()->setDeviceProperty(deviceId(), "certificate", mSocketLineReader->peerCertificate().toPem());
+		config->setDeviceProperty(deviceId(), "certificate", mSocketLineReader->peerCertificate().toPem());
     }
 }
 

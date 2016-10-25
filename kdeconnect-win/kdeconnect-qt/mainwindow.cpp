@@ -40,15 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->pushButtonSettingInfo->setHidden(true);
 #endif
 
-	// Start UDP Socket watcher
-	udpListener = new UdpListenerThread();
-
 	// Signal/Slots connections
-	connect(daemon, SIGNAL(deviceAdded(QString)), this, SLOT(displayStatus(QString)));
-	connect(udpListener, SIGNAL(newIdentification(QString)), this, SLOT(displayStatus(QString)));
-	connect(udpListener, SIGNAL(error(int,QString)), this, SLOT(displayError(int,QString)));
-	//connect(udpListener, SIGNAL(status(QString)), this, SLOT(displayStatus(QString)));
-	connect(udpListener, SIGNAL(logMe(QtMsgType,QString,QString)), this, SLOT(displayDebugMessage(QtMsgType,QString,QString)));
+	connect(daemon, SIGNAL(logMe(QtMsgType,QString,QString)), this, SLOT(displayDebugMessage(QtMsgType,QString,QString)));
 	connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
 }
@@ -152,17 +145,7 @@ void MainWindow::on_pushButtonUnPair_clicked()
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
-	NetworkPackage np(QString::null);
-	NetworkPackage::createIdentityPackage(&np);
-	np.set("tcpPort", 1716);
-	qint64 bytes = udpListener->getSocket()->writeDatagram(np.serialize(), QHostAddress("255.255.255.255"), 1714);
-	if(bytes == -1)
-		displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "Write Datagram error.");
-	else {
-		QString msg = "Broadcasted " + QString::number(bytes) + " bytes to network.";
-		displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", msg);
-	}
-
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonRefresh clicked.");
 }
 
 /**

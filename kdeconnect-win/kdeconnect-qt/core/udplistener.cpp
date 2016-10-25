@@ -101,9 +101,11 @@ void UdpListenerThread::connected()
 
 	NetworkPackage* receivedPackage = receivedIdentityPackages[socket].np;
 	const QString& deviceId = receivedPackage->get<QString>("deviceId");
-	qDebug() << "Connected" << socket->isWritable();
+	qDebug() << "Connected";
+	//qDebug() << "Socket is writeable:" << socket->isWritable() ? "true" : "false";
 
-	// If network is on ssl, do not believe when they are connected, believe when handshake is completed
+	// If network is on ssl, do not believe when they are connected,
+	// believe when handshake is completed
 	NetworkPackage np2(QString::null);
 	NetworkPackage::createIdentityPackage(&np2);
 	socket->write(np2.serialize());

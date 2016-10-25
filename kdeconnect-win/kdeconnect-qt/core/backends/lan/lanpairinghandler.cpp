@@ -18,14 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <KLocalizedString>
+#include <QDebug>
 
-#include "core_debug.h"
-#include "daemon.h"
-#include "kdeconnectconfig.h"
+#include "core/daemon.h"
+#include "core/kdeconnectconfig.h"
 #include "landevicelink.h"
 #include "lanpairinghandler.h"
-#include "networkpackagetypes.h"
+#include "core/networkpackagetypes.h"
 
 LanPairingHandler::LanPairingHandler(DeviceLink* deviceLink)
     : PairingHandler(deviceLink)
@@ -46,11 +45,11 @@ void LanPairingHandler::packageReceived(const NetworkPackage& np)
 
         if (isPairRequested())  { //We started pairing
 
-            qCDebug(KDECONNECT_CORE) << "Pair answer";
+			qDebug() << "Pair answer";
             setInternalPairStatus(Paired);
             
         } else {
-            qCDebug(KDECONNECT_CORE) << "Pair request";
+			qDebug() << "Pair request";
 
             if (isPaired()) { //I'm already paired, but they think I'm not
                 acceptPairing();
@@ -63,11 +62,11 @@ void LanPairingHandler::packageReceived(const NetworkPackage& np)
 
     } else { //wantsPair == false
 
-        qCDebug(KDECONNECT_CORE) << "Unpair request";
+		qDebug() << "Unpair request";
 
         setInternalPairStatus(NotPaired);
          if (isPairRequested()) {
-            Q_EMIT pairingError(i18n("Canceled by other peer"));
+			Q_EMIT pairingError("Canceled by other peer");
         }
     }
 }
@@ -76,13 +75,13 @@ bool LanPairingHandler::requestPairing()
 {
     switch (m_status) {
         case Paired:
-            Q_EMIT pairingError(i18n("%1: Already paired", deviceLink()->name()));
+			Q_EMIT pairingError(QString("%1: Already paired").arg(deviceLink()->name()));
             return false;
         case Requested:
-            Q_EMIT pairingError(i18n("%1: Pairing already requested for this device", deviceLink()->name()));
+			Q_EMIT pairingError(QString("%1: Pairing already requested for this device").arg(deviceLink()->name()));
             return false;
         case RequestedByPeer:
-            qCDebug(KDECONNECT_CORE) << deviceLink()->name() << " : Pairing already started by the other end, accepting their request.";
+			qDebug() << deviceLink()->name() << " : Pairing already started by the other end, accepting their request.";
             acceptPairing();
             return false;
         case NotPaired:
@@ -127,7 +126,7 @@ void LanPairingHandler::pairingTimeout()
     NetworkPackage np(PACKAGE_TYPE_PAIR, {{"pair", false}});
     deviceLink()->sendPackage(np);
     setInternalPairStatus(NotPaired); //Will emit the change as well
-    Q_EMIT pairingError(i18n("Timed out"));
+	Q_EMIT pairingError("Timed out");
 }
 
 void LanPairingHandler::setInternalPairStatus(LanPairingHandler::InternalPairStatus status)

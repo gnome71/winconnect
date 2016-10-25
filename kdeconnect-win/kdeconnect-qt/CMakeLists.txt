@@ -73,6 +73,10 @@ set(SOURCES
 	core/backends/pairinghandler.cpp
 	core/backends/linkprovider.cpp
 	core/backends/lan/server.cpp
+	core/backends/lan/lanpairinghandler.cpp
+	core/backends/lan/lanlinkprovider.cpp
+	core/backends/lan/landevicelink.cpp
+	core/backends/lan/socketlinereader.cpp
 	core/backends/loopback/loopbacklinkprovider.cpp
 	core/backends/loopback/loopbackdevicelink.cpp
 	)

@@ -50,7 +50,7 @@ public:
 
 	explicit			NetworkPackage(const QString& type, const QVariantMap &body = {});
 
-	static void				createIdentityPackage(NetworkPackage*);
+	static void			createIdentityPackage(NetworkPackage*);
 
 	QByteArray			serialize() const;
 	static bool			unserialize(const QByteArray& json, NetworkPackage* out);

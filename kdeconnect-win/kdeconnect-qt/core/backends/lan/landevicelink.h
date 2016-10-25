@@ -26,13 +26,12 @@
 #include <QSslSocket>
 #include <QSslCertificate>
 
-#include <kdeconnectcore_export.h>
-#include "backends/devicelink.h"
-#include "uploadjob.h"
+#include "core/backends/devicelink.h"
+//#include "uploadjob.h"
 
 class SocketLineReader;
 
-class KDECONNECTCORE_EXPORT LanDeviceLink
+class LanDeviceLink
     : public DeviceLink
 {
     Q_OBJECT
@@ -45,7 +44,7 @@ public:
 
     QString name() override;
     bool sendPackage(NetworkPackage& np) override;
-    UploadJob* sendPayload(const NetworkPackage& np);
+//    UploadJob* sendPayload(const NetworkPackage& np);
 
     void userRequestsPair() override;
     void userRequestsUnpair() override;
