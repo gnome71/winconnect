@@ -68,7 +68,7 @@ set(SOURCES
 	core/daemon.cpp
 	core/kdeconnectconfig.cpp
 	core/networkpackage.cpp
-	core/udplistener.cpp
+//	core/udplistener.cpp
 	core/backends/devicelink.cpp
 	core/backends/pairinghandler.cpp
 	core/backends/linkprovider.cpp

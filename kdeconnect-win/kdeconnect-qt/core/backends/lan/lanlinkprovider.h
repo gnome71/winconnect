@@ -55,6 +55,9 @@ public:
 
     const static quint16 PORT = 1716;
 
+Q_SIGNALS:
+	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
+
 public Q_SLOTS:
     void onNetworkChange() override;
     void onStart() override;
@@ -77,7 +80,8 @@ private:
     void onNetworkConfigurationChanged(const QNetworkConfiguration &config);
     void addLink(const QString& deviceId, QSslSocket* socket, NetworkPackage* receivedPackage, LanDeviceLink::ConnectionStarted connectionOrigin);
 
-    Server* mServer;
+	const QString& mPrefix = "LanLinkPro";
+	Server* mServer;
     QUdpSocket mUdpSocket;
     quint16 mTcpPort;
 

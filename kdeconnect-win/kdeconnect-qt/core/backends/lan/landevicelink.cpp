@@ -20,6 +20,7 @@
 
 #include "landevicelink.h"
 #include "core/kdeconnectconfig.h"
+#include "core/kclogger.h"
 #include "core/backends/linkprovider.h"
 //#include "uploadjob.h"
 //#include "downloadjob.h"
@@ -92,7 +93,8 @@ void LanDeviceLink::dataReceived()
     NetworkPackage package(QString::null);
     NetworkPackage::unserialize(serializedPackage, &package);
 
-	qDebug() << "LanDeviceLink dataReceived" << serializedPackage;
+	qDebug() << "LanDeviceLink: dataReceived" << serializedPackage;
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Data received" + serializedPackage);
 
     if (package.type() == PACKAGE_TYPE_PAIR) {
         //TODO: Handle pair/unpair requests and forward them (to the pairing handler?)

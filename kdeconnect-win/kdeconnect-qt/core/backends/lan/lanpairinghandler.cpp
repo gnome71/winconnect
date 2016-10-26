@@ -22,6 +22,7 @@
 
 #include "core/daemon.h"
 #include "core/kdeconnectconfig.h"
+#include "core/kclogger.h"
 #include "landevicelink.h"
 #include "lanpairinghandler.h"
 #include "core/networkpackagetypes.h"
@@ -46,10 +47,12 @@ void LanPairingHandler::packageReceived(const NetworkPackage& np)
         if (isPairRequested())  { //We started pairing
 
 			qDebug() << "Pair answer";
-            setInternalPairStatus(Paired);
+			KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Pair answer");
+			setInternalPairStatus(Paired);
             
         } else {
 			qDebug() << "Pair request";
+			KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Pair request");
 
             if (isPaired()) { //I'm already paired, but they think I'm not
                 acceptPairing();
@@ -63,6 +66,7 @@ void LanPairingHandler::packageReceived(const NetworkPackage& np)
     } else { //wantsPair == false
 
 		qDebug() << "Unpair request";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "UnPair request");
 
         setInternalPairStatus(NotPaired);
          if (isPairRequested()) {
@@ -82,7 +86,8 @@ bool LanPairingHandler::requestPairing()
             return false;
         case RequestedByPeer:
 			qDebug() << deviceLink()->name() << " : Pairing already started by the other end, accepting their request.";
-            acceptPairing();
+			KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, deviceLink()->name() + " : Pairing already started by the other end, accepting their request.");
+			acceptPairing();
             return false;
         case NotPaired:
             ;
@@ -104,8 +109,12 @@ bool LanPairingHandler::acceptPairing()
     bool success = deviceLink()->sendPackage(np);
     if (success) {
         setInternalPairStatus(Paired);
-    }
-    return success;
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Internal pairing status: paired");
+	}
+	else {
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Internal pairing status: not paired");
+	}
+	return success;
 }
 
 void LanPairingHandler::rejectPairing()

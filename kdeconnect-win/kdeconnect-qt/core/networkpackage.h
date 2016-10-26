@@ -85,6 +85,7 @@ private:
     void setBody(const QVariantMap& b) { mBody = b; }
     void setPayloadSize(qint64 s) { mPayloadSize = s; }
 
+	const QString& prefix = "NetWorkPac";
 	QString		mId;
 	QString		mType;
     QVariantMap mBody;

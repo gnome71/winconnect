@@ -59,13 +59,14 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	: QObject(parent)
 	, d(new DaemonPrivate)
 {
+	qDebug() << "Daemon: parent: " << parent->metaObject()->className();
 
 	KdeConnectConfig* config = new KdeConnectConfig();
 
 	Q_ASSERT(!s_instance.exists());
 	*s_instance = this;
 	qDebug() << "KdeConnect daemon starting";
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", "WinConnect daemon starting.");
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon starting.");
 
 	//Load backends
 	if (testMode)
@@ -95,7 +96,7 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	//QDBusConnection::sessionBus().registerObject("/modules/kdeconnect", this, QDBusConnection::ExportScriptableContents);
 
 	qDebug() << "KdeConnect daemon started";
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", "WinConnect daemon started.");
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon started.");
 }
 
 void Daemon::acquireDiscoveryMode(const QString &key)
@@ -143,9 +144,8 @@ void Daemon::cleanDevices()
 
 void Daemon::forceOnNetworkChange()
 {
-	QString msg = "Sending onNetworkChange to " + QString::number(d->mLinkProviders.size()) + " LinkProviders";
 	qDebug() << "Sending onNetworkChange to " << d->mLinkProviders.size() << " LinkProviders";
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Sending onNetworkChange to " + QString::number(d->mLinkProviders.size()) + " LinkProviders");
 	Q_FOREACH (LinkProvider* a, d->mLinkProviders) {
 		a->onNetworkChange();
 	}
@@ -176,14 +176,12 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 {
 	const QString& id = identityPackage.get<QString>("deviceId");
 
-	QString msg = "Device discovered " + id + " via " + dl->provider()->name();
 	qDebug() << "Device discovered" << id << "via" << dl->provider()->name();
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device discovered " + id + " via " + dl->provider()->name());
 
 	if (d->mDevices.contains(id)) {
 		qDebug() << "It is a known device" << identityPackage.get<QString>("deviceName");
-		QString msg = "It is a known device " + identityPackage.get<QString>("deviceName");
-		Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "It is a known device " + identityPackage.get<QString>("deviceName"));
 		Device* device = d->mDevices[id];
 		bool wasReachable = device->isReachable();
 		device->addLink(identityPackage, dl);
@@ -192,8 +190,7 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		}
 	} else {
 		qDebug() << "It is a new device" << identityPackage.get<QString>("deviceName");
-		QString msg = "It is a new device " + identityPackage.get<QString>("deviceName");
-		Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "It is a new device " + identityPackage.get<QString>("deviceName"));
 		Device* device = new Device(this, identityPackage, dl);
 
 		//we discard the connections that we created but it's not paired.
@@ -214,13 +211,11 @@ void Daemon::onDeviceStatusChanged()
 	Device* device = (Device*)sender();
 
 	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable();// << ". Paired: " << device->isPaired();
-	QString msg = "Device " + device->name() + " status changed. Reachable: " + device->isReachable();
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name() + " status changed. Reachable: " + device->isReachable());
 
 	if (!device->isReachable() && !device->isTrusted()) {
 		qDebug() << "Destroying device" << device->name();
-		QString msg = "Destroying device " + device->name();
-		Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Destroying device " + device->name());
 		removeDevice(device);
 	} else {
 		Q_EMIT deviceVisibilityChanged(device->id(), device->isReachable());
@@ -231,8 +226,7 @@ void Daemon::onDeviceStatusChanged()
 void Daemon::setAnnouncedName(const QString &name)
 {
 	qDebug() << "Announcing name";
-	QString msg = "Announcing name: " + name;
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", msg);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Announcing name: " + name);
 	KdeConnectConfig* config = new KdeConnectConfig();
 	config->setName(name);
 	forceOnNetworkChange();
@@ -276,7 +270,7 @@ QString Daemon::deviceIdByName(const QString &name) const
 void Daemon::askPairingConfirmation(PairingHandler *d)
 {
 	qDebug() << "askPairingConfirmation()";
-	Q_EMIT logMe(QtMsgType::QtInfoMsg, "Daemon  :", "Asking for pairing confirmation");
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Asking for pairing confirmation");
 
 	QMessageBox msgBox;
 	msgBox.setText("Pairing request");
@@ -297,11 +291,9 @@ void Daemon::askPairingConfirmation(PairingHandler *d)
 void Daemon::reportError(const QString &title, const QString &description)
 {
 	qDebug() << "Daemon: " << title << description;
-	QString msg = title + " " + description;
-	Q_EMIT logMe(QtMsgType::QtDebugMsg, "Daemon  :", msg);
+	KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, title + " " + description);
 }
 
 Daemon::~Daemon()
 {
-
 }

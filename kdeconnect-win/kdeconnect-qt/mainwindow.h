@@ -20,12 +20,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+	void displayDebugMessage(QtMsgType type, const QString &prefix, const QString &msg);
+
 signals:
 	void getQcaInfo();
 
 private slots:
-	void displayDebugMessage(QtMsgType type, const QString &prefix, const QString &msg);
-	
 	void showDeviceIdentity(const QString &device);
 	void displayError(int socketError, const QString &message);
 	void displayStatus(QString status);

@@ -30,8 +30,7 @@ DeviceLink::DeviceLink(const QString& deviceId, LinkProvider* parent)
 {
 	Q_ASSERT(!deviceId.isEmpty());
 
-	KdeConnectConfig* config = new KdeConnectConfig();
-	mPrivateKey = config->privateKey();
+	mPrivateKey = KdeConnectConfig::instance()->privateKey();
 
     setProperty("deviceId", deviceId);
 }

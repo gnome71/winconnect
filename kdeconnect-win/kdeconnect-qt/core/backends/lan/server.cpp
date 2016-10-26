@@ -21,6 +21,7 @@
 #include "server.h"
 
 #include "core/kdeconnectconfig.h"
+#include "core/kclogger.h"
 //#include "lanlinkprovider.h"
 
 #include <QSslKey>
@@ -34,7 +35,7 @@ Server::Server(QObject * parent)
 }
 
 void Server::incomingConnection(qintptr socketDescriptor) {
-    qDebug() << "incomingConnection";
+	qDebug() << "Server: incomingConnection";
     QSslSocket *serverSocket = new QSslSocket(parent());
     if (serverSocket->setSocketDescriptor(socketDescriptor)) {
         pendingConnections.append(serverSocket);
@@ -46,7 +47,7 @@ void Server::incomingConnection(qintptr socketDescriptor) {
 }
 
 QSslSocket* Server::nextPendingConnection() {
-    qDebug() << "nextPendingConnection (emtpy:" << pendingConnections.isEmpty() << ")";
+	qDebug() << "Server: nextPendingConnection (emtpy:" << pendingConnections.isEmpty() << ")";
     if (pendingConnections.isEmpty()) {
         return Q_NULLPTR;
     } else {
@@ -60,5 +61,6 @@ bool Server::hasPendingConnections() const {
 
 void Server::errorFound(QAbstractSocket::SocketError socketError)
 {
-    qDebug() << "error:" << socketError;
+	qDebug() << "Server: error:" << socketError;
+	KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "Error " + socketError);
 }

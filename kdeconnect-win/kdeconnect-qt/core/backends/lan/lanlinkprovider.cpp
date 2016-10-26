@@ -39,15 +39,15 @@
 #include "landevicelink.h"
 #include "lanpairinghandler.h"
 #include "core/kdeconnectconfig.h"
+#include "core/kclogger.h"
 
 #define MIN_VERSION_WITH_SSL_SUPPORT 6
-
-KdeConnectConfig* config = new KdeConnectConfig();
 
 LanLinkProvider::LanLinkProvider(bool testMode)
     : mTestMode(testMode)
 {
-    mTcpPort = 0;
+
+	mTcpPort = 0;
 
     combineBroadcastsTimer.setInterval(0); // increase this if waiting a single event-loop iteration is not enough
     combineBroadcastsTimer.setSingleShot(true);
@@ -83,14 +83,16 @@ void LanLinkProvider::onStart()
     bool success = mUdpSocket.bind(bindAddress, PORT, QUdpSocket::ShareAddress);
     Q_ASSERT(success);
 
-	qDebug() << "onStart";
+	qDebug() << "LanLinkProvider: onStart";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "On start");
 
     mTcpPort = PORT;
     while (!mServer->listen(bindAddress, mTcpPort)) {
         mTcpPort++;
         if (mTcpPort > 1764) { //No ports available?
 			qWarning() << "Error opening a port in range 1714-1764";
-            mTcpPort = 0;
+			KcLogger::instance()->write(QtMsgType::QtDebugMsg, mPrefix, "Error opening a port in range 1714-1764");
+			mTcpPort = 0;
             return;
         }
     }
@@ -100,16 +102,18 @@ void LanLinkProvider::onStart()
 
 void LanLinkProvider::onStop()
 {
-	qDebug() << "onStop";
-    mUdpSocket.close();
+	qDebug() << "LanLinkProvider: onStop";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "On stop");
+	mUdpSocket.close();
     mServer->close();
 }
 
 void LanLinkProvider::onNetworkChange()
 {
     if (combineBroadcastsTimer.isActive()) {
-		qDebug() << "Preventing duplicate broadcasts";
-        return;
+		qDebug() << "LanLinkProvider: preventing duplicate broadcasts";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Preventing duplicate broadcasts");
+		return;
     }
     combineBroadcastsTimer.start();
 }
@@ -125,8 +129,9 @@ void LanLinkProvider::broadcastToNetwork()
 
     Q_ASSERT(mTcpPort != 0);
 
-	qDebug() << "Broadcasting identity packet";
-    NetworkPackage np("");
+	qDebug() << "LanLinkProvider: broadcasting identity packet";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Broadcasting identity package");
+	NetworkPackage np("");
     NetworkPackage::createIdentityPackage(&np);
     np.set("tcpPort", mTcpPort);
     mUdpSocket.writeDatagram(np.serialize(), mTestMode ? QHostAddress::LocalHost : QHostAddress("255.255.255.255"), PORT);
@@ -159,7 +164,7 @@ void LanLinkProvider::newUdpConnection() //udpBroadcastReceived
             continue;
         }
 
-		if (receivedPackage->get<QString>("deviceId") == config->deviceId()) {
+		if (receivedPackage->get<QString>("deviceId") == KdeConnectConfig::instance()->deviceId()) {
 			//qDebug() << "Ignoring my own broadcast";
             delete receivedPackage;
             continue;
@@ -167,7 +172,8 @@ void LanLinkProvider::newUdpConnection() //udpBroadcastReceived
 
         int tcpPort = receivedPackage->get<int>("tcpPort", PORT);
 
-		qDebug() << "Received Udp identity package from" << sender << " asking for a tcp connection on port " << tcpPort;
+		qDebug() << "LanLinkProvider: received Udp identity package from" << sender << " asking for a tcp connection on port " << tcpPort;
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Received Udp identity package from" + sender.toString() + " asking for a tcp connection on port " + QString::number(tcpPort));
 
         QSslSocket* socket = new QSslSocket(this);
         receivedIdentityPackages[socket].np = receivedPackage;
@@ -185,8 +191,9 @@ void LanLinkProvider::connectError()
     disconnect(socket, SIGNAL(connected()), this, SLOT(connected()));
     disconnect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectError()));
 
-	qDebug() << "Fallback (1), try reverse connection (send udp packet)" << socket->errorString();
-    NetworkPackage np("");
+	qDebug() << "LanLinkProvider: fallback (1), try reverse connection (send udp packet)" << socket->errorString();
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Fallback (1), try reverse connection (send udp packet)" + socket->errorString());
+	NetworkPackage np("");
     NetworkPackage::createIdentityPackage(&np);
     np.set("tcpPort", mTcpPort);
     mUdpSocket.writeDatagram(np.serialize(), receivedIdentityPackages[socket].sender, PORT);
@@ -200,7 +207,8 @@ void LanLinkProvider::connectError()
 //We received a UDP package and answered by connecting to them by TCP. This gets called on a succesful connection.
 void LanLinkProvider::connected()
 {
-	qDebug() << "Socket connected";
+	qDebug() << "LanLinkProvider: socket connected";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Socket connected");
 
     QSslSocket* socket = qobject_cast<QSslSocket*>(sender());
     if (!socket) return;
@@ -214,25 +222,29 @@ void LanLinkProvider::connected()
 
     NetworkPackage* receivedPackage = receivedIdentityPackages[socket].np;
     const QString& deviceId = receivedPackage->get<QString>("deviceId");
-	qDebug() << "Connected" << socket->isWritable();
+	qDebug() << "LanLinkProvider: connected" << socket->isWritable();
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Connected writeable: " + socket->isWritable());
 
-    // If network is on ssl, do not believe when they are connected, believe when handshake is completed
-    NetworkPackage np2("");
+	// If network is on ssl, do not believe when they are connected,
+	// believe when handshake is completed
+	NetworkPackage np2(QString::null);
     NetworkPackage::createIdentityPackage(&np2);
     socket->write(np2.serialize());
-    bool success = socket->waitForBytesWritten();
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Sending handshake package");
+	bool success = socket->waitForBytesWritten();
 
     if (success) {
-
-		qDebug() << "TCP connection done (i'm the existing device)";
+		qDebug() << "LanLinkProvider: TCP connection done (i'm the existing device)";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "TCP connection done (I'm the existing device)");
 
         // if ssl supported
         if (receivedPackage->get<int>("protocolVersion") >= MIN_VERSION_WITH_SSL_SUPPORT) {
 
-			bool isDeviceTrusted = config->trustedDevices().contains(deviceId);
+			bool isDeviceTrusted = KdeConnectConfig::instance()->trustedDevices().contains(deviceId);
             configureSslSocket(socket, deviceId, isDeviceTrusted);
 
-			qDebug() << "Starting server ssl (I'm the client TCP socket)";
+			qDebug() << "LanLinkProvider: starting server ssl (I'm the client TCP socket)";
+			KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Starting server SSL (I'm the client TCP socket)");
 
             connect(socket, SIGNAL(encrypted()), this, SLOT(encrypted()));
 
@@ -245,14 +257,15 @@ void LanLinkProvider::connected()
             return; // Return statement prevents from deleting received package, needed in slot "encrypted"
         } else {
             qWarning() << receivedPackage->get<QString>("deviceName") << "uses an old protocol version, this won't work";
-            //addLink(deviceId, socket, receivedPackage, LanDeviceLink::Remotely);
         }
 
     } else {
         //I think this will never happen, but if it happens the deviceLink
         //(or the socket that is now inside it) might not be valid. Delete them.
-		qDebug() << "Fallback (2), try reverse connection (send udp packet)";
-        mUdpSocket.writeDatagram(np2.serialize(), receivedIdentityPackages[socket].sender, PORT);
+		qDebug() << "LanLinkProvider: Fallback (2), try reverse connection (send udp packet)";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Fallback (2), try reverse connection (Send UDP packet");
+
+		mUdpSocket.writeDatagram(np2.serialize(), receivedIdentityPackages[socket].sender, PORT);
     }
 
     delete receivedIdentityPackages.take(socket).np;
@@ -261,7 +274,8 @@ void LanLinkProvider::connected()
 
 void LanLinkProvider::encrypted()
 {
-	qDebug() << "Socket succesfully established an SSL connection";
+	qDebug() << "LanLinkProvider: socket succesfully established an SSL connection";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Socket successfully established an SSL connection");
 
     QSslSocket* socket = qobject_cast<QSslSocket*>(sender());
     if (!socket) return;
@@ -295,8 +309,9 @@ void LanLinkProvider::sslErrors(const QList<QSslError>& errors)
             case QSslError::CertificateExpired:
             case QSslError::CertificateUntrusted:
             case QSslError::SelfSignedCertificate: {
-				qDebug() << "Failing due to " << error.errorString();
-                // Due to simultaneous multiple connections, it may be possible that device instance does not exist anymore
+				qDebug() << "LanLinkProvider: failing due to " << error.errorString();
+				KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "SSL error: " + error.errorString());
+				// Due to simultaneous multiple connections, it may be possible that device instance does not exist anymore
                 Device *device = Daemon::instance()->getDevice(socket->peerVerifyName());
                 if (device != Q_NULLPTR) {
                     device->unpair();
@@ -338,7 +353,8 @@ void LanLinkProvider::dataReceived()
 
     const QByteArray data = socket->readLine();
 
-	qDebug() << "LanLinkProvider received reply:" << data;
+	qDebug() << "LanLinkProvider: received reply:" << data;
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Received reply: " + data);
 
     NetworkPackage* np = new NetworkPackage("");
     bool success = NetworkPackage::unserialize(data, np);
@@ -349,8 +365,9 @@ void LanLinkProvider::dataReceived()
     }
 
     if (np->type() != PACKAGE_TYPE_IDENTITY) {
-		qWarning() << "LanLinkProvider/newConnection: Expected identity, received " << np->type();
-        delete np;
+		qWarning() << "LanLinkProvider: expected identity, received " << np->type();
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "NewConnection, expected identity, received " + np->type());
+		delete np;
         return;
     }
 
@@ -358,17 +375,19 @@ void LanLinkProvider::dataReceived()
     receivedIdentityPackages[socket].np = np;
 
     const QString& deviceId = np->get<QString>("deviceId");
-	qDebug() << "Handshaking done (i'm the new device)";
+	qDebug() << "LanLinkProvider: handshaking done (i'm the new device)";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Handshaking done (I'm the new device)");
 
     //This socket will now be owned by the LanDeviceLink or we don't want more data to be received, forget about it
     disconnect(socket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
 
     if (np->get<int>("protocolVersion") >= MIN_VERSION_WITH_SSL_SUPPORT) {
 
-		bool isDeviceTrusted = config->trustedDevices().contains(deviceId);
+		bool isDeviceTrusted = KdeConnectConfig::instance()->trustedDevices().contains(deviceId);
         configureSslSocket(socket, deviceId, isDeviceTrusted);
 
-		qDebug() << "Starting client ssl (but I'm the server TCP socket)";
+		qDebug() << "LanLinkProvider: starting client ssl (but I'm the server TCP socket)";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Starting client SSL (But I'm the server TCP socket)");
 
         connect(socket, SIGNAL(encrypted()), this, SLOT(encrypted()));
 
@@ -388,8 +407,9 @@ void LanLinkProvider::dataReceived()
 void LanLinkProvider::deviceLinkDestroyed(QObject* destroyedDeviceLink)
 {
     const QString id = destroyedDeviceLink->property("deviceId").toString();
-	qDebug() << "deviceLinkDestroyed" << id;
-    Q_ASSERT(mLinks.key(static_cast<LanDeviceLink*>(destroyedDeviceLink)) == id);
+	qDebug() << "LanLinkProvider: deviceLinkDestroyed" << id;
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Device link destroyed: " + id);
+	Q_ASSERT(mLinks.key(static_cast<LanDeviceLink*>(destroyedDeviceLink)) == id);
     QMap< QString, LanDeviceLink* >::iterator linkIterator = mLinks.find(id);
     if (linkIterator != mLinks.end()) {
         Q_ASSERT(linkIterator.value() == destroyedDeviceLink);
@@ -417,12 +437,12 @@ void LanLinkProvider::configureSslSocket(QSslSocket* socket, const QString& devi
     sslConfig.setProtocol(QSsl::TlsV1_0);
 
     socket->setSslConfiguration(sslConfig);
-	socket->setLocalCertificate(config->certificate());
-	socket->setPrivateKey(config->privateKeyPath());
+	socket->setLocalCertificate(KdeConnectConfig::instance()->certificate());
+	socket->setPrivateKey(KdeConnectConfig::instance()->privateKeyPath());
     socket->setPeerVerifyName(deviceId);
 
     if (isDeviceTrusted) {
-		QString certString = config->getDeviceProperty(deviceId, "certificate", QString());
+		QString certString = KdeConnectConfig::instance()->getDeviceProperty(deviceId, "certificate", QString());
         socket->addCaCertificate(QSslCertificate(certString.toLatin1()));
         socket->setPeerVerifyMode(QSslSocket::VerifyPeer);
     } else {
@@ -471,8 +491,9 @@ void LanLinkProvider::addLink(const QString& deviceId, QSslSocket* socket, Netwo
     //Do we have a link for this device already?
     QMap< QString, LanDeviceLink* >::iterator linkIterator = mLinks.find(deviceId);
     if (linkIterator != mLinks.end()) {
-		qDebug() << "Reusing link to" << deviceId;
-        deviceLink = linkIterator.value();
+		qDebug() << "LanLinkProvider: reusing link to" << deviceId;
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Reusing link to: " + deviceId);
+		deviceLink = linkIterator.value();
         deviceLink->reset(socket, connectionOrigin);
     } else {
         deviceLink = new LanDeviceLink(deviceId, this, socket, connectionOrigin);
@@ -494,8 +515,9 @@ LanPairingHandler* LanLinkProvider::createPairingHandler(DeviceLink* link)
     LanPairingHandler* ph = mPairingHandlers.value(link->deviceId());
     if (!ph) {
         ph = new LanPairingHandler(link);
-		qDebug() << "creating pairing handler for" << link->deviceId();
-        connect (ph, &LanPairingHandler::pairingError, link, &DeviceLink::pairingError);
+		qDebug() << "LanLinkProvider: creating pairing handler for" << link->deviceId();
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Creating pairing handler for " + link->deviceId());
+		connect (ph, &LanPairingHandler::pairingError, link, &DeviceLink::pairingError);
         mPairingHandlers[link->deviceId()] = ph;
     }
     return ph;
@@ -515,7 +537,8 @@ void LanLinkProvider::userRequestsUnpair(const QString& deviceId)
 
 void LanLinkProvider::incomingPairPackage(DeviceLink* deviceLink, const NetworkPackage& np)
 {
-    LanPairingHandler* ph = createPairingHandler(deviceLink);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Incoming pairPackage");
+	LanPairingHandler* ph = createPairingHandler(deviceLink);
     ph->packageReceived(np);
 }
 

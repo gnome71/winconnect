@@ -81,6 +81,7 @@ private Q_SLOTS:
 	void onDeviceStatusChanged();
 
 private:
+	const QString& prefix = "Daemon    ";
 	bool isDiscoveringDevices() const;
 	void removeDevice(Device* d);
 	void cleanDevices();

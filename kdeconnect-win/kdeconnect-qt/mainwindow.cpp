@@ -6,7 +6,6 @@
 #include "core/kclogger.h"
 #include "core/daemon.h"
 #include "core/networkpackage.h"
-#include "core/udplistener.h"
 
 #include <QtCrypto>
 #include <QLoggingCategory>
@@ -19,10 +18,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
+	QCA::Initializer mQcaInitializer;
+
 	ui->setupUi(this);
 
-	// Start daemon
-	Daemon* daemon = new Daemon(this, false);
+	// create KcLogger instance
+	KcLogger* logger = new KcLogger(this);
+
 	// Access to configuration
 	KdeConnectConfig* config = new KdeConnectConfig();
 
@@ -40,10 +42,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->pushButtonSettingInfo->setHidden(true);
 #endif
 
+	// Start daemon
+	Daemon* daemon = new Daemon(this, false);
+
 	// Signal/Slots connections
-	connect(daemon, SIGNAL(logMe(QtMsgType,QString,QString)), this, SLOT(displayDebugMessage(QtMsgType,QString,QString)));
-	connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
+//	connect(daemon, &Daemon::logMe, this, &MainWindow::displayDebugMessage);
+//	connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
+	connect(logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
 }
 
 void MainWindow::showDeviceIdentity(const QString &device)

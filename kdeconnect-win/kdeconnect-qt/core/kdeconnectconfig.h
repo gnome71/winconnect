@@ -25,7 +25,7 @@ public:
 		QString deviceType;
 	};
 
-	KdeConnectConfig();
+	static KdeConnectConfig* instance();
 
 	// our own info
 	static QString deviceId();
@@ -61,6 +61,8 @@ Q_SIGNALS:
 	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
 
 private:
+	KdeConnectConfig();
+	const QString& prefix = "KCConfig  ";
 	struct KdeConnectConfigPrivate* d;
 	QCA::Initializer mQcaInitializer;	// Note it's not being used anywhere. That's intended
 };

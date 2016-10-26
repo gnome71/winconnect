@@ -32,8 +32,9 @@
 class LanPairingHandler
     : public PairingHandler
 {
-public:
+	Q_OBJECT
 
+public:
     enum InternalPairStatus {
         NotPaired,
         Requested,
@@ -53,14 +54,17 @@ public:
     bool isPairRequested() const { return m_status == Requested; }
     bool isPaired() const { return m_status == Paired; }
 
+Q_SIGNALS:
+	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
+
 private Q_SLOTS:
     void pairingTimeout();
 
 protected:
     void setInternalPairStatus(InternalPairStatus status);
 
-    QTimer m_pairingTimeout;
-
+	const QString& prefix = "LanPairH  ";
+	QTimer m_pairingTimeout;
     InternalPairStatus m_status;
 };
 

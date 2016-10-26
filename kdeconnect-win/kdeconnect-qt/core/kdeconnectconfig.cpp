@@ -26,55 +26,65 @@ struct KdeConnectConfigPrivate {
 	// Use QSslCertificate instead of QCA::Certificate due to compatibility with QSslSocket
 	QSslCertificate certificate;
 
-	//QSettings* config;
-	//QSettings* trusted_devices;
+	QSettings* config;
+	QSettings* trusted_devices;
 };
 
-KdeConnectConfig::KdeConnectConfig()
+KdeConnectConfig* KdeConnectConfig::instance()
 {
-	//QCA::Initializer mQcaInitializer;
+	static KdeConnectConfig* kcc = new KdeConnectConfig();
+	return kcc;
+}
+
+KdeConnectConfig::KdeConnectConfig()
+	: d(new KdeConnectConfigPrivate)
+{
 
 	if(!QCA::isSupported("rsa")) {
-		qCDebug(kcQca) << "RSA not supported";
+		qDebug() << "RSA not supported";
 		return;
 	}
 	else if(!QCA::isSupported("pkey") ||
 			!QCA::PKey::supportedIOTypes().contains(QCA::PKey::RSA)) {
-		qCDebug(kcQca) << "PKEY not supported";
+		qDebug() << "PKEY not supported";
 		return;
 	}
 
-	QSettings::setDefaultFormat(QSettings::IniFormat);
-	QSettings config;
-	QSettings trusted_devices;
+//	QSettings::setDefaultFormat(QSettings::IniFormat);
+//	QSettings config;
+//	QSettings trusted_devices;
 
-	config.sync();
+	d->config = new QSettings(baseConfigDir().absoluteFilePath("config"), QSettings::IniFormat);
+	d->trusted_devices = new QSettings(baseConfigDir().absoluteFilePath("trusted_devices"), QSettings::IniFormat);
+
+//	config.sync();
 
 	//Register my own id if not there yet
-	if(!config.contains("my/id")) {
-		QString uuid = "";
-		uuid = QUuid::createUuid().toString();
+	if(!d->config->contains("id")) {
+		QString uuid = QUuid::createUuid().toString();
 		DeviceIdHelper::filterNonExportableCharacters(uuid);
-		config.setValue("my/id", uuid);
-		config.sync();
-		qCDebug(kcQca) << "My id:" << uuid;
+		d->config->setValue("id", uuid);
+		d->config->sync();
+		qDebug() << "My id:" << uuid;
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "My id: " + uuid);
 	}
 
 	// Register my own name if not there yet
-	if(!config.contains("my/name")) {
+	if(!d->config->contains("name")) {
 		QString n = qgetenv("USERNAME");
 		QString h = qgetenv("COMPUTERNAME");
 		QString name = n + "@" + h;
-		config.setValue("my/name", name);
-		config.sync();
+		d->config->setValue("name", name);
+		d->config->sync();
 	}
 
 	// Register my own deviceType as Desktop hardcoded
-	if (!config.contains("my/deviceType")) {
+	if (!d->config->contains("deviceType")) {
 		QString deviceType = "desktop";
-		qCDebug(kcQca) << "My deviceType: " << deviceType;
-		config.setValue("my/deviceType", deviceType);
-		config.sync();
+		qDebug() << "My deviceType: " << deviceType;
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "My deviceType: " + deviceType);
+		d->config->setValue("deviceType", deviceType);
+		d->config->sync();
 	}
 
 	// Load or register new private key if not there
@@ -82,20 +92,21 @@ KdeConnectConfig::KdeConnectConfig()
 	QFile privKey(keyPath);
 	QCA::PrivateKey privateKey;
 	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
-		privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
-		//qCDebug(kcQca) << "Opened private key: " << keyPath;
-		if(privateKey.isNull())
-			qCDebug(kcQca) << "load: privateKey.isNull";
+		d->privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
+		//qDebug() << "Opened private key: " << keyPath;
+		if(d->privateKey.isNull())
+			qDebug() << "load: privateKey.isNull";
 		privKey.close();
 	}
 	else {
-		privateKey = QCA::KeyGenerator().createRSA(2048);
+		d->privateKey = QCA::KeyGenerator().createRSA(2048);
 		if(!privKey.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			qCDebug(kcQca) << "Could not store private key file: " << privKey.fileName();
+			qDebug() << "Could not store private key file: " << privKey.fileName();
 		}
 		else {
-			int len = privKey.write(privateKey.toPEM().toLatin1());
-			qCDebug(kcQca) << "Created private key with length: " << len;
+			int len = privKey.write(d->privateKey.toPEM().toLatin1());
+			qDebug() << "Created private key with length: " << len;
+			KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "PrivateKey created. Length: " + QString::number(len));
 			privKey.close();
 		}
 	}
@@ -106,10 +117,10 @@ KdeConnectConfig::KdeConnectConfig()
 	QSslCertificate certificate;
 	if(cert.exists() && cert.open(QIODevice::ReadOnly)) {
 		if(!QSslCertificate::fromPath(certPath, QSsl::Pem).at(0).isNull()) {
-			certificate = QSslCertificate::fromPath(certPath).at(0);
-			//qCDebug(kcQca) << "Opened Cert: " << certPath;
+			d->certificate = QSslCertificate::fromPath(certPath).at(0);
+			//qDebug() << "Opened Cert: " << certPath;
 		}
-		else { qCDebug(kcQca) << "Unable to open: " + certPath; }
+		else { qDebug() << "Unable to open: " + certPath; }
 
 		cert.close();
 	}
@@ -127,13 +138,13 @@ KdeConnectConfig::KdeConnectConfig()
 		certificateOptions.setSerialNumber(QCA::BigInteger(10));
 		certificateOptions.setValidityPeriod(startTime, endTime);
 
-		certificate = QSslCertificate(QCA::Certificate(certificateOptions, privateKey).toPEM().toLatin1());
+		d->certificate = QSslCertificate(QCA::Certificate(certificateOptions, d->privateKey).toPEM().toLatin1());
 
 		if(!cert.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			qCDebug(kcQca) << "Could not store certificate file: " + cert.fileName();
+			qDebug() << "Could not store certificate file: " + cert.fileName();
 		}
 		else {
-			cert.write(certificate.toPem());
+			cert.write(d->certificate.toPem());
 			cert.close();
 		}
 	}
@@ -141,24 +152,23 @@ KdeConnectConfig::KdeConnectConfig()
 
 QString KdeConnectConfig::deviceId()
 {
-	QSettings config;
-	config.sync();
-	QString ret = config.value("my/id").toString();
+//	QSettings config;
+//	config.sync();
+	QString ret = d->config->value("id", "").toString();
 	return ret;
 }
 
 QString KdeConnectConfig::name()
 {
-	QSettings config;
-	config.sync();
-	return config.value("my/name").toString();
+//	QSettings config;
+//	config.sync();
+	QString defaultName = qgetenv("USER") + '@' + QHostInfo::localHostName();
+	return d->config->value("name", defaultName).toString();
 }
 
 QString KdeConnectConfig::deviceType()
 {
-	QSettings config;
-	config.sync();
-	return config.value("my/deviceType").toString();
+	return "desktop";
 }
 
 QString KdeConnectConfig::privateKeyPath()
@@ -168,30 +178,22 @@ QString KdeConnectConfig::privateKeyPath()
 
 QCA::PrivateKey KdeConnectConfig::privateKey()
 {
-	QFile privKey(privateKeyPath());
-	QCA::PrivateKey pk;
-	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
-		pk = QCA::PrivateKey::fromPEM(privKey.readAll());
-		//qCDebug(kcQca) << "Opened private key: " << privateKeyPath();
-		if(pk.isNull())
-			qCDebug(kcQca) << "load: privateKey.isNull";
-	}
-	privKey.close();
-	return pk;
+	return d->privateKey;
+//	QFile privKey(privateKeyPath());
+//	QCA::PrivateKey pk;
+//	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
+//		pk = QCA::PrivateKey::fromPEM(privKey.readAll());
+//		//qDebug() << "Opened private key: " << privateKeyPath();
+//		if(pk.isNull())
+//			qDebug() << "load: privateKey.isNull";
+//	}
+//	privKey.close();
+//	return pk;
 }
 
 QCA::PublicKey KdeConnectConfig::publicKey()
 {
-	QFile privKey(privateKeyPath());
-	QCA::PrivateKey privateKey;
-	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
-		privateKey = QCA::PrivateKey::fromPEM(privKey.readAll());
-		//qCDebug(kcQca) << "Opened private key: " << privateKeyPath();
-		if(privateKey.isNull())
-			qCDebug(kcQca) << "load: privateKey.isNull";
-	}
-	privKey.close();
-	return privateKey.toPublicKey();
+	return d->privateKey.toPublicKey();
 }
 
 QString KdeConnectConfig::certificatePath()
@@ -201,100 +203,68 @@ QString KdeConnectConfig::certificatePath()
 
 QSslCertificate KdeConnectConfig::certificate()
 {
-	QFile cert(certificatePath());
-	QSslCertificate certificate;
-	if(cert.exists() && cert.open(QIODevice::ReadOnly)) {
-		if(!QSslCertificate::fromPath(certificatePath(), QSsl::Pem).at(0).isNull()) {
-			certificate = QSslCertificate::fromPath(certificatePath()).at(0);
-			//qCDebug(kcQca) << "Opened Cert: " << certificatePath();
-		}
-		else { qCDebug(kcQca) << "Unable to open: " + certificatePath(); }
-
-		cert.close();
-	}
-	return certificate;
+	return d->certificate;
 }
 
 void KdeConnectConfig::setName(QString name)
 {
-	QSettings config;
-	config.sync();
-	config.setValue("my/name", name);
-	config.sync();
+	d->config->setValue("my/name", name);
 }
 
 QStringList KdeConnectConfig::trustedDevices()
 {
-	QSettings trusted_devices;
-	trusted_devices.sync();
-	const QStringList& list = trusted_devices.childGroups();
+	const QStringList& list = d->trusted_devices->childGroups();
 	return list;
 }
 
 void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, const QString &type)
 {
-	QSettings trusted_devices;
-	trusted_devices.sync();
-//	trusted_devices.beginGroup("trustedDevices");
-//	trusted_devices.beginGroup(id);
-	trusted_devices.setValue(id + "/name", name);
-	trusted_devices.setValue(id + "/type", type);
-//	trusted_devices.endGroup();
-//	trusted_devices.endGroup();
+	trusted_devices.beginGroup(id);
+	trusted_devices.setValue("name", name);
+	trusted_devices.setValue("type", type);
+	trusted_devices.endGroup();
 
 	QDir().mkpath(deviceConfigDir(id).path());
 }
 
 KdeConnectConfig::DeviceInfo KdeConnectConfig::getTrustedDevice(const QString &id)
 {
-	QSettings trusted_devices;
-	trusted_devices.sync();
-//	trusted_devices.beginGroup("trustedDevices");
-//	trusted_devices.beginGroup(id);
+	d->trusted_devices->beginGroup(id);
 	KdeConnectConfig::DeviceInfo info;
-	info.deviceName = trusted_devices.value(id + "/name", QLatin1String("unnamed")).toString();
-	info.deviceType = trusted_devices.value(id + "/type", QLatin1String("unknown")).toString();
-//	trusted_devices.endGroup();
-//	trusted_devices.endGroup();
+	info.deviceName = d->trusted_devices->value("name", QLatin1String("unnamed")).toString();
+	info.deviceType = d->trusted_devices->value("type", QLatin1String("unknown")).toString();
+	trusted_devices.endGroup();
 
 	return info;
 }
 
 void KdeConnectConfig::removeTrustedDevice(const QString &deviceId)
 {
-	QSettings trusted_devices;
-	trusted_devices.sync();
-	trusted_devices.remove(deviceId);
-	trusted_devices.sync();
+	d->trusted_devices->remove(deviceId);
+	d->trusted_devices->sync();
 	// We do not remove the config files
 }
 
 void KdeConnectConfig::setDeviceProperty(QString deviceId, QString key, QString value)
 {
-	QSettings trusted_devices;
-	trusted_devices.sync();
-//	trusted_devices.beginGroup("trustedDevices");
-	trusted_devices.beginGroup(deviceId);
-	trusted_devices.setValue(key, value);
-	trusted_devices.endGroup();
-//	trusted_devices.endGroup();
-	trusted_devices.sync();
+	d->trusted_devices->beginGroup(deviceId);
+	d->trusted_devices->setValue(key, value);
+	d->trusted_devices->endGroup();
+	d->trusted_devices->sync();
 }
 
 QString KdeConnectConfig::getDeviceProperty(QString deviceId, QString key, QString defaultValue)
 {
-	QSettings trusted_devices;
-	trusted_devices.sync();
 	QString value;
-	trusted_devices.beginGroup(deviceId);
-	value = trusted_devices.value(key, defaultValue).toString();
-	trusted_devices.endGroup();
+	d->trusted_devices->beginGroup(deviceId);
+	value = d->trusted_devices->value(key, defaultValue).toString();
+	d->trusted_devices->endGroup();
 	return value;
 }
 
 QString KdeConnectConfig::getQcaInfo() {
-	QCA::PrivateKey pk = privateKey();
-	QSslCertificate cert = certificate();
+	QCA::PrivateKey pk = d->privateKey;
+	QSslCertificate cert = d->certificate;
 	QString msg = "QCA Diagnostic:\n" + QCA::pluginDiagnosticText();
 	msg += "QCA capabilities:\n" + QCA::supportedFeatures().join(", ");
 	msg += "\n";
@@ -320,11 +290,8 @@ QString KdeConnectConfig::getQcaInfo() {
  */
 QDir KdeConnectConfig::baseConfigDir()
 {
-	QSettings config;
-	config.sync();
-
 	// base configuration directory without filename
-	QFileInfo info(config.fileName());
+	QFileInfo info(d->config->fileName());
 	QDir bcd(info.absolutePath());
 
 	return bcd;

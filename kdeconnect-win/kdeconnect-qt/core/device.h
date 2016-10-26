@@ -131,6 +131,7 @@ Q_SIGNALS:
 	Q_SCRIPTABLE void trustedChanged(bool trusted);
 	Q_SCRIPTABLE void pairingError(const QString& error);
 	Q_SCRIPTABLE void nameChanged(const QString& name);
+	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
 
 private: //Methods
 	static DeviceType str2type(const QString &deviceType);
@@ -140,6 +141,7 @@ private: //Methods
 	QString iconForStatus(bool reachable, bool paired) const;
 
 private: //Fields (TODO: dPointer!)
+	const QString& prefix = "Device    ";
 	const QString m_deviceId;
 	QString m_deviceName;
 	DeviceType m_deviceType;

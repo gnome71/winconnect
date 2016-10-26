@@ -57,7 +57,8 @@ private Q_SLOTS:
     void dataReceived();
 
 private:
-    SocketLineReader* mSocketLineReader;
+	const QString& prefix = "LanDevLink";
+	SocketLineReader* mSocketLineReader;
     ConnectionStarted mConnectionSource;
 };
 

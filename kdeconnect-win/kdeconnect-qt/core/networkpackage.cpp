@@ -99,8 +99,9 @@ QByteArray NetworkPackage::serialize() const
 	QVariantMap variant = qobject2qvariant(this);
 
     if (hasPayload()) {
-		qCDebug(kcCore) << "Serializing payloadTransferInfo";
-        variant["payloadSize"] = payloadSize();
+		qDebug() << "NetworkPackage: Serializing payloadTransferInfo";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Serializing payloadTransferInfo");
+		variant["payloadSize"] = payloadSize();
         variant["payloadTransferInfo"] = mPayloadTransferInfo;
     }
 
@@ -108,8 +109,9 @@ QByteArray NetworkPackage::serialize() const
     auto jsonDocument = QJsonDocument::fromVariant(variant);
     QByteArray json = jsonDocument.toJson(QJsonDocument::Compact);
     if (json.isEmpty()) {
-		qDebug() << "Serialization error:";
-    } else {
+		qDebug() << "NetworkPackage: Serialization error:";
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Serialization error");
+	} else {
 		//if (!isEncrypted()) {
 		//	qDebug() << "Serialized package:" << json;
 		//}
@@ -126,15 +128,17 @@ void qvariant2qobject(const QVariantMap& variant, T* object)
     {
         const int propertyIndex = T::staticMetaObject.indexOfProperty(iter.key().toLatin1());
         if (propertyIndex < 0) {
-			qWarning(kcCore) << "missing property" << object << iter.key();
-            continue;
+			qWarning() << "NetworkPackage: missing property" << object << iter.key();
+			//KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "Missing property");
+			continue;
         }
 
         QMetaProperty property = T::staticMetaObject.property(propertyIndex);
         bool ret = property.writeOnGadget(object, *iter);
         if (!ret) {
-			qWarning(kcCore) << "couldn't set" << object << "->" << property.name() << '=' << *iter;
-        }
+			qWarning() << "NetworkPackage: couldn't set" << object << "->" << property.name() << '=' << *iter;
+			//KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "couldn't set" + object + "->" + property.name() + '=' + *iter);
+		}
     }
 }
 
@@ -145,8 +149,9 @@ bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
     QJsonParseError parseError;
     auto parser = QJsonDocument::fromJson(a, &parseError);
     if (parser.isNull()) {
-		qDebug(kcCore) << "Unserialization error:" << parseError.errorString();
-        return false;
+		qDebug() << "NetworkPackage: Unserialization error:" << parseError.errorString();
+		//KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "Unserialization error:" + parseError.errorString());
+		return false;
     }
 
     auto variant = parser.toVariant().toMap();
