@@ -5,8 +5,7 @@
 
 #include "core/kclogger.h"
 #include "core/kdeconnectconfig.h"
-//#include "core/networkpackage.h"
-#include "core/udplistener.h"
+#include "core/daemon.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,9 +25,9 @@ signals:
 	void getQcaInfo();
 
 private slots:
-	void showDeviceIdentity(const QString &device);
-	void displayError(int socketError, const QString &message);
-	void displayStatus(QString status);
+//	void showDeviceIdentity(const QString &device);
+//	void displayError(int socketError, const QString &message);
+//	void displayStatus(QString status);
 
 	void on_radioButtonLog_toggled(bool checked);
     void on_pushButtonMyName_clicked();
@@ -40,8 +39,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-	KdeConnectConfig* config;
-	UdpListenerThread* udpListener;
+	//QCA::Initializer mQcaInitializer;
+	Daemon* daemon;
 };
 
 #endif // MAINWINDOW_H

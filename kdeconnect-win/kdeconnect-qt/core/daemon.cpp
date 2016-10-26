@@ -61,8 +61,6 @@ Daemon::Daemon(QObject *parent, bool testMode)
 {
 	qDebug() << "Daemon: parent: " << parent->metaObject()->className();
 
-	KdeConnectConfig* config = new KdeConnectConfig();
-
 	Q_ASSERT(!s_instance.exists());
 	*s_instance = this;
 	qDebug() << "KdeConnect daemon starting";
@@ -75,7 +73,7 @@ Daemon::Daemon(QObject *parent, bool testMode)
 		d->mLinkProviders.insert(new LanLinkProvider());
 
 	//Read remebered paired devices
-	const QStringList& list = config->trustedDevices();
+	const QStringList& list = KdeConnectConfig::instance()->trustedDevices();
 	Q_FOREACH (const QString& id, list) {
 		Device* device = new Device(this, id);
 		connect(device, SIGNAL(reachableStatusChanged()), this, SLOT(onDeviceStatusChanged()));
@@ -210,7 +208,7 @@ void Daemon::onDeviceStatusChanged()
 {
 	Device* device = (Device*)sender();
 
-	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable();// << ". Paired: " << device->isPaired();
+	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable();
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name() + " status changed. Reachable: " + device->isReachable());
 
 	if (!device->isReachable() && !device->isTrusted()) {
@@ -227,16 +225,14 @@ void Daemon::setAnnouncedName(const QString &name)
 {
 	qDebug() << "Announcing name";
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Announcing name: " + name);
-	KdeConnectConfig* config = new KdeConnectConfig();
-	config->setName(name);
+	KdeConnectConfig::instance()->setName(name);
 	forceOnNetworkChange();
 	Q_EMIT announcedNameChanged(name);
 }
 
 QString Daemon::announcedName()
 {
-	KdeConnectConfig* config = new KdeConnectConfig();
-	return config->name();
+	return KdeConnectConfig::instance()->name();
 }
 
 QNetworkAccessManager* Daemon::networkAccessManager()

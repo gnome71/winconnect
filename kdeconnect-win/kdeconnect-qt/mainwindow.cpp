@@ -14,6 +14,8 @@
 #include <QThread>
 #include <cassert>
 
+static QString createId() { return QStringLiteral("kcw")+QString::number(QCoreApplication::applicationPid()); }
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -26,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	KcLogger* logger = new KcLogger(this);
 
 	// Access to configuration
-	KdeConnectConfig* config = new KdeConnectConfig();
+	KdeConnectConfig* config = KdeConnectConfig::instance();
 
 	// Setup GUI
 	ui->lineEditMyName->setText(config->name());
@@ -43,37 +45,12 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
 	// Start daemon
-	Daemon* daemon = new Daemon(this, false);
+	daemon = new Daemon(this, false);
 
 	// Signal/Slots connections
-//	connect(daemon, &Daemon::logMe, this, &MainWindow::displayDebugMessage);
-//	connect(config, &KdeConnectConfig::logMe, this, &MainWindow::displayDebugMessage);
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
 	connect(logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
 }
-
-void MainWindow::showDeviceIdentity(const QString &device)
-{
-	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket ", device);
-}
-
-void MainWindow::displayError(int socketError, const QString &message) {
-	switch(socketError) {
-	case QAbstractSocket::HostNotFoundError:
-		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket ", "Host not found.");
-		break;
-	case QAbstractSocket::ConnectionRefusedError:
-		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket ", "Connection refused.");
-		break;
-	default:
-		displayDebugMessage(QtMsgType::QtWarningMsg, "UdpSocket ", message);
-	}
-}
-
-void MainWindow::displayStatus(QString status) {
-	displayDebugMessage(QtMsgType::QtInfoMsg, "UdpSocket ", status);
-}
-
 
 /**
  * @brief MainWindow::displayDebugMessage
@@ -153,6 +130,8 @@ void MainWindow::on_pushButtonUnPair_clicked()
 void MainWindow::on_pushButtonRefresh_clicked()
 {
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonRefresh clicked.");
+	daemon->acquireDiscoveryMode(createId());
+	daemon->forceOnNetworkChange();
 }
 
 /**
@@ -163,13 +142,13 @@ void MainWindow::on_lineEditMyName_textChanged()
 {
 	if(ui->lineEditMyName->isModified()) {
 		ui->pushButtonMyName->setEnabled(true);
-		config->setName(ui->lineEditMyName->text());
+		KdeConnectConfig::instance()->setName(ui->lineEditMyName->text());
 	}
 }
 
 void MainWindow::on_pushButtonQcaInfo_clicked()
 {
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", config->getQcaInfo());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", KdeConnectConfig::instance()->getQcaInfo());
 }
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
@@ -177,11 +156,11 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 
 	QString versionString = QString("KdeConnect-Win Version: %1").arg(KDECONNECT_VERSION_STRING);
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", versionString);
-	QDir bcd = config->baseConfigDir();
-	QDir dcd = config->deviceConfigDir("1234");
+	QDir bcd = KdeConnectConfig::instance()->baseConfigDir();
+	QDir dcd = KdeConnectConfig::instance()->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "BaseConfigDir: " + bcd.path());
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "DeviceConfigDir: " + dcd.path());
-	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyName: " + config->name());
-	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyId: " + QString(config->deviceId()));
-	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyDeviceType: " + config->deviceType());
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyName: " + KdeConnectConfig::instance()->name());
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyId: " + QString(KdeConnectConfig::instance()->deviceId()));
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyDeviceType: " + KdeConnectConfig::instance()->deviceType());
 }

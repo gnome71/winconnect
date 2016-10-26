@@ -57,10 +57,7 @@ Device::Device(QObject* parent, const QString& id)
 	, m_deviceId(id)
 	, m_protocolVersion(NetworkPackage::ProtocolVersion) //We don't know it yet
 {
-	qDebug() << "Device: parent: " << parent->metaObject()->className();
-
-	KdeConnectConfig* config = new KdeConnectConfig();
-	KdeConnectConfig::DeviceInfo info = config->getTrustedDevice(id);
+	KdeConnectConfig::DeviceInfo info = KdeConnectConfig::instance()->getTrustedDevice(id);
 
 	m_deviceName = info.deviceName;
 	m_deviceType = str2type(info.deviceType);

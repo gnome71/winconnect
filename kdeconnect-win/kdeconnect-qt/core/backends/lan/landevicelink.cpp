@@ -54,8 +54,7 @@ void LanDeviceLink::reset(QSslSocket* socket, ConnectionStarted connectionSource
 
     mConnectionSource = connectionSource;
 
-	KdeConnectConfig* config = new KdeConnectConfig();
-	QString certString = config->getDeviceProperty(deviceId(), "certificate");
+	QString certString = KdeConnectConfig::instance()->getDeviceProperty(deviceId(), "certificate");
     DeviceLink::setPairStatus(certString.isEmpty()? PairStatus::NotPaired : PairStatus::Paired);
 }
 
@@ -144,10 +143,9 @@ void LanDeviceLink::setPairStatus(PairStatus status)
 
     DeviceLink::setPairStatus(status);
     if (status == Paired) {
-		KdeConnectConfig* config = new KdeConnectConfig();
-		Q_ASSERT(config->trustedDevices().contains(deviceId()));
+		Q_ASSERT(KdeConnectConfig::instance()->trustedDevices().contains(deviceId()));
         Q_ASSERT(!mSocketLineReader->peerCertificate().isNull());
-		config->setDeviceProperty(deviceId(), "certificate", mSocketLineReader->peerCertificate().toPem());
+		KdeConnectConfig::instance()->setDeviceProperty(deviceId(), "certificate", mSocketLineReader->peerCertificate().toPem());
     }
 }
 

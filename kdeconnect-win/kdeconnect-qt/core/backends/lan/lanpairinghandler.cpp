@@ -142,8 +142,10 @@ void LanPairingHandler::setInternalPairStatus(LanPairingHandler::InternalPairSta
 {
     m_status = status;
     if (status == Paired) {
+		KdeConnectConfig::instance()->setDeviceProperty(deviceLink()->deviceId(), "paired", "true");
         deviceLink()->setPairStatus(DeviceLink::Paired);
     } else {
-        deviceLink()->setPairStatus(DeviceLink::NotPaired);
+		KdeConnectConfig::instance()->setDeviceProperty(deviceLink()->deviceId(), "paired", "false");
+		deviceLink()->setPairStatus(DeviceLink::NotPaired);
     }
 }

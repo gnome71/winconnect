@@ -50,14 +50,8 @@ KdeConnectConfig::KdeConnectConfig()
 		return;
 	}
 
-//	QSettings::setDefaultFormat(QSettings::IniFormat);
-//	QSettings config;
-//	QSettings trusted_devices;
-
 	d->config = new QSettings(baseConfigDir().absoluteFilePath("config"), QSettings::IniFormat);
 	d->trusted_devices = new QSettings(baseConfigDir().absoluteFilePath("trusted_devices"), QSettings::IniFormat);
-
-//	config.sync();
 
 	//Register my own id if not there yet
 	if(!d->config->contains("id")) {
@@ -70,22 +64,22 @@ KdeConnectConfig::KdeConnectConfig()
 	}
 
 	// Register my own name if not there yet
-	if(!d->config->contains("name")) {
-		QString n = qgetenv("USERNAME");
-		QString h = qgetenv("COMPUTERNAME");
-		QString name = n + "@" + h;
-		d->config->setValue("name", name);
-		d->config->sync();
-	}
+//	if(!d->config->contains("name")) {
+//		QString n = qgetenv("USERNAME");
+//		QString h = qgetenv("COMPUTERNAME");
+//		QString name = n + "@" + h;
+//		d->config->setValue("name", name);
+//		d->config->sync();
+//	}
 
 	// Register my own deviceType as Desktop hardcoded
-	if (!d->config->contains("deviceType")) {
-		QString deviceType = "desktop";
-		qDebug() << "My deviceType: " << deviceType;
-		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "My deviceType: " + deviceType);
-		d->config->setValue("deviceType", deviceType);
-		d->config->sync();
-	}
+//	if (!d->config->contains("deviceType")) {
+//		QString deviceType = "desktop";
+//		qDebug() << "My deviceType: " << deviceType;
+//		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "My deviceType: " + deviceType);
+//		d->config->setValue("deviceType", deviceType);
+//		d->config->sync();
+//	}
 
 	// Load or register new private key if not there
 	QString keyPath = privateKeyPath();
@@ -152,8 +146,6 @@ KdeConnectConfig::KdeConnectConfig()
 
 QString KdeConnectConfig::deviceId()
 {
-//	QSettings config;
-//	config.sync();
 	QString ret = d->config->value("id", "").toString();
 	return ret;
 }
@@ -163,7 +155,8 @@ QString KdeConnectConfig::name()
 //	QSettings config;
 //	config.sync();
 	QString defaultName = qgetenv("USER") + '@' + QHostInfo::localHostName();
-	return d->config->value("name", defaultName).toString();
+	QString name =  d->config->value("name", defaultName).toString();
+	return name;
 }
 
 QString KdeConnectConfig::deviceType()
@@ -208,7 +201,8 @@ QSslCertificate KdeConnectConfig::certificate()
 
 void KdeConnectConfig::setName(QString name)
 {
-	d->config->setValue("my/name", name);
+	d->config->setValue("name", name);
+	d->trusted_devices->sync();
 }
 
 QStringList KdeConnectConfig::trustedDevices()
@@ -219,11 +213,12 @@ QStringList KdeConnectConfig::trustedDevices()
 
 void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, const QString &type)
 {
-	trusted_devices.beginGroup(id);
-	trusted_devices.setValue("name", name);
-	trusted_devices.setValue("type", type);
-	trusted_devices.endGroup();
-
+	d->trusted_devices->beginGroup(id);
+	d->trusted_devices->setValue("name", name);
+	d->trusted_devices->setValue("type", type);
+	d->trusted_devices->setValue("paired", true);
+	d->trusted_devices->endGroup();
+	d->trusted_devices->sync();
 	QDir().mkpath(deviceConfigDir(id).path());
 }
 
@@ -233,7 +228,7 @@ KdeConnectConfig::DeviceInfo KdeConnectConfig::getTrustedDevice(const QString &i
 	KdeConnectConfig::DeviceInfo info;
 	info.deviceName = d->trusted_devices->value("name", QLatin1String("unnamed")).toString();
 	info.deviceType = d->trusted_devices->value("type", QLatin1String("unknown")).toString();
-	trusted_devices.endGroup();
+	d->trusted_devices->endGroup();
 
 	return info;
 }
@@ -291,10 +286,9 @@ QString KdeConnectConfig::getQcaInfo() {
 QDir KdeConnectConfig::baseConfigDir()
 {
 	// base configuration directory without filename
-	QFileInfo info(d->config->fileName());
-	QDir bcd(info.absolutePath());
-
-	return bcd;
+	QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+//	QString kdeconnectConfigPath = QDir(configPath);
+	return QDir(configPath);
 }
 
 /**
@@ -305,9 +299,6 @@ QDir KdeConnectConfig::baseConfigDir()
  */
 QDir KdeConnectConfig::deviceConfigDir(const QString &deviceId)
 {
-	//QSettings config;
-	//config.sync();
-
 	// device configuration directory
 	QString deviceConfigPath = baseConfigDir().absoluteFilePath(deviceId);
 	return QDir(deviceConfigPath);

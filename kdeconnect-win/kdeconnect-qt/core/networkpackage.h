@@ -29,7 +29,6 @@
 #include <QUrl>
 
 #include "networkpackagetypes.h"
-#include "kdeconnectconfig.h"
 
 class FileTransferJob;
 
@@ -79,7 +78,6 @@ public:
 	bool			hasPayloadTransferInfo() const { return !mPayloadTransferInfo.isEmpty(); }
 
 private:
-	KdeConnectConfig config;
     void setId(const QString& id) { mId = id; }
     void setType(const QString& t) { mType = t; }
     void setBody(const QVariantMap& b) { mBody = b; }
