@@ -223,7 +223,8 @@ void LanLinkProvider::connected()
     NetworkPackage* receivedPackage = receivedIdentityPackages[socket].np;
     const QString& deviceId = receivedPackage->get<QString>("deviceId");
 	qDebug() << "LanLinkProvider: connected" << socket->isWritable();
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Connected writeable: " + socket->isWritable());
+	QString wri = socket->isWritable() ? "true" : "false";
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Connected writeable: " + wri);
 
 	// If network is on ssl, do not believe when they are connected,
 	// believe when handshake is completed

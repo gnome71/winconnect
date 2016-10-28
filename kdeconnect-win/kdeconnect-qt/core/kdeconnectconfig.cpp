@@ -63,24 +63,6 @@ KdeConnectConfig::KdeConnectConfig()
 		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "My id: " + uuid);
 	}
 
-	// Register my own name if not there yet
-//	if(!d->config->contains("name")) {
-//		QString n = qgetenv("USERNAME");
-//		QString h = qgetenv("COMPUTERNAME");
-//		QString name = n + "@" + h;
-//		d->config->setValue("name", name);
-//		d->config->sync();
-//	}
-
-	// Register my own deviceType as Desktop hardcoded
-//	if (!d->config->contains("deviceType")) {
-//		QString deviceType = "desktop";
-//		qDebug() << "My deviceType: " << deviceType;
-//		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "My deviceType: " + deviceType);
-//		d->config->setValue("deviceType", deviceType);
-//		d->config->sync();
-//	}
-
 	// Load or register new private key if not there
 	QString keyPath = privateKeyPath();
 	QFile privKey(keyPath);
@@ -152,9 +134,7 @@ QString KdeConnectConfig::deviceId()
 
 QString KdeConnectConfig::name()
 {
-//	QSettings config;
-//	config.sync();
-	QString defaultName = qgetenv("USER") + '@' + QHostInfo::localHostName();
+	QString defaultName = qgetenv("USERNAME") + '@' + QHostInfo::localHostName();
 	QString name =  d->config->value("name", defaultName).toString();
 	return name;
 }
@@ -172,16 +152,6 @@ QString KdeConnectConfig::privateKeyPath()
 QCA::PrivateKey KdeConnectConfig::privateKey()
 {
 	return d->privateKey;
-//	QFile privKey(privateKeyPath());
-//	QCA::PrivateKey pk;
-//	if(privKey.exists() && privKey.open(QIODevice::ReadOnly)) {
-//		pk = QCA::PrivateKey::fromPEM(privKey.readAll());
-//		//qDebug() << "Opened private key: " << privateKeyPath();
-//		if(pk.isNull())
-//			qDebug() << "load: privateKey.isNull";
-//	}
-//	privKey.close();
-//	return pk;
 }
 
 QCA::PublicKey KdeConnectConfig::publicKey()
@@ -286,7 +256,7 @@ QString KdeConnectConfig::getQcaInfo() {
 QDir KdeConnectConfig::baseConfigDir()
 {
 	// base configuration directory without filename
-	QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+	QString configPath = QStandardPaths::writableLocation(QStandardPaths:: AppDataLocation);
 //	QString kdeconnectConfigPath = QDir(configPath);
 	return QDir(configPath);
 }
