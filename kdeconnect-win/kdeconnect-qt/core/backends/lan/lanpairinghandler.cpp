@@ -60,7 +60,7 @@ void LanPairingHandler::packageReceived(const NetworkPackage& np)
             }
 
             Daemon::instance()->askPairingConfirmation(this);
-            setInternalPairStatus(RequestedByPeer);
+			//setInternalPairStatus(RequestedByPeer);
         }
 
     } else { //wantsPair == false

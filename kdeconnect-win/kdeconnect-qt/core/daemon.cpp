@@ -208,7 +208,7 @@ void Daemon::onDeviceStatusChanged()
 {
 	Device* device = (Device*)sender();
 
-	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable();
+	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable() << ", Trusted:" << device->isTrusted();
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name() + " status changed. Reachable: " + device->isReachable());
 
 	if (!device->isReachable() && !device->isTrusted()) {
@@ -279,7 +279,7 @@ void Daemon::askPairingConfirmation(PairingHandler *d)
 			d->acceptPairing();
 			break;
 		case QMessageBox::Discard:
-			d->rejectPairing();
+			d->rejectPairing();		//BUG: read access violation
 			break;
 	}
 }
