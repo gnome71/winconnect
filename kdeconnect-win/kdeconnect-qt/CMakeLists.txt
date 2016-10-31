@@ -78,6 +78,7 @@ set(SOURCES
 	core/backends/lan/socketlinereader.cpp
 	core/backends/loopback/loopbacklinkprovider.cpp
 	core/backends/loopback/loopbackdevicelink.cpp
+	interfaces/devicesmodel.cpp
 	)
 
 set(FORMS

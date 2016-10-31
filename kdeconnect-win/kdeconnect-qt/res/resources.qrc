@@ -1,5 +1,11 @@
-<!DOCTYPE RCC><RCC version="1.0">
-    <qresource>
-        <file>icons/BlankPhone_16x.svg</file>
+<RCC>
+    <qresource prefix="/">
+        <file>icons/AppIcon.svg</file>
+        <file>icons/PhoneConnected.svg</file>
+        <file>icons/PhoneDisConnected.svg</file>
+        <file>icons/PhoneTrusted.svg</file>
+        <file>icons/TabletConnected.svg</file>
+        <file>icons/TabletDisConnected.svg</file>
+        <file>icons/TabletTrusted.svg</file>
     </qresource>
 </RCC>

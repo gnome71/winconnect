@@ -15,6 +15,8 @@
 #include <cassert>
 
 static QString createId() { return QStringLiteral("kcw")+QString::number(QCoreApplication::applicationPid()); }
+static QString createKeyId() { return QCoreApplication::instance()->applicationName()+QString::number(QCoreApplication::applicationPid()); }
+Q_GLOBAL_STATIC_WITH_ARGS(QString, s_keyId, (createKeyId()));
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -50,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	// Signal/Slots connections
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
 	connect(logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
+	//connect(daemon, &Daemon::deviceAdded)
 }
 
 /**

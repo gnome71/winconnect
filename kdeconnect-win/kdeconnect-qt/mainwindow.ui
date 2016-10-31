@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="res/resources.qrc">
-    <normaloff>:/icons/BlankPhone_16x.svg</normaloff>:/icons/BlankPhone_16x.svg</iconset>
+    <normaloff>:/icons/AppIcon.svg</normaloff>:/icons/AppIcon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">

@@ -59,8 +59,6 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	: QObject(parent)
 	, d(new DaemonPrivate)
 {
-	qDebug() << "Daemon: parent: " << parent->metaObject()->className();
-
 	Q_ASSERT(!s_instance.exists());
 	*s_instance = this;
 	qDebug() << "KdeConnect daemon starting";
