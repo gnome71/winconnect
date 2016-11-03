@@ -90,16 +90,16 @@ void DevicesModel::deviceAdded(const QString& id)
         return;
     }
 
-//    DeviceDbusInterface* dev = new DeviceDbusInterface(id, this);
-//    Q_ASSERT(dev->isValid());
+	Device* dev = m_daemonInterface->getDevice(id);
+	Q_ASSERT(dev != nullptr);
 
-//    if (! passesFilter(dev)) {
-//        delete dev;
-//        return;
-//    }
+	if (! passesFilter(dev)) {
+		delete dev;
+		return;
+	}
 
     beginInsertRows(QModelIndex(), m_deviceList.size(), m_deviceList.size());
-//    appendDevice(dev);
+	appendDevice(dev);
     endInsertRows();
 }
 
@@ -144,7 +144,7 @@ void DevicesModel::deviceUpdated(const QString& id, bool isVisible)
 Device* DevicesModel::getDevice(int row) const
 {
 	QList<Device*> devs = m_daemonInterface->devicesList();
-	Device* dev = devs.at(row);
+	return devs.at(row);
 }
 
 int DevicesModel::displayFilter() const
@@ -186,7 +186,8 @@ void DevicesModel::refreshDeviceList()
 /*
 void DevicesModel::receivedDeviceList(QDBusPendingCallWatcher* watcher)
 {
-    watcher->deleteLater();
+	return;
+watcher->deleteLater();
     clearDevices();
     QDBusPendingReply<QStringList> pendingDeviceIds = *watcher;
     if (pendingDeviceIds.isError()) {
@@ -227,7 +228,7 @@ void DevicesModel::clearDevices()
 {
     if (!m_deviceList.isEmpty()) {
         beginRemoveRows(QModelIndex(), 0, m_deviceList.size() - 1);
-        qDeleteAll(m_deviceList);
+//        qDeleteAll(m_deviceList);
         m_deviceList.clear();
         endRemoveRows();
     }
@@ -242,10 +243,12 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
-	Q_ASSERT(m_daemonInterface == Q_NULLPTR);
+	Q_ASSERT(m_daemonInterface != nullptr);
 
 	QString device = m_deviceList[index.row()];
-	Q_ASSERT(device == Q_NULLPTR);
+	Device* d = m_daemonInterface->getDevice(m_daemonInterface->deviceIdByName(device));
+	Q_ASSERT(device != nullptr);
+	Q_ASSERT(d != nullptr);
 
     //This function gets called lots of times, producing lots of dbus calls. Add a cache?
     switch (role) {
@@ -254,35 +257,36 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
             return QIcon::fromTheme(icon);
         }
         case IdModelRole:
-            return device->id();
+			return d->id();
         case NameModelRole:
-            return device->name();
+			return d->name();
         case Qt::ToolTipRole: {
-            bool trusted = device->isTrusted();
-            bool reachable = device->isReachable();
-            QString status = reachable? (trusted? i18n("Device trusted and connected") : i18n("Device not trusted")) : i18n("Device disconnected");
+			bool trusted = d->isTrusted();
+			bool reachable = d->isReachable();
+			QString status = reachable? (trusted? tr("Device trusted and connected") : tr("Device not trusted")) : tr("Device disconnected");
             return status;
         }
         case StatusModelRole: {
             int status = StatusFilterFlag::NoFilter;
-            if (device->isReachable()) {
+			if (d->isReachable()) {
                 status |= StatusFilterFlag::Reachable;
             }
-            if (device->isTrusted()) {
+			if (d->isTrusted()) {
                 status |= StatusFilterFlag::Paired;
             }
             return status;
         }
         case IconNameRole:
-            return device->statusIconName();
+			return d->statusIconName();
         case DeviceRole:
-            return QVariant::fromValue<QObject*>(device);
+			return QVariant::fromValue<QObject*>(d);
         default:
             return QVariant();
     }
 }
 
-DeviceDbusInterface* DevicesModel::getDevice(int row) const
+/*
+QString* DevicesModel::getDevice(int row) const
 {
     if (row < 0 || row >= m_deviceList.size()) {
         return nullptr;
@@ -290,7 +294,7 @@ DeviceDbusInterface* DevicesModel::getDevice(int row) const
 
     return m_deviceList[row];
 }
-
+*/
 int DevicesModel::rowCount(const QModelIndex& parent) const
 {
     if(parent.isValid()) {

@@ -39,7 +39,7 @@ public:
     enum ModelRoles {
         NameModelRole   = Qt::DisplayRole,
         IconModelRole   = Qt::DecorationRole,
-//        StatusModelRole = Qt::InitialSortOrderRole,
+		StatusModelRole = Qt::InitialSortOrderRole,
         IdModelRole     = Qt::UserRole,
         IconNameRole,
         DeviceRole

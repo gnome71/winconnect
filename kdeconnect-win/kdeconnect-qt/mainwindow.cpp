@@ -7,6 +7,7 @@
 #include "core/daemon.h"
 #include "core/networkpackage.h"
 
+
 #include <QtCrypto>
 #include <QLoggingCategory>
 #include <QDateTime>
@@ -47,10 +48,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	// Start daemon
 	daemon = new Daemon(this, false);
 
+	// Set model/view
+	m_dmodel = new DevicesModel();
+	ui->listViewDevice->setModel(m_dmodel);
+
 	// Signal/Slots connections
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
 	connect(logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
-	//connect(daemon, &Daemon::deviceAdded)
 }
 
 /**

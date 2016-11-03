@@ -61,7 +61,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QListWidget" name="listWidgetDevice"/>
+              <widget class="QListView" name="listViewDevice"/>
              </item>
              <item>
               <widget class="QPushButton" name="pushButtonRefresh">

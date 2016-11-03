@@ -186,7 +186,6 @@ void KdeConnectConfig::addTrustedDevice(const QString &id, const QString &name, 
 	d->trusted_devices->beginGroup(id);
 	d->trusted_devices->setValue("name", name);
 	d->trusted_devices->setValue("type", type);
-	d->trusted_devices->setValue("paired", true);
 	d->trusted_devices->endGroup();
 	d->trusted_devices->sync();
 	QDir().mkpath(deviceConfigDir(id).path());

@@ -6,6 +6,7 @@
 #include "core/kclogger.h"
 #include "core/kdeconnectconfig.h"
 #include "core/daemon.h"
+#include "interfaces/devicesmodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -41,6 +42,7 @@ private:
     Ui::MainWindow *ui;
 	//QCA::Initializer mQcaInitializer;
 	Daemon* daemon;
+	DevicesModel* m_dmodel;
 };
 
 #endif // MAINWINDOW_H
