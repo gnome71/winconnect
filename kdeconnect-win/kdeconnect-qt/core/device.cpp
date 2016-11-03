@@ -301,6 +301,7 @@ QString Device::iconName() const
 	return iconForStatus(true, false);
 }
 
+//TODO: icon
 QString Device::iconForStatus(bool reachable, bool trusted) const
 {
 	Device::DeviceType deviceType = m_deviceType;

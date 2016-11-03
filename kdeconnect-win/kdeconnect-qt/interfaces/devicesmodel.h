@@ -66,7 +66,7 @@ public:
     QVariant data(const QModelIndex& index, int role) const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
-//    Q_SCRIPTABLE DeviceDbusInterface* getDevice(int row) const;
+	Device* getDevice(int row) const;
     QHash<int, QByteArray> roleNames() const override;
 
 private Q_SLOTS:
@@ -83,8 +83,8 @@ Q_SIGNALS:
 private:
     int rowForDevice(const QString& id) const;
     void clearDevices();
-//    void appendDevice(DeviceDbusInterface* dev);
-//    bool passesFilter(DeviceDbusInterface *dev) const;
+	void appendDevice(Device* dev);
+	bool passesFilter(Device *dev) const;
 
 	Daemon* m_daemonInterface;
 	QStringList m_deviceList;

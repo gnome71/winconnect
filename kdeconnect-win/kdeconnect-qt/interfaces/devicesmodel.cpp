@@ -20,13 +20,14 @@
 
 #include "devicesmodel.h"
 
+#include <QCoreApplication>
 #include <QString>
 #include <QIcon>
 #include <QDebug>
 
 
-//static QString createId() { return QCoreApplication::instance()->applicationName()+QString::number(QCoreApplication::applicationPid()); }
-//Q_GLOBAL_STATIC_WITH_ARGS(QString, s_keyId, (createId()));
+static QString createId() { return QCoreApplication::instance()->applicationName()+QString::number(QCoreApplication::applicationPid()); }
+Q_GLOBAL_STATIC_WITH_ARGS(QString, s_keyId, (createId()));
 
 DevicesModel::DevicesModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -52,6 +53,10 @@ DevicesModel::DevicesModel(QObject *parent)
     setDisplayFilter(NoFilter);
 }
 
+/**
+ * @brief DevicesModel::roleNames
+ * @return
+ */
 QHash< int, QByteArray > DevicesModel::roleNames() const
 {
     QHash<int, QByteArray> names = QAbstractItemModel::roleNames();
@@ -70,8 +75,8 @@ DevicesModel::~DevicesModel()
 int DevicesModel::rowForDevice(const QString& id) const
 {
     for (int i = 0, c=m_deviceList.size(); i<c; ++i) {
-		m_daemonInterface->devices().at(i).
-		if (m_deviceList[i]->id() == id) {
+		qDebug() << m_daemonInterface->devicesList().at(i)->id();
+		if (m_daemonInterface->devicesList().at(i)->id() == id) {
             return i;
         }
     }
@@ -103,7 +108,7 @@ void DevicesModel::deviceRemoved(const QString& id)
     int row = rowForDevice(id);
     if (row>=0) {
         beginRemoveRows(QModelIndex(), row, row);
-        delete m_deviceList.takeAt(row);
+		m_deviceList.removeAt(row);
         endRemoveRows();
     }
 }
@@ -123,10 +128,10 @@ void DevicesModel::deviceUpdated(const QString& id, bool isVisible)
 		qDebug() << "Adding missing or previously removed device" << id;
         deviceAdded(id);
     } else {
-//        DeviceDbusInterface *dev = getDevice(row);
+		Device* dev = getDevice(row);
         if (! passesFilter(dev)) {
             beginRemoveRows(QModelIndex(), row, row);
-            delete m_deviceList.takeAt(row);
+			m_deviceList.removeAt(row);
             endRemoveRows();
 			qDebug() << "Removed changed device " << id;
         } else {
@@ -134,6 +139,12 @@ void DevicesModel::deviceUpdated(const QString& id, bool isVisible)
             Q_EMIT dataChanged(idx, idx);
         }
     }
+}
+
+Device* DevicesModel::getDevice(int row) const
+{
+	QList<Device*> devs = m_daemonInterface->devicesList();
+	Device* dev = devs.at(row);
 }
 
 int DevicesModel::displayFilter() const
@@ -156,11 +167,11 @@ void DevicesModel::setDisplayFilter(int flags)
 
 void DevicesModel::refreshDeviceList()
 {
-	if (!m_daemonInterface->isValid()) {
-        clearDevices();
-		qWarning() << "daemon interface not valid";
-        return;
-    }
+//	if (!m_daemonInterface->isValid()) {
+//        clearDevices();
+//		qWarning() << "daemon interface not valid";
+//        return;
+//    }
 
     bool onlyPaired = (m_displayFilter & StatusFilterFlag::Paired);
     bool onlyReachable = (m_displayFilter & StatusFilterFlag::Reachable);
@@ -172,6 +183,7 @@ void DevicesModel::refreshDeviceList()
 //                     this, SLOT(receivedDeviceList(QDBusPendingCallWatcher*)));
 }
 
+/*
 void DevicesModel::receivedDeviceList(QDBusPendingCallWatcher* watcher)
 {
     watcher->deleteLater();
@@ -194,17 +206,17 @@ void DevicesModel::receivedDeviceList(QDBusPendingCallWatcher* watcher)
     }
     endInsertRows();
 }
-
-void DevicesModel::appendDevice(DeviceDbusInterface* dev)
+*/
+void DevicesModel::appendDevice(Device* dev)
 {
-    m_deviceList.append(dev);
+	m_deviceList.append(dev->name());
     connect(dev, SIGNAL(nameChanged(QString)), SLOT(nameChanged(QString)));
 }
 
 void DevicesModel::nameChanged(const QString& newName)
 {
     Q_UNUSED(newName);
-    DeviceDbusInterface* device = static_cast<DeviceDbusInterface*>(sender());
+	Device* device = static_cast<Device*>(sender());
 
     Q_ASSERT(rowForDevice(device->id()) >= 0);
 
@@ -230,10 +242,10 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
-	Q_ASSERT(m_daemonInterface->isValid());
+	Q_ASSERT(m_daemonInterface == Q_NULLPTR);
 
 	QString device = m_deviceList[index.row()];
-    Q_ASSERT(device->isValid());
+	Q_ASSERT(device == Q_NULLPTR);
 
     //This function gets called lots of times, producing lots of dbus calls. Add a cache?
     switch (role) {
@@ -289,7 +301,7 @@ int DevicesModel::rowCount(const QModelIndex& parent) const
     return m_deviceList.size();
 }
 
-bool DevicesModel::passesFilter(DeviceDbusInterface* dev) const
+bool DevicesModel::passesFilter(Device* dev) const
 {
     bool onlyPaired = (m_displayFilter & StatusFilterFlag::Paired);
     bool onlyReachable = (m_displayFilter & StatusFilterFlag::Reachable);

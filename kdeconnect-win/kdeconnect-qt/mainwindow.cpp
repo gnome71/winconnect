@@ -15,8 +15,6 @@
 #include <cassert>
 
 static QString createId() { return QStringLiteral("kcw")+QString::number(QCoreApplication::applicationPid()); }
-static QString createKeyId() { return QCoreApplication::instance()->applicationName()+QString::number(QCoreApplication::applicationPid()); }
-Q_GLOBAL_STATIC_WITH_ARGS(QString, s_keyId, (createKeyId()));
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
