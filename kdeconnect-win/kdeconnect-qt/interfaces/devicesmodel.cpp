@@ -19,6 +19,7 @@
  */
 
 #include "devicesmodel.h"
+#include "core/kclogger.h"
 
 #include <QCoreApplication>
 #include <QString>
@@ -74,8 +75,8 @@ DevicesModel::~DevicesModel()
 
 int DevicesModel::rowForDevice(const QString& id) const
 {
-    for (int i = 0, c=m_deviceList.size(); i<c; ++i) {
-		qDebug() << m_daemonInterface->devicesList().at(i)->id();
+	for (int i = 0, c = m_daemonInterface->devicesList().size(); i<c; ++i) {
+		qDebug() << "rowForDevice: " << m_daemonInterface->devicesList().at(i)->id();
 		if (m_daemonInterface->devicesList().at(i)->id() == id) {
             return i;
         }
@@ -86,7 +87,8 @@ int DevicesModel::rowForDevice(const QString& id) const
 void DevicesModel::deviceAdded(const QString& id)
 {
     if (rowForDevice(id) >= 0) {
-        Q_ASSERT_X(false, "deviceAdded", "Trying to add a device twice");
+		KcLogger::instance()->write(QtMsgType::QtDebugMsg, mPrefix, "Trying to add a device twice. Id: " + id);
+		//Q_ASSERT_X(false, "deviceAdded", "Trying to add a device twice");
         return;
     }
 
@@ -167,47 +169,41 @@ void DevicesModel::setDisplayFilter(int flags)
 
 void DevicesModel::refreshDeviceList()
 {
-//	if (!m_daemonInterface->isValid()) {
-//        clearDevices();
-//		qWarning() << "daemon interface not valid";
-//        return;
-//    }
+	if (m_daemonInterface == nullptr) {
+		clearDevices();
+		qWarning() << "daemon interface not valid";
+		return;
+	}
 
     bool onlyPaired = (m_displayFilter & StatusFilterFlag::Paired);
     bool onlyReachable = (m_displayFilter & StatusFilterFlag::Reachable);
 
-//    QDBusPendingReply<QStringList> pendingDeviceIds = m_dbusInterface->devices(onlyReachable, onlyPaired);
+	QStringList pendingDeviceIds = m_daemonInterface->devices(onlyReachable, onlyPaired);
 //    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(pendingDeviceIds, this);
 
-//    QObject::connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
-//                     this, SLOT(receivedDeviceList(QDBusPendingCallWatcher*)));
+	connect(this, SIGNAL(finishedDeviceList(QStringList)),
+					 this, SLOT(receivedDeviceList(QStringList)));
 }
 
-/*
-void DevicesModel::receivedDeviceList(QDBusPendingCallWatcher* watcher)
+
+void DevicesModel::receivedDeviceList(QStringList pendingDeviceIds)
 {
-	return;
-watcher->deleteLater();
     clearDevices();
-    QDBusPendingReply<QStringList> pendingDeviceIds = *watcher;
-    if (pendingDeviceIds.isError()) {
-        qCWarning(KDECONNECT_INTERFACES) << "error while refreshing device list" << pendingDeviceIds.error().message();
-        return;
-    }
+//    if (pendingDeviceIds.isError()) {
+//        qCWarning(KDECONNECT_INTERFACES) << "error while refreshing device list" << pendingDeviceIds.error().message();
+//        return;
+//    }
 
-    Q_ASSERT(m_deviceList.isEmpty());
-    const QStringList deviceIds = pendingDeviceIds.value();
-
-    if (deviceIds.isEmpty())
+	if (pendingDeviceIds.isEmpty())
         return;
 
-    beginInsertRows(QModelIndex(), 0, deviceIds.count()-1);
-    Q_FOREACH(const QString& id, deviceIds) {
-        appendDevice(new DeviceDbusInterface(id, this));
+	beginInsertRows(QModelIndex(), 0, pendingDeviceIds.count()-1);
+	Q_FOREACH(const QString& id, pendingDeviceIds) {
+		appendDevice(m_daemonInterface->getDevice(id));
     }
     endInsertRows();
 }
-*/
+
 void DevicesModel::appendDevice(Device* dev)
 {
 	m_deviceList.append(dev->name());
@@ -247,8 +243,14 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
 
 	QString device = m_deviceList[index.row()];
 	Device* d = m_daemonInterface->getDevice(m_daemonInterface->deviceIdByName(device));
-	Q_ASSERT(device != nullptr);
-	Q_ASSERT(d != nullptr);
+	if(device == nullptr) {
+//		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "No device for row: " + QString::number(index.row()));
+		return QVariant();
+	}
+	if(d == nullptr) {
+//		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "No device registered in daemon");
+		return QVariant();
+	}
 
     //This function gets called lots of times, producing lots of dbus calls. Add a cache?
     switch (role) {

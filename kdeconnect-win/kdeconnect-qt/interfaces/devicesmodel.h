@@ -74,11 +74,12 @@ private Q_SLOTS:
     void deviceRemoved(const QString& id);
     void deviceUpdated(const QString& id, bool isVisible);
     void refreshDeviceList();
-//    void receivedDeviceList(QDBusPendingCallWatcher* watcher);
+	void receivedDeviceList(QStringList pendingDeviceIds);
     void nameChanged(const QString& newName);
 
 Q_SIGNALS:
     void rowsChanged();
+	void finishedDeviceList(QStringList devices);
 
 private:
     int rowForDevice(const QString& id) const;
@@ -89,6 +90,7 @@ private:
 	Daemon* m_daemonInterface;
 	QStringList m_deviceList;
     StatusFilterFlag m_displayFilter;
+	const QString& mPrefix = "DModel    ";
 };
 
 //Q_DECLARE_OPERATORS_FOR_FLAGS(DevicesModel::StatusFilterFlag)
