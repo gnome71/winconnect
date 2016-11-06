@@ -37,12 +37,14 @@ private slots:
 	void on_lineEditMyName_textChanged();
 	void on_pushButtonQcaInfo_clicked();
 	void on_pushButtonSettingInfo_clicked();
+	void on_listViewDevice_clicked(QModelIndex index);
+	void on_dataChanged(QModelIndex tl, QModelIndex br);
 
 private:
     Ui::MainWindow *ui;
-	//QCA::Initializer mQcaInitializer;
 	Daemon* daemon;
 	DevicesModel* m_dmodel;
+	const QString& mPrefix = "MainWindow";
 };
 
 #endif // MAINWINDOW_H

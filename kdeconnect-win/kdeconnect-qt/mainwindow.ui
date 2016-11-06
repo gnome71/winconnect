@@ -151,8 +151,14 @@
                </item>
                <item>
                 <widget class="QPushButton" name="pushButtonUnPair">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
-                  <string>Unpair</string>
+                  <string>Pair</string>
+                 </property>
+                 <property name="flat">
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>

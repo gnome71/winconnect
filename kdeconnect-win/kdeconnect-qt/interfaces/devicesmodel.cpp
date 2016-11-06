@@ -42,6 +42,8 @@ DevicesModel::DevicesModel(QObject *parent)
             this, SIGNAL(rowsChanged()));
     connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)),
             this, SIGNAL(rowsChanged()));
+	connect(this, SIGNAL(finishedDeviceList(QStringList)),
+			this, SLOT(receivedDeviceList(QStringList)));
 
 	connect(m_daemonInterface, SIGNAL(deviceAdded(QString)),
             this, SLOT(deviceAdded(QString)));
@@ -179,10 +181,11 @@ void DevicesModel::refreshDeviceList()
     bool onlyReachable = (m_displayFilter & StatusFilterFlag::Reachable);
 
 	QStringList pendingDeviceIds = m_daemonInterface->devices(onlyReachable, onlyPaired);
-//    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(pendingDeviceIds, this);
+	Q_EMIT finishedDeviceList(pendingDeviceIds);
+	//    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(pendingDeviceIds, this);
 
-	connect(this, SIGNAL(finishedDeviceList(QStringList)),
-					 this, SLOT(receivedDeviceList(QStringList)));
+//	connect(this, SIGNAL(finishedDeviceList(QStringList)),
+//					 this, SLOT(receivedDeviceList(QStringList)));
 }
 
 
@@ -255,8 +258,8 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
     //This function gets called lots of times, producing lots of dbus calls. Add a cache?
     switch (role) {
         case IconModelRole: {
-            QString icon = data(index, IconNameRole).toString();
-            return QIcon::fromTheme(icon);
+			QString icon = ":/icons/" + data(index, IconNameRole).toString() + ".svg";
+			return QIcon(icon);
         }
         case IdModelRole:
 			return d->id();
@@ -287,16 +290,6 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
     }
 }
 
-/*
-QString* DevicesModel::getDevice(int row) const
-{
-    if (row < 0 || row >= m_deviceList.size()) {
-        return nullptr;
-    }
-
-    return m_deviceList[row];
-}
-*/
 int DevicesModel::rowCount(const QModelIndex& parent) const
 {
     if(parent.isValid()) {

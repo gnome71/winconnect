@@ -54,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	// Signal/Slots connections
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
+	connect(ui->listViewDevice, &QListView::activated, this, &MainWindow::on_listViewDevice_clicked);
+	connect(m_dmodel, &DevicesModel::dataChanged, this, &MainWindow::on_dataChanged);
 	connect(logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
 }
 
@@ -168,4 +170,28 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyName: " + KdeConnectConfig::instance()->name());
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyId: " + QString(KdeConnectConfig::instance()->deviceId()));
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyDeviceType: " + KdeConnectConfig::instance()->deviceType());
+}
+
+void MainWindow::on_listViewDevice_clicked(QModelIndex index)
+{
+	ui->labelPairedDevice->setText(m_dmodel->data(index, Qt::DisplayRole).toString());
+	// Reachable 0x01, Paired 0x02
+	if(m_dmodel->data(index, Qt::InitialSortOrderRole) == 1) {
+		ui->labelPairedDevice->setEnabled(true);
+		ui->pushButtonUnPair->setText("Pair");
+		ui->pushButtonUnPair->setEnabled(true);
+	}
+	else if(m_dmodel->data(index, Qt::InitialSortOrderRole) == 2) {
+		ui->labelPairedDevice->setEnabled(true);
+		ui->pushButtonUnPair->setText("Unpair");
+		ui->pushButtonUnPair->setEnabled(true);
+	}
+}
+
+void MainWindow::on_dataChanged(QModelIndex tl, QModelIndex br)
+{
+	Q_UNUSED(br);
+	QString msg = "Data changed for: " + m_dmodel->data(tl, Qt::DisplayRole).toString()
+			+ " " + m_dmodel->data(tl, Qt::UserRole).toString();
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, msg);
 }

@@ -311,7 +311,14 @@ QString Device::iconForStatus(bool reachable, bool trusted) const
 		deviceType = Device::Device::Laptop; // We don't have desktop icon yet
 	}
 
-	QString status = (reachable? (trusted? QStringLiteral("connected") : QStringLiteral("disconnected")) : QStringLiteral("trusted"));
+	QString status;
+	if(reachable && trusted)
+		status = "trusted";
+	else if (reachable && !trusted)
+		status = "connected";
+	else
+		status = "disconnected";
+
 	QString type = type2str(deviceType);
 
 	return type+'-'+status;
