@@ -341,15 +341,16 @@ QString Device::encryptionInfo() const
 	for (int i=2 ; i<localSha1.size() ; i+=3) {
 		localSha1.insert(i, ':'); // Improve readability
 	}
-	result += "SHA1 fingerprint of your device certificate is: " + localSha1 + "\n";
+	result += "Local SHA1 fingerprint: " + localSha1;
 
-	std::string  remotePem = KdeConnectConfig::instance()->getDeviceProperty(id(), "certificate").toStdString();
+	qDebug() << m_deviceId;
+	std::string  remotePem = KdeConnectConfig::instance()->getDeviceProperty(m_deviceId, "certificate").toStdString();
 	QSslCertificate remoteCertificate = QSslCertificate(QByteArray(remotePem.c_str(), remotePem.size()));
 	QString remoteSha1 = QString::fromLatin1(remoteCertificate.digest(digestAlgorithm).toHex());
 	for (int i=2 ; i<remoteSha1.size() ; i+=3) {
 		remoteSha1.insert(i, ':'); // Improve readability
 	}
-	result += "SHA1 fingerprint of remote device certificate is: " + remoteSha1 + "\n";
+	result += ", remote SHA1 fingerprint: " + remoteSha1;
 
 	qDebug() << "Device: EncryptionInfo:" << result;
 	Q_EMIT const_cast<Device*>(this)->logMe(QtMsgType::QtInfoMsg, prefix, "Encryption Info: " + result);

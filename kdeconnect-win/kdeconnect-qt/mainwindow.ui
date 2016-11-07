@@ -314,22 +314,6 @@
  </resources>
  <connections>
   <connection>
-   <sender>pushButtonOk</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>889</x>
-     <y>685</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>469</x>
-     <y>624</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pushButtonCancel</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>

@@ -13,6 +13,8 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QThread>
+#include <QMessageBox>
+#include <QMenu>
 #include <cassert>
 
 static QString createId() { return QStringLiteral("kcw")+QString::number(QCoreApplication::applicationPid()); }
@@ -51,6 +53,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	// Set model/view
 	m_dmodel = new DevicesModel();
 	ui->listViewDevice->setModel(m_dmodel);
+
+	// Create tray stuff
+	createTrayActions();
+	createTrayIcon();
 
 	// Signal/Slots connections
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
@@ -173,9 +179,11 @@ void MainWindow::on_lineEditMyName_textChanged()
 void MainWindow::on_pushButtonQcaInfo_clicked()
 {
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", KdeConnectConfig::instance()->getQcaInfo());
-//	m_currentIndex = ui->listViewDevice->selectionModel()->selectedRows().at(0);
-//	m_currentDevice = m_daemon->getDevice(m_dmodel->data(m_currentIndex, DevicesModel::NameModelRole).toString());
-//	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", m_currentDevice->encryptionInfo());
+	if(!ui->listViewDevice->selectionModel()->hasSelection())
+		return;
+	m_currentIndex = ui->listViewDevice->selectionModel()->selectedRows().at(0);
+	m_currentDevice = m_daemon->getDevice(m_dmodel->data(m_currentIndex, DevicesModel::IdModelRole).toString());
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", m_currentDevice->encryptionInfo());
 }
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
@@ -219,9 +227,47 @@ void MainWindow::on_dataChanged(QModelIndex tl, QModelIndex br)
 {
 	Q_UNUSED(br);
 	QString msg = "Data changed for: " + m_dmodel->data(tl, Qt::DisplayRole).toString()
-			+ " " + m_dmodel->data(tl, Qt::UserRole).toString();
+			+ ", Id: " + m_dmodel->data(tl, Qt::UserRole).toString();
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, msg);
 	//qDebug() << m_daemon->devices();
 
 	on_listViewDevice_clicked(tl);
 }
+
+void MainWindow::on_pushButtonOk_clicked()
+{
+	if (trayIcon->isVisible()) {
+		this->hide();
+	}
+}
+
+void MainWindow::createTrayIcon()
+{
+	trayIcon = new QSystemTrayIcon(QIcon(":/icons/AppIcon.svg"), this);
+	trayIcon->setToolTip("WinConnect");
+	trayIconMenu = new QMenu(this);
+	trayIconMenu->addAction(minimizeAction);
+	trayIconMenu->addAction(maximizeAction);
+	trayIconMenu->addAction(restoreAction);
+	trayIconMenu->addSeparator();
+	trayIconMenu->addAction(quitAction);
+
+	trayIcon->setContextMenu(trayIconMenu);
+	trayIcon->show();
+}
+
+void MainWindow::createTrayActions()
+{
+	minimizeAction = new QAction(tr("Mi&nimize"), this);
+	connect(minimizeAction, &QAction::triggered, this, &QWidget::hide);
+
+	maximizeAction = new QAction(tr("Ma&ximize"), this);
+	connect(maximizeAction, &QAction::triggered, this, &QWidget::showMaximized);
+
+	restoreAction = new QAction(tr("&Restore"), this);
+	connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
+
+	quitAction = new QAction(tr("&Quit"), this);
+	connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+}
+

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
 
 #include "core/kclogger.h"
 #include "core/kdeconnectconfig.h"
@@ -30,6 +31,9 @@ private slots:
 //	void displayError(int socketError, const QString &message);
 //	void displayStatus(QString status);
 
+	void createTrayIcon();
+	void createTrayActions();
+
 	void on_radioButtonLog_toggled(bool checked);
     void on_pushButtonMyName_clicked();
     void on_pushButtonUnPair_clicked();
@@ -40,14 +44,22 @@ private slots:
 	void on_listViewDevice_clicked(QModelIndex index);
 	void on_dataChanged(QModelIndex tl, QModelIndex br);
 
+	void on_pushButtonOk_clicked();
+
 private:
     Ui::MainWindow *ui;
+	QSystemTrayIcon *trayIcon;
 	Daemon* m_daemon;
 	Device* m_currentDevice;
 	DevicesModel* m_dmodel;
 	QModelIndex m_currentIndex;
 	KcLogger* m_logger;
 	KdeConnectConfig* m_config;
+	QAction *minimizeAction;
+	QAction *maximizeAction;
+	QAction *restoreAction;
+	QAction *quitAction;
+	QMenu *trayIconMenu;
 	const QString& mPrefix = "MainWindow";
 };
 
