@@ -87,10 +87,6 @@ Daemon::Daemon(QObject *parent, bool testMode)
 		a->onStart();
 	}
 
-	//Register on DBus
-	//QDBusConnection::sessionBus().registerService("org.kde.kdeconnect");
-	//QDBusConnection::sessionBus().registerObject("/modules/kdeconnect", this, QDBusConnection::ExportScriptableContents);
-
 	qDebug() << "KdeConnect daemon started";
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon started.");
 }
@@ -206,8 +202,14 @@ void Daemon::onDeviceStatusChanged()
 {
 	Device* device = (Device*)sender();
 
+	QString t, r;
+	device->isReachable()? r = "true" : r = "false";
+	device->isTrusted()? t = "true" : t = "false";
+
 	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable() << ", Trusted:" << device->isTrusted();
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name() + " status changed. Reachable: " + device->isReachable());
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name()
+								+ " status changed. Reachable: " + r
+								+ " Trusted: " + t);
 
 	if (!device->isReachable() && !device->isTrusted()) {
 		qDebug() << "Destroying device" << device->name();

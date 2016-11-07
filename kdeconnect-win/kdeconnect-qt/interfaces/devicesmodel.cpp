@@ -66,7 +66,7 @@ QHash< int, QByteArray > DevicesModel::roleNames() const
     names.insert(IdModelRole, "deviceId");
     names.insert(IconNameRole, "iconName");
     names.insert(DeviceRole, "device");
-//    names.insert(StatusModelRole, "status");
+	names.insert(StatusModelRole, "status");
     return names;
 }
 
@@ -182,20 +182,14 @@ void DevicesModel::refreshDeviceList()
 
 	QStringList pendingDeviceIds = m_daemonInterface->devices(onlyReachable, onlyPaired);
 	Q_EMIT finishedDeviceList(pendingDeviceIds);
-	//    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(pendingDeviceIds, this);
 
-//	connect(this, SIGNAL(finishedDeviceList(QStringList)),
-//					 this, SLOT(receivedDeviceList(QStringList)));
+	receivedDeviceList(pendingDeviceIds);
 }
 
 
 void DevicesModel::receivedDeviceList(QStringList pendingDeviceIds)
 {
     clearDevices();
-//    if (pendingDeviceIds.isError()) {
-//        qCWarning(KDECONNECT_INTERFACES) << "error while refreshing device list" << pendingDeviceIds.error().message();
-//        return;
-//    }
 
 	if (pendingDeviceIds.isEmpty())
         return;

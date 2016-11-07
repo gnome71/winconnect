@@ -42,8 +42,12 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-	Daemon* daemon;
+	Daemon* m_daemon;
+	Device* m_currentDevice;
 	DevicesModel* m_dmodel;
+	QModelIndex m_currentIndex;
+	KcLogger* m_logger;
+	KdeConnectConfig* m_config;
 	const QString& mPrefix = "MainWindow";
 };
 

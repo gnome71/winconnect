@@ -74,6 +74,7 @@ void LanLinkProvider::onNetworkConfigurationChanged(const QNetworkConfiguration 
 
 LanLinkProvider::~LanLinkProvider()
 {
+	KcLogger::instance()->disconnect();
 }
 
 void LanLinkProvider::onStart()
@@ -106,6 +107,7 @@ void LanLinkProvider::onStop()
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "On stop");
 	mUdpSocket.close();
     mServer->close();
+
 }
 
 void LanLinkProvider::onNetworkChange()
@@ -130,11 +132,14 @@ void LanLinkProvider::broadcastToNetwork()
     Q_ASSERT(mTcpPort != 0);
 
 	qDebug() << "LanLinkProvider: broadcasting identity packet";
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Broadcasting identity package");
+	//KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Broadcasting identity package");
 	NetworkPackage np("");
     NetworkPackage::createIdentityPackage(&np);
     np.set("tcpPort", mTcpPort);
-    mUdpSocket.writeDatagram(np.serialize(), mTestMode ? QHostAddress::LocalHost : QHostAddress("255.255.255.255"), PORT);
+	if(mUdpSocket.writeDatagram(np.serialize(), mTestMode ? QHostAddress::LocalHost : QHostAddress("255.255.255.255"), PORT) !=-1)
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Broadcasted identity package: " + np.serialize());
+	else
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Failed broadcasting identity package: " + np.serialize());
 }
 
 //I'm the existing device, a new device is kindly introducing itself.
@@ -155,9 +160,9 @@ void LanLinkProvider::newUdpConnection() //udpBroadcastReceived
         NetworkPackage* receivedPackage = new NetworkPackage("");
         bool success = NetworkPackage::unserialize(datagram, receivedPackage);
 
-		//qDebug() << "udp connection from " << receivedPackage->;
+		//qDebug() << "udp connection from " << receivedPackage->get<QString>();
 
-		//qDebug() << "Datagram " << datagram.data() ;
+		qDebug() << "Received datagram " << datagram.data() ;
 
         if (!success || receivedPackage->type() != PACKAGE_TYPE_IDENTITY) {
             delete receivedPackage;
@@ -409,7 +414,7 @@ void LanLinkProvider::deviceLinkDestroyed(QObject* destroyedDeviceLink)
 {
     const QString id = destroyedDeviceLink->property("deviceId").toString();
 	qDebug() << "LanLinkProvider: deviceLinkDestroyed" << id;
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Device link destroyed: " + id);
+	//FIXME:	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "Device link destroyed: " + id);
 	Q_ASSERT(mLinks.key(static_cast<LanDeviceLink*>(destroyedDeviceLink)) == id);
     QMap< QString, LanDeviceLink* >::iterator linkIterator = mLinks.find(id);
     if (linkIterator != mLinks.end()) {

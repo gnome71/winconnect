@@ -26,13 +26,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 
 	// create KcLogger instance
-	KcLogger* logger = new KcLogger(this);
+	m_logger = new KcLogger(this);
 
 	// Access to configuration
-	KdeConnectConfig* config = KdeConnectConfig::instance();
+	m_config = KdeConnectConfig::instance();
 
 	// Setup GUI
-	ui->lineEditMyName->setText(config->name());
+	ui->lineEditMyName->setText(m_config->name());
 #ifdef QT_DEBUG
 	ui->plainTextEditDebug->setHidden(false);
 	ui->radioButtonLog->setChecked(true);
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
 	// Start daemon
-	daemon = new Daemon(this, false);
+	m_daemon = new Daemon(this, false);
 
 	// Set model/view
 	m_dmodel = new DevicesModel();
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
 	connect(ui->listViewDevice, &QListView::activated, this, &MainWindow::on_listViewDevice_clicked);
 	connect(m_dmodel, &DevicesModel::dataChanged, this, &MainWindow::on_dataChanged);
-	connect(logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
+	connect(m_logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
 }
 
 /**
@@ -106,6 +106,8 @@ void MainWindow::displayDebugMessage(QtMsgType type, const QString &prefix, cons
 
 MainWindow::~MainWindow()
 {
+	m_logger->disconnect();
+	m_daemon->releaseDiscoveryMode(createId());
 	delete ui;
 }
 
@@ -130,15 +132,30 @@ void MainWindow::on_pushButtonMyName_clicked()
 
 void MainWindow::on_pushButtonUnPair_clicked()
 {
+	if(!ui->listViewDevice->selectionModel()->hasSelection())
+		return;
+	m_currentIndex = ui->listViewDevice->selectionModel()->selectedRows().at(0);
+	QString id = m_dmodel->data(m_currentIndex, DevicesModel::IdModelRole).toString();
+	m_currentDevice = m_daemon->getDevice(m_dmodel->data(m_currentIndex, DevicesModel::IdModelRole).toString());
+	if(m_currentDevice == nullptr)
+		return;
+	QString msg = "Current device: " + m_currentDevice->name();
+	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", msg);
 
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonUnPair clicked.");
+	if(m_currentDevice->isReachable() && m_currentDevice->isTrusted()) {
+		m_currentDevice->unpair();
+		return;
+	}
+	if(m_currentDevice->isReachable() && !m_currentDevice->isTrusted()) {
+		m_currentDevice->requestPair();
+		return;
+	}
 }
 
 void MainWindow::on_pushButtonRefresh_clicked()
 {
-	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", "pushButtonRefresh clicked.");
-	daemon->acquireDiscoveryMode(createId());
-	daemon->forceOnNetworkChange();
+	m_daemon->acquireDiscoveryMode(createId());
+	m_daemon->forceOnNetworkChange();
 }
 
 /**
@@ -156,6 +173,9 @@ void MainWindow::on_lineEditMyName_textChanged()
 void MainWindow::on_pushButtonQcaInfo_clicked()
 {
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", KdeConnectConfig::instance()->getQcaInfo());
+//	m_currentIndex = ui->listViewDevice->selectionModel()->selectedRows().at(0);
+//	m_currentDevice = m_daemon->getDevice(m_dmodel->data(m_currentIndex, DevicesModel::NameModelRole).toString());
+//	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", m_currentDevice->encryptionInfo());
 }
 
 void MainWindow::on_pushButtonSettingInfo_clicked()
@@ -174,14 +194,21 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 
 void MainWindow::on_listViewDevice_clicked(QModelIndex index)
 {
+	m_currentDevice = m_daemon->getDevice(m_dmodel->data(index, DevicesModel::NameModelRole).toString());
+
 	ui->labelPairedDevice->setText(m_dmodel->data(index, Qt::DisplayRole).toString());
 	// Reachable 0x01, Paired 0x02
-	if(m_dmodel->data(index, Qt::InitialSortOrderRole) == 1) {
+	if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 1) {
 		ui->labelPairedDevice->setEnabled(true);
 		ui->pushButtonUnPair->setText("Pair");
 		ui->pushButtonUnPair->setEnabled(true);
 	}
-	else if(m_dmodel->data(index, Qt::InitialSortOrderRole) == 2) {
+//	else if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 2) {
+//		ui->labelPairedDevice->setEnabled(true);
+//		ui->pushButtonUnPair->setText("Unpair");
+//		ui->pushButtonUnPair->setEnabled(true);
+//	}
+	else if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 3) {
 		ui->labelPairedDevice->setEnabled(true);
 		ui->pushButtonUnPair->setText("Unpair");
 		ui->pushButtonUnPair->setEnabled(true);
@@ -194,4 +221,7 @@ void MainWindow::on_dataChanged(QModelIndex tl, QModelIndex br)
 	QString msg = "Data changed for: " + m_dmodel->data(tl, Qt::DisplayRole).toString()
 			+ " " + m_dmodel->data(tl, Qt::UserRole).toString();
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, msg);
+	//qDebug() << m_daemon->devices();
+
+	on_listViewDevice_clicked(tl);
 }
