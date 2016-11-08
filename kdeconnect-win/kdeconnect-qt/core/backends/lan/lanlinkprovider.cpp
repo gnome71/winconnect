@@ -161,8 +161,7 @@ void LanLinkProvider::newUdpConnection() //udpBroadcastReceived
         bool success = NetworkPackage::unserialize(datagram, receivedPackage);
 
 		//qDebug() << "udp connection from " << receivedPackage->get<QString>();
-
-		qDebug() << "Received datagram " << datagram.data() ;
+		//qDebug() << "Received datagram " << datagram.data() ;
 
         if (!success || receivedPackage->type() != PACKAGE_TYPE_IDENTITY) {
             delete receivedPackage;
@@ -185,7 +184,8 @@ void LanLinkProvider::newUdpConnection() //udpBroadcastReceived
         receivedIdentityPackages[socket].sender = sender;
         connect(socket, SIGNAL(connected()), this, SLOT(connected()));
         connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectError()));
-        socket->connectToHost(sender, tcpPort);
+		connect(socket, &QSslSocket::encrypted, this, &LanLinkProvider::encrypted);
+		socket->connectToHost(sender, tcpPort);
     }
 }
 

@@ -207,9 +207,7 @@ void Daemon::onDeviceStatusChanged()
 	device->isTrusted()? t = "true" : t = "false";
 
 	qDebug() << "Device" << device->name() << "status changed. Reachable:" << device->isReachable() << ", Trusted:" << device->isTrusted();
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name()
-								+ " status changed. Reachable: " + r
-								+ " Trusted: " + t);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Device " + device->name() + " status changed. Reachable: " + r + " Trusted: " + t);
 
 	if (!device->isReachable() && !device->isTrusted()) {
 		qDebug() << "Destroying device" << device->name();
@@ -257,7 +255,7 @@ bool Daemon::isDiscoveringDevices() const
 QString Daemon::deviceIdByName(const QString &name) const
 {
 	Q_FOREACH (Device* d, d->mDevices) {
-		if (d->name() == name && d->isTrusted())
+		if (d->name() == name /*&& d->isTrusted()*/)
 			return d->id();
 	}
 	return {};

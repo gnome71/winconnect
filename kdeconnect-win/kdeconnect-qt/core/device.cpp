@@ -62,9 +62,6 @@ Device::Device(QObject* parent, const QString& id)
 	m_deviceName = info.deviceName;
 	m_deviceType = str2type(info.deviceType);
 
-	//Register in bus
-	//QDBusConnection::sessionBus().registerObject(dbusPath(), this, QDBusConnection::ExportScriptableContents | QDBusConnection::ExportAdaptors);
-
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	//m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
 
@@ -83,9 +80,6 @@ Device::Device(QObject* parent, const NetworkPackage& identityPackage, DeviceLin
 	, m_deviceName(identityPackage.get<QString>("deviceName"))
 {
 	addLink(identityPackage, dl);
-
-	//Register in bus
-	//QDBusConnection::sessionBus().registerObject(dbusPath(), this, QDBusConnection::ExportScriptableContents | QDBusConnection::ExportAdaptors);
 
 	connect(this, &Device::pairingError, this, &warn);
 }
@@ -343,7 +337,6 @@ QString Device::encryptionInfo() const
 	}
 	result += "Local SHA1 fingerprint: " + localSha1;
 
-	qDebug() << m_deviceId;
 	std::string  remotePem = KdeConnectConfig::instance()->getDeviceProperty(m_deviceId, "certificate").toStdString();
 	QSslCertificate remoteCertificate = QSslCertificate(QByteArray(remotePem.c_str(), remotePem.size()));
 	QString remoteSha1 = QString::fromLatin1(remoteCertificate.digest(digestAlgorithm).toHex());

@@ -202,25 +202,31 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 
 void MainWindow::on_listViewDevice_clicked(QModelIndex index)
 {
-	m_currentDevice = m_daemon->getDevice(m_dmodel->data(index, DevicesModel::NameModelRole).toString());
+	//m_currentDevice = m_daemon->getDevice(m_dmodel->data(index, DevicesModel::NameModelRole).toString());
 
 	ui->labelPairedDevice->setText(m_dmodel->data(index, Qt::DisplayRole).toString());
-	// Reachable 0x01, Paired 0x02
+	// Paired 0x01, Reachable 0x02, combineable
 	if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 1) {
 		ui->labelPairedDevice->setEnabled(true);
 		ui->pushButtonUnPair->setText("Pair");
 		ui->pushButtonUnPair->setEnabled(true);
 	}
-//	else if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 2) {
-//		ui->labelPairedDevice->setEnabled(true);
-//		ui->pushButtonUnPair->setText("Unpair");
-//		ui->pushButtonUnPair->setEnabled(true);
-//	}
+	else if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 2) {
+		ui->labelPairedDevice->setEnabled(true);
+		ui->pushButtonUnPair->setText("Pair");
+		ui->pushButtonUnPair->setEnabled(true);
+	}
 	else if(m_dmodel->data(index, DevicesModel::StatusModelRole) == 3) {
 		ui->labelPairedDevice->setEnabled(true);
 		ui->pushButtonUnPair->setText("Unpair");
 		ui->pushButtonUnPair->setEnabled(true);
 	}
+
+	QString tt = "";
+	Q_FOREACH(const QString& d, m_daemon->devices()) {
+		tt.append(m_daemon->getDevice(d)->name() + "\n");
+	}
+	trayIcon->setToolTip(tt);
 }
 
 void MainWindow::on_dataChanged(QModelIndex tl, QModelIndex br)
@@ -243,6 +249,7 @@ void MainWindow::on_pushButtonOk_clicked()
 
 void MainWindow::createTrayIcon()
 {
+	qDebug() << "MainWindow Tray:" << m_daemon->devices();
 	trayIcon = new QSystemTrayIcon(QIcon(":/icons/AppIcon.svg"), this);
 	trayIcon->setToolTip("WinConnect");
 	trayIconMenu = new QMenu(this);

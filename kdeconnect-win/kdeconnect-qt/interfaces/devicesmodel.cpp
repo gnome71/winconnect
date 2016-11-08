@@ -28,7 +28,7 @@
 
 
 static QString createId() { return QCoreApplication::instance()->applicationName()+QString::number(QCoreApplication::applicationPid()); }
-Q_GLOBAL_STATIC_WITH_ARGS(QString, s_keyId, (createId()));
+Q_GLOBAL_STATIC_WITH_ARGS(QString, s_keyId, (createId()))
 
 DevicesModel::DevicesModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -42,8 +42,6 @@ DevicesModel::DevicesModel(QObject *parent)
             this, SIGNAL(rowsChanged()));
     connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)),
             this, SIGNAL(rowsChanged()));
-	connect(this, SIGNAL(finishedDeviceList(QStringList)),
-			this, SLOT(receivedDeviceList(QStringList)));
 
 	connect(m_daemonInterface, SIGNAL(deviceAdded(QString)),
             this, SLOT(deviceAdded(QString)));
@@ -77,8 +75,7 @@ DevicesModel::~DevicesModel()
 
 int DevicesModel::rowForDevice(const QString& id) const
 {
-	for (int i = 0, c = m_daemonInterface->devicesList().size(); i<c; ++i) {
-		qDebug() << "rowForDevice: " << m_daemonInterface->devicesList().at(i)->id();
+	for (int i = 0, c = m_deviceList.size(); i<c; ++i) {
 		if (m_daemonInterface->devicesList().at(i)->id() == id) {
             return i;
         }
@@ -88,10 +85,10 @@ int DevicesModel::rowForDevice(const QString& id) const
 
 void DevicesModel::deviceAdded(const QString& id)
 {
-    if (rowForDevice(id) >= 0) {
+	if (rowForDevice(id) >= 0) {
 		KcLogger::instance()->write(QtMsgType::QtDebugMsg, mPrefix, "Trying to add a device twice. Id: " + id);
 		//Q_ASSERT_X(false, "deviceAdded", "Trying to add a device twice");
-        return;
+		return;
     }
 
 	Device* dev = m_daemonInterface->getDevice(id);
@@ -221,7 +218,6 @@ void DevicesModel::clearDevices()
 {
     if (!m_deviceList.isEmpty()) {
         beginRemoveRows(QModelIndex(), 0, m_deviceList.size() - 1);
-//        qDeleteAll(m_deviceList);
         m_deviceList.clear();
         endRemoveRows();
     }
@@ -241,11 +237,11 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
 	QString device = m_deviceList[index.row()];
 	Device* d = m_daemonInterface->getDevice(m_daemonInterface->deviceIdByName(device));
 	if(device == nullptr) {
-//		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "No device for row: " + QString::number(index.row()));
+		//KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "No device for row: " + QString::number(index.row()));
 		return QVariant();
 	}
 	if(d == nullptr) {
-//		KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "No device registered in daemon");
+		//KcLogger::instance()->write(QtMsgType::QtInfoMsg, mPrefix, "No device registered in daemon");
 		return QVariant();
 	}
 
