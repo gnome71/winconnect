@@ -76,7 +76,12 @@ DevicesModel::~DevicesModel()
 int DevicesModel::rowForDevice(const QString& id) const
 {
 	for (int i = 0, c = m_deviceList.size(); i<c; ++i) {
-		if (m_daemonInterface->devicesList().at(i)->id() == id) {
+		QString ddevn = m_daemonInterface->devicesList().at(i)->name();
+		QString ddevi = m_daemonInterface->devicesList().at(i)->id();
+		QString mdevn = m_deviceList.at(i);
+		QString mdevi = m_daemonInterface->deviceIdByName(m_deviceList.at(i));
+		if (id == mdevi) {
+			qDebug() << id << "==" << mdevi;
             return i;
         }
     }
