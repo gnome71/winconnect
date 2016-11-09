@@ -263,11 +263,13 @@ QString Daemon::deviceIdByName(const QString &name) const
 
 void Daemon::askPairingConfirmation(PairingHandler *d)
 {
-	qDebug() << "askPairingConfirmation()";
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Asking for pairing confirmation");
+	const QString& dev = getDevice(d->deviceLink()->deviceId())->name();
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Asking user for pairing confirmation");
+
+	Q_EMIT askPairing(dev, "Confirm Pairing by clicking this message.");
 
 	QMessageBox msgBox;
-	msgBox.setText("Pairing request");
+	msgBox.setText("Pairing request from " + dev);
 	msgBox.setInformativeText("Accept pairing?");
 	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Discard);
 	msgBox.setDefaultButton(QMessageBox::Ok);

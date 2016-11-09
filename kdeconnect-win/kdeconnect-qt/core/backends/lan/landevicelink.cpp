@@ -93,7 +93,7 @@ void LanDeviceLink::dataReceived()
     NetworkPackage::unserialize(serializedPackage, &package);
 
 	qDebug() << "LanDeviceLink: dataReceived" << serializedPackage;
-	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Data received" + serializedPackage);
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Data received" + serializedPackage.simplified());
 
     if (package.type() == PACKAGE_TYPE_PAIR) {
         //TODO: Handle pair/unpair requests and forward them (to the pairing handler?)

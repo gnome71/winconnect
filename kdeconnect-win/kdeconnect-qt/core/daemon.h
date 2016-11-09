@@ -74,6 +74,7 @@ Q_SIGNALS:
 	Q_SCRIPTABLE void deviceRemoved(const QString& id); //Note that paired devices will never be removed
 	Q_SCRIPTABLE void deviceVisibilityChanged(const QString& id, bool isVisible);
 	Q_SCRIPTABLE void announcedNameChanged(const QString &announcedName);
+	void askPairing(const QString& dev, const QString& msg);
 	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
 
 private Q_SLOTS:

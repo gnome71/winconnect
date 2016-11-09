@@ -33,6 +33,9 @@ private slots:
 
 	void createTrayIcon();
 	void createTrayActions();
+	void showMessage(const QString& dev, const QString& msg);
+	void iconActivated(QSystemTrayIcon::ActivationReason reason);
+	void messageClicked();
 
 	void on_radioButtonLog_toggled(bool checked);
     void on_pushButtonMyName_clicked();
@@ -60,6 +63,7 @@ private:
 	QAction *restoreAction;
 	QAction *quitAction;
 	QMenu *trayIconMenu;
+	//const QString& notificationId;
 	const QString& mPrefix = "MainWindow";
 };
 

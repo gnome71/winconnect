@@ -62,7 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->lineEditMyName, &QLineEdit::textEdited, this, &MainWindow::on_lineEditMyName_textChanged);
 	connect(ui->listViewDevice, &QListView::activated, this, &MainWindow::on_listViewDevice_clicked);
 	connect(m_dmodel, &DevicesModel::dataChanged, this, &MainWindow::on_dataChanged);
+	connect(m_daemon, &Daemon::askPairing, this, &MainWindow::showMessage);
 	connect(m_logger, &KcLogger::logMe, this, &MainWindow::displayDebugMessage);
+	connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &MainWindow::messageClicked);
 }
 
 /**
@@ -276,5 +278,27 @@ void MainWindow::createTrayActions()
 
 	quitAction = new QAction(tr("&Quit"), this);
 	connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+}
+
+void MainWindow::showMessage(const QString& dev, const QString &msg)
+{
+	KcLogger::instance()->write(QtMsgType::QtInfoMsg, "  NOTIFY  ", dev + ": " + msg);
+	trayIcon->showMessage(dev, msg, QSystemTrayIcon::Information, 5000);
+}
+
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+	switch (reason) {
+	case QSystemTrayIcon::DoubleClick:
+		this->showNormal();
+	default:
+		;
+	}
+}
+
+void MainWindow::messageClicked()
+{
+	qDebug() << QObject::sender();
+
 }
 
