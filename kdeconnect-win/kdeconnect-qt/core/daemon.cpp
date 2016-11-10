@@ -35,26 +35,35 @@
 #include "device.h"
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
+#include "interfaces/notificationinterface.h"
 
 Q_GLOBAL_STATIC(Daemon*, s_instance)
 
+/**
+ * @brief The DaemonPrivate struct
+ */
 struct DaemonPrivate
 {
-	//Different ways to find devices and connect to them
-	QSet<LinkProvider*> mLinkProviders;
-
-	//Every known device
-	QMap<QString, Device*> mDevices;
-
+	QSet<LinkProvider*> mLinkProviders;	//! Different ways to find devices and connect to them
+	QMap<QString, Device*> mDevices;	//! Every known device
 	QSet<QString> mDiscoveryModeAcquisitions;
 };
 
+/**
+ * @brief Daemon::instance
+ * @return Q_GLOBAL_STATIC pointer to Daemon
+ */
 Daemon* Daemon::instance()
 {
 	Q_ASSERT(s_instance.exists());
 	return *s_instance;
 }
 
+/**
+ * @brief Daemon::Daemon
+ * @param parent
+ * @param testMode, Lan or Loopback backend
+ */
 Daemon::Daemon(QObject *parent, bool testMode)
 	: QObject(parent)
 	, d(new DaemonPrivate)
@@ -91,6 +100,10 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon started.");
 }
 
+/**
+ * @brief Daemon::acquireDiscoveryMode
+ * @param key
+ */
 void Daemon::acquireDiscoveryMode(const QString &key)
 {
 	bool oldState = d->mDiscoveryModeAcquisitions.isEmpty();
@@ -102,6 +115,10 @@ void Daemon::acquireDiscoveryMode(const QString &key)
 	}
 }
 
+/**
+ * @brief Daemon::releaseDiscoveryMode
+ * @param key
+ */
 void Daemon::releaseDiscoveryMode(const QString &key)
 {
 	bool oldState = d->mDiscoveryModeAcquisitions.isEmpty();
@@ -113,6 +130,10 @@ void Daemon::releaseDiscoveryMode(const QString &key)
 	}
 }
 
+/**
+ * @brief Daemon::removeDevice
+ * @param device
+ */
 void Daemon::removeDevice(Device* device)
 {
 	d->mDevices.remove(device->id());
@@ -120,6 +141,9 @@ void Daemon::removeDevice(Device* device)
 	Q_EMIT deviceRemoved(device->id());
 }
 
+/**
+ * @brief Daemon::cleanDevices
+ */
 void Daemon::cleanDevices()
 {
 	Q_FOREACH (Device* device, d->mDevices) {
@@ -134,6 +158,9 @@ void Daemon::cleanDevices()
 	}
 }
 
+/**
+ * @brief Daemon::forceOnNetworkChange
+ */
 void Daemon::forceOnNetworkChange()
 {
 	qDebug() << "Sending onNetworkChange to " << d->mLinkProviders.size() << " LinkProviders";
@@ -143,6 +170,11 @@ void Daemon::forceOnNetworkChange()
 	}
 }
 
+/**
+ * @brief Daemon::getDevice
+ * @param deviceId
+ * @return
+ */
 Device*Daemon::getDevice(const QString& deviceId)
 {
 	Q_FOREACH (Device* device, d->mDevices) {
@@ -153,6 +185,12 @@ Device*Daemon::getDevice(const QString& deviceId)
 	return Q_NULLPTR;
 }
 
+/**
+ * @brief Daemon::devices
+ * @param onlyReachable
+ * @param onlyTrusted
+ * @return QStringList, list of deviceIds
+ */
 QStringList Daemon::devices(bool onlyReachable, bool onlyTrusted) const
 {
 	QStringList ret;
@@ -164,6 +202,11 @@ QStringList Daemon::devices(bool onlyReachable, bool onlyTrusted) const
 	return ret;
 }
 
+/**
+ * @brief Daemon::onNewDeviceLink
+ * @param identityPackage
+ * @param dl
+ */
 void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* dl)
 {
 	const QString& id = identityPackage.get<QString>("deviceId");
@@ -198,6 +241,9 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 	}
 }
 
+/**
+ * @brief Daemon::onDeviceStatusChanged
+ */
 void Daemon::onDeviceStatusChanged()
 {
 	Device* device = (Device*)sender();
@@ -219,6 +265,10 @@ void Daemon::onDeviceStatusChanged()
 
 }
 
+/**
+ * @brief Daemon::setAnnouncedName
+ * @param name, the name of the local device
+ */
 void Daemon::setAnnouncedName(const QString &name)
 {
 	qDebug() << "Announcing name";
@@ -228,11 +278,22 @@ void Daemon::setAnnouncedName(const QString &name)
 	Q_EMIT announcedNameChanged(name);
 }
 
+/**
+ * @brief Daemon::announcedName
+ * @return name of the local device
+ */
 QString Daemon::announcedName()
 {
 	return KdeConnectConfig::instance()->name();
 }
 
+/**
+ * @brief Daemon::networkAccessManager
+ *
+ * The QNetworkAccessManager class allows the application to send
+ * network requests and receive replies.
+ * @return
+ */
 QNetworkAccessManager* Daemon::networkAccessManager()
 {
 	static QPointer<QNetworkAccessManager> manager;
@@ -242,16 +303,29 @@ QNetworkAccessManager* Daemon::networkAccessManager()
 	return manager;
 }
 
+/**
+ * @brief Daemon::devicesList
+ * @return List of pointer to devices
+ */
 QList<Device*> Daemon::devicesList() const
 {
 	return d->mDevices.values();
 }
 
+/**
+ * @brief Daemon::isDiscoveringDevices
+ * @return
+ */
 bool Daemon::isDiscoveringDevices() const
 {
 	return !d->mDiscoveryModeAcquisitions.isEmpty();
 }
 
+/**
+ * @brief Daemon::deviceIdByName
+ * @param name
+ * @return deviceId
+ */
 QString Daemon::deviceIdByName(const QString &name) const
 {
 	Q_FOREACH (Device* d, d->mDevices) {
@@ -261,6 +335,12 @@ QString Daemon::deviceIdByName(const QString &name) const
 	return {};
 }
 
+/**
+ * @brief Daemon::askPairingConfirmation
+ *
+ * Ask the user for pairing confirmation to a device
+ * @param d
+ */
 void Daemon::askPairingConfirmation(PairingHandler *d)
 {
 	const QString& dev = getDevice(d->deviceLink()->deviceId())->name();
@@ -284,12 +364,20 @@ void Daemon::askPairingConfirmation(PairingHandler *d)
 	}
 }
 
+/**
+ * @brief Daemon::reportError
+ * @param title
+ * @param description
+ */
 void Daemon::reportError(const QString &title, const QString &description)
 {
 	qDebug() << "Daemon: " << title << description;
 	KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, title + " " + description);
 }
 
+/**
+ * @brief Daemon::~Daemon
+ */
 Daemon::~Daemon()
 {
 }

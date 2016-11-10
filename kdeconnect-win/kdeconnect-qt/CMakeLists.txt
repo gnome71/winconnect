@@ -1,7 +1,7 @@
 project(kdeconnect-qt)
 
 set(KDECONNECT_VERSION_MAJOR 0)
-set(KDECONNECT_VERSION_MINOR 1)
+set(KDECONNECT_VERSION_MINOR 2)
 set(KDECONNECT_VERSION_PATCH 0)
 set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.${KDECONNECT_VERSION_PATCH}")
 
@@ -67,6 +67,8 @@ set(SOURCES
 	core/device.cpp
 	core/daemon.cpp
 	core/kdeconnectconfig.cpp
+	core/kdeconnectpluginconfig.cpp
+	core/kdeconnectplugin.cpp
 	core/networkpackage.cpp
 	core/backends/devicelink.cpp
 	core/backends/pairinghandler.cpp
@@ -79,6 +81,8 @@ set(SOURCES
 	core/backends/loopback/loopbacklinkprovider.cpp
 	core/backends/loopback/loopbackdevicelink.cpp
 	interfaces/devicesmodel.cpp
+	interfaces/notificationinterface.cpp
+	plugins/ping/pingplugin.cpp
 	)
 
 set(FORMS

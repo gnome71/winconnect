@@ -33,26 +33,31 @@ class DeviceLink;
 class Device;
 class QNetworkAccessManager;
 
+/**
+ * @brief The Daemon class
+ *
+ * The daemon runs in the GUI Thread and handles devices and connections
+ */
 class Daemon
 	: public QObject
 {
 	Q_OBJECT
 	Q_CLASSINFO("D-Bus Interface", "org.kde.kdeconnect.daemon")
-	Q_PROPERTY(bool isDiscoveringDevices READ isDiscoveringDevices)
+	Q_PROPERTY(bool isDiscoveringDevices READ isDiscoveringDevices)	//! is discovering devices?
 
 public:
 	explicit Daemon(QObject *parent, bool testMode = false);
 	~Daemon() override;
 
-	static Daemon* instance();
+	static Daemon* instance();	//! returns an instance of the daemon
 
-	QList<Device*> devicesList() const;
+	QList<Device*> devicesList() const;		//! List of pointer to devices
 
-	void askPairingConfirmation(PairingHandler *d);
-	void reportError(const QString &title, const QString &description);
+	void askPairingConfirmation(PairingHandler *d);	//! ask the user for confirmation
+	void reportError(const QString &title, const QString &description);	//! report an error to MainWindow
 	QNetworkAccessManager* networkAccessManager();
 
-	Device* getDevice(const QString& deviceId);
+	Device* getDevice(const QString& deviceId);	//! returns a pointer to device with deviceId
 
 public Q_SLOTS:
 	Q_SCRIPTABLE void acquireDiscoveryMode(const QString &id);
@@ -61,33 +66,33 @@ public Q_SLOTS:
 	Q_SCRIPTABLE void forceOnNetworkChange();
 
 	///don't try to turn into Q_PROPERTY, it doesn't work
-	Q_SCRIPTABLE QString announcedName();
-	Q_SCRIPTABLE void setAnnouncedName(const QString &name);
+	Q_SCRIPTABLE QString announcedName();	//! name of local device
+	Q_SCRIPTABLE void setAnnouncedName(const QString &name);	//! change name of local device
 
 	//Returns a list of ids. The respective devices can be manipulated using the dbus path: "/modules/kdeconnect/Devices/"+id
-	Q_SCRIPTABLE QStringList devices(bool onlyReachable = false, bool onlyPaired = false) const;
+	Q_SCRIPTABLE QStringList devices(bool onlyReachable = false, bool onlyPaired = false) const; //! returns a list of device Ids
 
-	Q_SCRIPTABLE QString deviceIdByName(const QString &name) const;
+	Q_SCRIPTABLE QString deviceIdByName(const QString &name) const; //! returns the device id
 
 Q_SIGNALS:
-	Q_SCRIPTABLE void deviceAdded(const QString& id);
-	Q_SCRIPTABLE void deviceRemoved(const QString& id); //Note that paired devices will never be removed
+	Q_SCRIPTABLE void deviceAdded(const QString& id);	//! signal to DeviceModel
+	Q_SCRIPTABLE void deviceRemoved(const QString& id); //! signal to DeviceModel
 	Q_SCRIPTABLE void deviceVisibilityChanged(const QString& id, bool isVisible);
-	Q_SCRIPTABLE void announcedNameChanged(const QString &announcedName);
-	void askPairing(const QString& dev, const QString& msg);
+	Q_SCRIPTABLE void announcedNameChanged(const QString &announcedName);	//! signal to DeviceModel
+	void askPairing(const QString& dev, const QString& msg);	//! signal to MainWindow
 	void logMe(QtMsgType type, const QString &prefix, const QString &msg);
 
 private Q_SLOTS:
-	void onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* dl);
-	void onDeviceStatusChanged();
+	void onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* dl);	//! new, known, trusted device, add it if necessary
+	void onDeviceStatusChanged();	//! reachable, trusted changed, destroy if necessary
 
 private:
 	const QString& prefix = "Daemon    ";
 	bool isDiscoveringDevices() const;
-	void removeDevice(Device* d);
-	void cleanDevices();
+	void removeDevice(Device* d);	//! remove device from DaemonPrivate
+	void cleanDevices();	//! remove untrusted devices
 
-	QScopedPointer<struct DaemonPrivate> d;
+	QScopedPointer<struct DaemonPrivate> d;	//! LinkProviders, Devices and DiscoveryModeAcquisitions
 };
 
 #endif // DAEMON_H

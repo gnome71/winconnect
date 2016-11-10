@@ -30,10 +30,14 @@
 
 #include "networkpackage.h"
 #include "backends/devicelink.h"
+#include "interfaces/notificationinterface.h"
 
 class DeviceLink;
 //class KdeConnectPlugin;
 
+/**
+ * @brief The Device class
+ */
 class Device
 	: public QObject
 {
@@ -49,6 +53,9 @@ class Device
 
 public:
 
+	/**
+	 * @brief The DeviceType enum
+	 */
 	enum DeviceType {
 		Unknown,
 		Desktop,
@@ -57,6 +64,9 @@ public:
 		Tablet,
 	};
 
+	/**
+	 * @brief The TrustStatus enum
+	 */
 	enum TrustStatus {
 		NotTrusted,
 		Trusted
@@ -80,7 +90,7 @@ public:
 
 	QString id() const { return m_deviceId; }
 	QString name() const { return m_deviceName; }
-	QString dbusPath() const { return "/modules/kdeconnect/devices/"+id(); }
+	QString dbusPath() const { return "/modules/kdeconnect/devices/"+id(); }	//! not used
 	QString type() const { return type2str(m_deviceType); }
 	QString iconName() const;
 	QString statusIconName() const;
@@ -110,18 +120,15 @@ public:
 	//QStringList supportedPlugins() const { return m_supportedPlugins.toList(); }
 
 public Q_SLOTS:
-	///sends a @p np package to the device
-	///virtual for testing purposes.
+	//!sends a @p np package to the device
+	//!virtual for testing purposes.
 	virtual bool sendPackage(NetworkPackage& np);
-
-	//Dbus operations
-public Q_SLOTS:
-	Q_SCRIPTABLE void requestPair(); //to all links
-	Q_SCRIPTABLE void unpair(); //from all links
+	Q_SCRIPTABLE void requestPair(); //! user requests pair
+	Q_SCRIPTABLE void unpair(); //! user requests unpair
 	//Q_SCRIPTABLE void reloadPlugins(); //from kconf
 
 private Q_SLOTS:
-	void privateReceivedPackage(const NetworkPackage& np);
+	void privateReceivedPackage(const NetworkPackage& np); //! receieved a pairing package
 	void linkDestroyed(QObject* o);
 	void pairStatusChanged(DeviceLink::PairStatus current);
 
@@ -149,7 +156,7 @@ private: //Fields (TODO: dPointer!)
 
 	QVector<DeviceLink*> m_deviceLinks;
 
-//	QHash<QString, KdeConnectPlugin*> m_plugins;
+	//	QHash<QString, KdeConnectPlugin*> m_plugins;
 
 	//Capabilities stuff
 //	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;

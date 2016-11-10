@@ -1,3 +1,24 @@
+/**
+ * Copyright 2016 by Alexander Kaspar <alexander.kaspar@gmail.com>
+ * based on the work from Albert Vaca <albertvaka@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License or (at your option) version 3 or any later version
+ * accepted by the membership of KDE e.V. (or its successor approved
+ * by the membership of KDE e.V.), which shall act as a proxy
+ * defined in Section 14 of version 3 of the license.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -19,6 +40,10 @@
 
 static QString createId() { return QStringLiteral("kcw")+QString::number(QCoreApplication::applicationPid()); }
 
+/**
+ * @brief MainWindow::MainWindow
+ * @param parent
+ */
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -112,6 +137,9 @@ void MainWindow::displayDebugMessage(QtMsgType type, const QString &prefix, cons
 	}
 }
 
+/**
+ * @brief MainWindow::~MainWindow
+ */
 MainWindow::~MainWindow()
 {
 	m_logger->disconnect();
@@ -119,6 +147,10 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+/**
+ * @brief MainWindow::on_radioButtonLog_toggled
+ * @param checked
+ */
 void MainWindow::on_radioButtonLog_toggled(bool checked)
 {
 	if(checked) {
@@ -133,11 +165,17 @@ void MainWindow::on_radioButtonLog_toggled(bool checked)
 	}
 }
 
+/**
+ * @brief MainWindow::on_pushButtonMyName_clicked
+ */
 void MainWindow::on_pushButtonMyName_clicked()
 {
 	ui->pushButtonMyName->setEnabled(false);
 }
 
+/**
+ * @brief MainWindow::on_pushButtonUnPair_clicked
+ */
 void MainWindow::on_pushButtonUnPair_clicked()
 {
 	if(!ui->listViewDevice->selectionModel()->hasSelection())
@@ -160,6 +198,9 @@ void MainWindow::on_pushButtonUnPair_clicked()
 	}
 }
 
+/**
+ * @brief MainWindow::on_pushButtonRefresh_clicked
+ */
 void MainWindow::on_pushButtonRefresh_clicked()
 {
 	m_daemon->acquireDiscoveryMode(createId());
@@ -178,6 +219,9 @@ void MainWindow::on_lineEditMyName_textChanged()
 	}
 }
 
+/**
+ * @brief MainWindow::on_pushButtonQcaInfo_clicked
+ */
 void MainWindow::on_pushButtonQcaInfo_clicked()
 {
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", KdeConnectConfig::instance()->getQcaInfo());
@@ -188,9 +232,11 @@ void MainWindow::on_pushButtonQcaInfo_clicked()
 	displayDebugMessage(QtMsgType::QtDebugMsg, "MainWindow", m_currentDevice->encryptionInfo());
 }
 
+/**
+ * @brief MainWindow::on_pushButtonSettingInfo_clicked
+ */
 void MainWindow::on_pushButtonSettingInfo_clicked()
 {
-
 	QString versionString = QString("KdeConnect-Win Version: %1").arg(KDECONNECT_VERSION_STRING);
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", versionString);
 	QDir bcd = KdeConnectConfig::instance()->baseConfigDir();
@@ -202,6 +248,10 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyDeviceType: " + KdeConnectConfig::instance()->deviceType());
 }
 
+/**
+ * @brief MainWindow::on_listViewDevice_clicked
+ * @param index
+ */
 void MainWindow::on_listViewDevice_clicked(QModelIndex index)
 {
 	//m_currentDevice = m_daemon->getDevice(m_dmodel->data(index, DevicesModel::NameModelRole).toString());
@@ -231,6 +281,11 @@ void MainWindow::on_listViewDevice_clicked(QModelIndex index)
 	trayIcon->setToolTip(tt);
 }
 
+/**
+ * @brief MainWindow::on_dataChanged
+ * @param tl, index of the changed device in the model
+ * @param br, not used
+ */
 void MainWindow::on_dataChanged(QModelIndex tl, QModelIndex br)
 {
 	Q_UNUSED(br);
@@ -242,6 +297,9 @@ void MainWindow::on_dataChanged(QModelIndex tl, QModelIndex br)
 	on_listViewDevice_clicked(tl);
 }
 
+/**
+ * @brief MainWindow::on_pushButtonOk_clicked
+ */
 void MainWindow::on_pushButtonOk_clicked()
 {
 	if (trayIcon->isVisible()) {
@@ -249,6 +307,9 @@ void MainWindow::on_pushButtonOk_clicked()
 	}
 }
 
+/**
+ * @brief MainWindow::createTrayIcon
+ */
 void MainWindow::createTrayIcon()
 {
 	qDebug() << "MainWindow Tray:" << m_daemon->devices();
@@ -265,6 +326,9 @@ void MainWindow::createTrayIcon()
 	trayIcon->show();
 }
 
+/**
+ * @brief MainWindow::createTrayActions
+ */
 void MainWindow::createTrayActions()
 {
 	minimizeAction = new QAction(tr("Mi&nimize"), this);
@@ -280,6 +344,11 @@ void MainWindow::createTrayActions()
 	connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
 
+/**
+ * @brief MainWindow::showMessage
+ * @param dev
+ * @param msg
+ */
 void MainWindow::showMessage(const QString& dev, const QString &msg)
 {
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, "  NOTIFY  ", dev + ": " + msg);
@@ -296,6 +365,9 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 	}
 }
 
+/**
+ * @brief MainWindow::messageClicked
+ */
 void MainWindow::messageClicked()
 {
 	qDebug() << QObject::sender();

@@ -42,6 +42,10 @@
 #include "kdeconnectconfig.h"
 #include "daemon.h"
 
+/**
+ * @brief warn
+ * @param info
+ */
 static void warn(const QString &info)
 {
 	qWarning() << "Device pairing error" << info;
@@ -61,7 +65,7 @@ Device::Device(QObject* parent, const QString& id)
 
 	m_deviceName = info.deviceName;
 	m_deviceType = str2type(info.deviceType);
-
+	// TODO: NotificationInterface* m_notificationInterface = new NotificationInterface(this, m_deviceId);
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	//m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
 
@@ -81,15 +85,24 @@ Device::Device(QObject* parent, const NetworkPackage& identityPackage, DeviceLin
 {
 	addLink(identityPackage, dl);
 
+	// TODO: NotificationInterface* m_notificationInterface = new NotificationInterface(this, m_deviceId);
+
 	connect(this, &Device::pairingError, this, &warn);
 }
 
+/**
+ * @brief Device::~Device
+ */
 Device::~Device()
 {
 	qDeleteAll(m_deviceLinks);
 	m_deviceLinks.clear();
+	//delete m_notifications;
 }
 
+/**
+ * @brief Device::requestPair
+ */
 void Device::requestPair()
 {
 	if (isTrusted()) {
@@ -107,6 +120,9 @@ void Device::requestPair()
 	}
 }
 
+/**
+ * @brief Device::unpair
+ */
 void Device::unpair()
 {
 	Q_FOREACH(DeviceLink* dl, m_deviceLinks) {
@@ -115,6 +131,10 @@ void Device::unpair()
 	KdeConnectConfig::instance()->removeTrustedDevice(id());
 }
 
+/**
+ * @brief Device::pairStatusChanged
+ * @param status
+ */
 void Device::pairStatusChanged(DeviceLink::PairStatus status)
 {
 	if (status == DeviceLink::NotPaired) {
@@ -136,11 +156,22 @@ void Device::pairStatusChanged(DeviceLink::PairStatus status)
 	Q_ASSERT(isTrusted == this->isTrusted());
 }
 
+/**
+ * @brief lessThan
+ * @param p1
+ * @param p2
+ * @return
+ */
 static bool lessThan(DeviceLink* p1, DeviceLink* p2)
 {
 	return p1->provider()->priority() > p2->provider()->priority();
 }
 
+/**
+ * @brief Device::addLink
+ * @param identityPackage
+ * @param link
+ */
 void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 {
 	qDebug() << "Device: adding link to" << id() << "via" << link->provider();
@@ -192,11 +223,19 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 	connect(link, &DeviceLink::pairingError, this, &Device::pairingError);
 }
 
+/**
+ * @brief Device::linkDestroyed
+ * @param o
+ */
 void Device::linkDestroyed(QObject* o)
 {
 	removeLink(static_cast<DeviceLink*>(o));
 }
 
+/**
+ * @brief Device::removeLink
+ * @param link
+ */
 void Device::removeLink(DeviceLink* link)
 {
 	m_deviceLinks.removeAll(link);
@@ -209,6 +248,11 @@ void Device::removeLink(DeviceLink* link)
 	}
 }
 
+/**
+ * @brief Device::sendPackage
+ * @param np
+ * @return
+ */
 bool Device::sendPackage(NetworkPackage& np)
 {
 	Q_ASSERT(np.type() != PACKAGE_TYPE_PAIR);
@@ -222,6 +266,10 @@ bool Device::sendPackage(NetworkPackage& np)
 	return false;
 }
 
+/**
+ * @brief Device::privateReceivedPackage
+ * @param np
+ */
 void Device::privateReceivedPackage(const NetworkPackage& np)
 {
 	Q_ASSERT(np.type() != PACKAGE_TYPE_PAIR);
@@ -231,7 +279,7 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 //			qWarning() << "discarding unsupported package" << np.type() << "for" << name();
 //		}
 //		Q_FOREACH (KdeConnectPlugin* plugin, plugins) {
-//			plugin->receivePackage(np);
+//TODO:			plugin->receivePackage(np);
 //		}
 	} else {
 		qDebug() << "Device: device" << name() << "not paired, ignoring package" << np.type();
@@ -240,11 +288,19 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 
 }
 
+/**
+ * @brief Device::isTrusted
+ * @return
+ */
 bool Device::isTrusted() const
 {
 	return KdeConnectConfig::instance()->trustedDevices().contains(id());
 }
 
+/**
+ * @brief Device::availableLinks
+ * @return
+ */
 QStringList Device::availableLinks() const
 {
 	QStringList sl;
@@ -254,6 +310,9 @@ QStringList Device::availableLinks() const
 	return sl;
 }
 
+/**
+ * @brief Device::cleanUnneededLinks
+ */
 void Device::cleanUnneededLinks() {
 	if (isTrusted()) {
 		return;
@@ -269,6 +328,11 @@ void Device::cleanUnneededLinks() {
 	}
 }
 
+/**
+ * @brief Device::str2type
+ * @param deviceType
+ * @return Device type
+ */
 Device::DeviceType Device::str2type(const QString &deviceType) {
 	if (deviceType == "desktop") return Desktop;
 	if (deviceType == "laptop") return Laptop;
@@ -277,6 +341,11 @@ Device::DeviceType Device::str2type(const QString &deviceType) {
 	return Unknown;
 }
 
+/**
+ * @brief Device::type2str
+ * @param deviceType
+ * @return deviceType
+ */
 QString Device::type2str(Device::DeviceType deviceType) {
 	if (deviceType == Desktop) return "desktop";
 	if (deviceType == Laptop) return "laptop";
@@ -285,6 +354,10 @@ QString Device::type2str(Device::DeviceType deviceType) {
 	return "unknown";
 }
 
+/**
+ * @brief Device::statusIconName
+ * @return IconName
+ */
 QString Device::statusIconName() const
 {
 	return iconForStatus(isReachable(), isTrusted());
@@ -295,7 +368,12 @@ QString Device::iconName() const
 	return iconForStatus(true, false);
 }
 
-//TODO: icon
+/**
+ * @brief Device::iconForStatus
+ * @param reachable
+ * @param trusted
+ * @return IconName
+ */
 QString Device::iconForStatus(bool reachable, bool trusted) const
 {
 	Device::DeviceType deviceType = m_deviceType;
@@ -318,6 +396,10 @@ QString Device::iconForStatus(bool reachable, bool trusted) const
 	return type+'-'+status;
 }
 
+/**
+ * @brief Device::setName
+ * @param name
+ */
 void Device::setName(const QString &name)
 {
 	if (m_deviceName != name) {
@@ -326,6 +408,10 @@ void Device::setName(const QString &name)
 	}
 }
 
+/**
+ * @brief Device::encryptionInfo
+ * @return Encryption info for device
+ */
 QString Device::encryptionInfo() const
 {
 	QString result;

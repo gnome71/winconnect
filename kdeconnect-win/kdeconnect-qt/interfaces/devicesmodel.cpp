@@ -1,5 +1,6 @@
 /**
- * Copyright 2013 Albert Vaca <albertvaka@gmail.com>
+ * Copyright 2014 Albert Vaca <albertvaka@gmail.com>
+ * Modified for Windows by Alexander Kaspar <alexander.kaspar@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
