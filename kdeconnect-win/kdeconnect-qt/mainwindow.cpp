@@ -28,7 +28,6 @@
 #include "core/daemon.h"
 #include "core/networkpackage.h"
 
-
 #include <QtCrypto>
 #include <QLoggingCategory>
 #include <QDateTime>
@@ -36,6 +35,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QMenu>
+#include <QLibraryInfo>
 #include <cassert>
 
 static QString createId() { return QStringLiteral("kcw")+QString::number(QCoreApplication::applicationPid()); }
@@ -78,6 +78,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	// Set model/view
 	m_dmodel = new DevicesModel();
 	ui->listViewDevice->setModel(m_dmodel);
+
+	// Load plugins
+	PluginManager::instance()->initialize();
+	qDebug() << "Successfully loaded:" << PluginManager::instance()->plugins();
+	PluginManager::instance()->uninitialize();
 
 	// Create tray stuff
 	createTrayActions();
@@ -243,6 +248,7 @@ void MainWindow::on_pushButtonSettingInfo_clicked()
 	QDir dcd = KdeConnectConfig::instance()->deviceConfigDir("1234");
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "BaseConfigDir: " + bcd.path());
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "DeviceConfigDir: " + dcd.path());
+	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "PluginDir: " + QLibraryInfo::location(QLibraryInfo::PluginsPath));
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyName: " + KdeConnectConfig::instance()->name());
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyId: " + QString(KdeConnectConfig::instance()->deviceId()));
 	displayDebugMessage(QtMsgType::QtInfoMsg, "MainWindow", "MyDeviceType: " + KdeConnectConfig::instance()->deviceType());

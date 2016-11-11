@@ -2,22 +2,24 @@ project(kdeconnectcore)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+add_subdirectory(backends/lan)
 #add_subdirectory(backends/loopback)
 
-set(SOURCES
-#	${backends_SOURCES}
+set(core_SRCS
+	${backends_SRCS}
 
-#	backends/linkprovider.cpp
-#	backends/devicelink.cpp
-#	backends/pairinghandler.cpp
+	core/backends/linkprovider.cpp
+	core/backends/devicelink.cpp
+	core/backends/pairinghandler.cpp
 
-	kclogger.cpp
-	kdeconnectconfig.cpp
-	deviceidhelper.cpp
-	networkpackage.cpp
-	udplistener.cpp
-#	daemon.cpp
-#	device.cpp
+	core/kclogger.cpp
+	core/kdeconnectconfig.cpp
+	core/deviceidhelper.cpp
+	core/networkpackage.cpp
+	core/daemon.cpp
+	core/device.cpp
+
+	PARENT_SCOPE
 	)
 
 set(HEADERS
@@ -25,8 +27,8 @@ set(HEADERS
 	kdeconnectconfig.h
 	deviceidhelper.h
 	networkpackage.h
-#	daemon.h
-#	device.h
+	daemon.h
+	device.h
 )
 
 # Create a target for the library

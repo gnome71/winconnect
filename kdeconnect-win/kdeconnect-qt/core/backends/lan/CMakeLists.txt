@@ -1,14 +1,13 @@
+set(backends_SRCS
+	${backends_SRCS}
 
-set(backends_kdeconnect_SRCS
-    ${backends_kdeconnect_SRCS}
-
-    backends/lan/server.cpp
-    backends/lan/lanlinkprovider.cpp
-    backends/lan/landevicelink.cpp
-    backends/lan/lanpairinghandler.cpp
-    backends/lan/uploadjob.cpp
-    backends/lan/downloadjob.cpp
-    backends/lan/socketlinereader.cpp
+	core/backends/lan/server.cpp
+	core/backends/lan/lanlinkprovider.cpp
+	core/backends/lan/landevicelink.cpp
+	core/backends/lan/lanpairinghandler.cpp
+#    backends/lan/uploadjob.cpp
+#    backends/lan/downloadjob.cpp
+	core/backends/lan/socketlinereader.cpp
 
     PARENT_SCOPE
 )

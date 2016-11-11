@@ -29,7 +29,8 @@
 #include "core/kdeconnectconfig.h"
 #include "core/daemon.h"
 #include "interfaces/devicesmodel.h"
-
+#include "plugins/plugin.h"
+#include "plugins/pluginmanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -80,6 +81,7 @@ private:
 	Device* m_currentDevice;
 	DevicesModel* m_dmodel;
 	QModelIndex m_currentIndex;
+	PluginManager* m_pluginManager;
 	KcLogger* m_logger;
 	KdeConnectConfig* m_config;
 

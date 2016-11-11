@@ -56,7 +56,8 @@ public Q_SLOTS:
 
     /**
      * This method will be called when a device is connected to this computer.
-     * The plugin could be loaded already, but there is no guarantee we will be able to reach the device until this is called.
+	 * The plugin could be loaded already, but there is no guarantee we will be
+	 * able to reach the device until this is called.
      */
     virtual void connected() = 0;
 
