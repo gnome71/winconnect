@@ -1,27 +1,23 @@
 #ifndef TESTPLUGINA_H
 #define TESTPLUGINA_H
 
-#pragma once
-
 #include "testPluginAExport.h"
-#include "plugins/plugin.h"
+#include "plugins/plugininterface.h"
 
 #include <QtCore>
 
 class TESTPLUGINA_EXPORT TestPluginA
-		: public Plugin
+		: public PluginInterface
 {
-	Q_INTERFACES(Plugin)
 	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "at.winconnect.plugin" FILE "testPluginA.json")
+	Q_PLUGIN_METADATA(IID "at.winconnect.pluginInterface" FILE "testPluginA.json")
+	Q_INTERFACES(PluginInterface)
 
 public:
-	TestPluginA();
-	~TestPluginA() override;
+	QString info(const QString& name) Q_DECL_OVERRIDE;
 
-signals:
-
-public slots:
+	//explicit TestPluginA(QObject* parent = 0/*, const QVariantList& args*/);
+	//~TestPluginA() override;
 };
 
 #endif // TESTPLUGINA_H

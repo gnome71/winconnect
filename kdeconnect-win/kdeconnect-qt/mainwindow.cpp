@@ -22,7 +22,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "kdeconnect-version.h"
+#include "winconnect-version.h"
 #include "core/kdeconnectconfig.h"
 #include "core/kclogger.h"
 #include "core/daemon.h"

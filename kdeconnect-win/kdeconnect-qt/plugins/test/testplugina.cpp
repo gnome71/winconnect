@@ -1,18 +1,11 @@
 #include "testplugina.h"
-#include "core/device.h"
 
-Q_PLUGIN_METADATA(IID "at.winconnect.plugin")
-
-TestPluginA::TestPluginA()
-	: Plugin()
+QString TestPluginA::info(const QString & name)
 {
-	qDebug() << "Testplugin constructor";
+	QString info = "TestPluginA info";
+	return info;
 }
 
-TestPluginA::~TestPluginA()
-{
-	qDebug() << "Testplugin destructor";
-}
+//Q_PLUGIN_METADATA(IID "at.winconnect.pluginInterface")
 
-//#include "testplugina.moc"
 

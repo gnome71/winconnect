@@ -29,13 +29,14 @@
 
 #include "kclogger.h"
 #include "kdeconnectconfig.h"
+#include "device.h"
 #include "networkpackage.h"
 #include "backends/lan/lanlinkprovider.h"
 #include "backends/loopback/loopbacklinkprovider.h"
-#include "device.h"
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "interfaces/notificationinterface.h"
+#include "plugins/plugininterface.h"
 
 Q_GLOBAL_STATIC(Daemon*, s_instance)
 
@@ -72,6 +73,10 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	*s_instance = this;
 	qDebug() << "KdeConnect daemon starting";
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon starting.");
+
+	// adding plugin for device
+	PluginInterface* testplugin;
+	qDebug() << testplugin->info("test");
 
 	//Load backends
 	if (testMode)
@@ -220,6 +225,16 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		Device* device = d->mDevices[id];
 		bool wasReachable = device->isReachable();
 		device->addLink(identityPackage, dl);
+
+//		// adding plugin for device
+//		PluginInterface* testplugin;
+//		qDebug() << testplugin->info("test");
+
+//		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
+//		QVariantList m_args;
+//		m_args << deviceVariant;
+//		TestPluginA* testPlugin = new TestPluginA(this, m_args);
+
 		if (!wasReachable) {
 			Q_EMIT deviceVisibilityChanged(id, true);
 		}

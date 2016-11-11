@@ -8,8 +8,8 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 cmake_minimum_required(VERSION 3.2.2)
 
 # Set policies
-cmake_policy(SET CMP0020 NEW)
-cmake_policy(SET CMP0003 OLD)
+#cmake_policy(SET CMP0020 NEW)
+#cmake_policy(SET CMP0003 OLD)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -Wno-microsoft-enum-value")
@@ -23,9 +23,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
-# Find Qca-qt5 in build tree
-#set(Qca-qt5_DIR ${PROJECT_SOURCE_DIR}/lib/qca/qca64-debug-dll/libd/cmake/Qca-qt5)
 
 # Search needed libs
 find_package(Qt5Widgets REQUIRED)
@@ -52,8 +49,8 @@ add_definitions(${Qt5Concurrent_DEFINITIONS})
 find_package(Qca-qt5 REQUIRED CONFIG)
 if(Qca-qt5_FOUND)
     message(STATUS "Qca-qt5 found v" ${Qca-qt5_VERSION})
-	get_target_property(Qca-qt5_location qca-qt5 LOCATION)
-	message(STATUS "Qca-qt5 location: " ${Qca-qt5_location})
+#	get_target_property(Qca-qt5_location qca-qt5 LOCATION)
+#	message(STATUS "Qca-qt5 location: " ${Qca-qt5_location})
 endif(Qca-qt5_FOUND)
 include_directories(${Qca-qt5_INCLUDES})
 add_definitions(${Qca-qt5_DEFINITIONS})
@@ -63,7 +60,7 @@ include(GenerateExportHeader)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
 )
-configure_file(kdeconnect-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/kdeconnect-version.h)
+configure_file(winconnect-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/winconnect-version.h)
 
 # Include subdirectories
 add_subdirectory(core)

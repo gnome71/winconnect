@@ -24,12 +24,12 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QVariantList>
 
 #include "core/kclogger.h"
 #include "core/kdeconnectconfig.h"
 #include "core/daemon.h"
 #include "interfaces/devicesmodel.h"
-#include "plugins/plugin.h"
 #include "plugins/pluginmanager.h"
 
 namespace Ui {
@@ -84,6 +84,7 @@ private:
 	PluginManager* m_pluginManager;
 	KcLogger* m_logger;
 	KdeConnectConfig* m_config;
+	QVariantList m_args;
 
 	// Menu for the trayIcon
 	QAction *minimizeAction;

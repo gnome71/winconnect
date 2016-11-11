@@ -1,8 +1,6 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
-#pragma once
-
 #include "pluginManagerExport.h"
 
 #include <QtCore/QObject>
