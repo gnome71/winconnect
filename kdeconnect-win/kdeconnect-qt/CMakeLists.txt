@@ -171,7 +171,6 @@ add_custom_target(windeploy-build-dir
 	COMMENT "Running windeployqt in " ${CMAKE_BINARY_DIR}
 )
 # Run windeployqt.exe in install prefix dir
-get_filename_component(_WINDEPLOY_DIR ${QT_QMAKE_EXECUTABLE} DIRECTORY)
 add_custom_target(windeploy-deploy-dir
 	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_INSTALL_PREFIX}/bin/${PROJECT_NAME}.exe"
 	WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin
