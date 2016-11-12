@@ -26,6 +26,8 @@
 #include <QDebug>
 #include <QPointer>
 #include <QMessageBox>
+#include <QPluginLoader>
+#include <QLibraryInfo>
 
 #include "kclogger.h"
 #include "kdeconnectconfig.h"
@@ -36,7 +38,7 @@
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "interfaces/notificationinterface.h"
-#include "plugins/plugininterface.h"
+#include "plugins/testplugininterface.h"
 
 Q_GLOBAL_STATIC(Daemon*, s_instance)
 
@@ -74,9 +76,8 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	qDebug() << "KdeConnect daemon starting";
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon starting.");
 
-	// adding plugin for device
-	PluginInterface* testplugin;
-	qDebug() << testplugin->info("test");
+	// Load plugins
+	loadPlugins();
 
 	//Load backends
 	if (testMode)
@@ -103,6 +104,23 @@ Daemon::Daemon(QObject *parent, bool testMode)
 
 	qDebug() << "KdeConnect daemon started";
 	KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "WinConnect daemon started.");
+}
+
+void Daemon::loadPlugins()
+{
+	QDir path = QLibraryInfo::location(QLibraryInfo::PluginsPath);
+	foreach (QString fileName, path.entryList(QDir::Files)) {
+		QPluginLoader loader(path.absoluteFilePath(fileName));
+		QObject *plugin = loader.instance();
+		if (plugin) {
+			testPlugin = qobject_cast<TestPluginInterface*>(plugin);
+			if(testPlugin) {
+				pluginFileNames += fileName;
+				qDebug() << "From testPlugin: " << testPlugin->info(fileName);
+			}
+		}
+	}
+	qDebug() << "Plugins:" << pluginFileNames;
 }
 
 /**
@@ -226,14 +244,11 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		bool wasReachable = device->isReachable();
 		device->addLink(identityPackage, dl);
 
-//		// adding plugin for device
-//		PluginInterface* testplugin;
-//		qDebug() << testplugin->info("test");
-
-//		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
-//		QVariantList m_args;
-//		m_args << deviceVariant;
-//		TestPluginA* testPlugin = new TestPluginA(this, m_args);
+		// adding plugin for device
+		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
+		QVariantList m_args;
+		m_args << deviceVariant;
+		testPlugin->sendPing(m_args);
 
 		if (!wasReachable) {
 			Q_EMIT deviceVisibilityChanged(id, true);
@@ -395,4 +410,5 @@ void Daemon::reportError(const QString &title, const QString &description)
  */
 Daemon::~Daemon()
 {
+
 }

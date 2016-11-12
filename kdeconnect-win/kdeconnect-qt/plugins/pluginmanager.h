@@ -20,6 +20,7 @@ public:
 	void load(const QString& path);
 	void unload(const QString& path);
 	QStringList plugins(void);
+	QString pluginName(const QString& path);
 
 protected:
 	 PluginManager(void);

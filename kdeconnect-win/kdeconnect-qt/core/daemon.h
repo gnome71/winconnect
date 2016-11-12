@@ -27,6 +27,8 @@
 #include <QMap>
 
 #include "device.h"
+//#include "plugins/pluginmanager.h"
+#include "plugins/testplugininterface.h"
 
 class NetworkPackage;
 class DeviceLink;
@@ -39,7 +41,7 @@ class QNetworkAccessManager;
  * The daemon runs in the GUI Thread and handles devices and connections
  */
 class Daemon
-	: public QObject
+		: public QObject
 {
 	Q_OBJECT
 	Q_CLASSINFO("D-Bus Interface", "org.kde.kdeconnect.daemon")
@@ -87,12 +89,15 @@ private Q_SLOTS:
 	void onDeviceStatusChanged();	//! reachable, trusted changed, destroy if necessary
 
 private:
-	const QString& prefix = "Daemon    ";
 	bool isDiscoveringDevices() const;
 	void removeDevice(Device* d);	//! remove device from DaemonPrivate
 	void cleanDevices();	//! remove untrusted devices
+	void loadPlugins();
 
+	TestPluginInterface* testPlugin;
+	QStringList pluginFileNames;
 	QScopedPointer<struct DaemonPrivate> d;	//! LinkProviders, Devices and DiscoveryModeAcquisitions
+	const QString& prefix = "Daemon    ";
 };
 
 #endif // DAEMON_H

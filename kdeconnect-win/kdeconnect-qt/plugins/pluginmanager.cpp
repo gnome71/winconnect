@@ -1,4 +1,4 @@
-#include "pluginInterface.h"
+#include "testplugininterface.h"
 #include "pluginmanager.h"
 
 #include <QtCore>
@@ -92,8 +92,8 @@ void PluginManager::scan(const QString& path)
 
 	QPluginLoader *loader = new QPluginLoader(path);
 
-		   d->names.insert(path, loader->metaData().value("MetaData").toObject().value("name").toVariant());
-		d->versions.insert(path, loader->metaData().value("MetaData").toObject().value("version").toVariant());
+	d->names.insert(path, loader->metaData().value("MetaData").toObject().value("name").toVariant());
+	d->versions.insert(path, loader->metaData().value("MetaData").toObject().value("version").toVariant());
 	d->dependencies.insert(path, loader->metaData().value("MetaData").toObject().value("dependencies").toArray().toVariantList());
 
 	delete loader;
@@ -109,7 +109,7 @@ void PluginManager::load(const QString& path)
 
 	QPluginLoader *loader = new QPluginLoader(path);
 
-	if(PluginInterface *plugin = qobject_cast<PluginInterface *>(loader->instance()))
+	if(TestPluginInterface *plugin = qobject_cast<TestPluginInterface *>(loader->instance()))
 		d->loaders.insert(path, loader);
 	else
 		delete loader;
@@ -128,6 +128,12 @@ void PluginManager::unload(const QString& path)
 QStringList PluginManager::plugins(void)
 {
 	return d->loaders.keys();
+}
+
+QString PluginManager::pluginName(const QString& path)
+{
+	qDebug() << "Loaders:" << d->loaders;
+	return d->names.value(path).toString();
 }
 
 PluginManager::PluginManager(void) : d(new PluginManagerPrivate)

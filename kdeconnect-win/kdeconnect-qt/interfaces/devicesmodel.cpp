@@ -77,6 +77,8 @@ DevicesModel::~DevicesModel()
 int DevicesModel::rowForDevice(const QString& id) const
 {
 	for (int i = 0, c = m_deviceList.size(); i<c; ++i) {
+		qDebug() << id << m_daemonInterface->deviceIdByName(m_deviceList.at(i));
+		//BUG: name not known
 		if (id == m_daemonInterface->deviceIdByName(m_deviceList.at(i))) {
             return i;
         }

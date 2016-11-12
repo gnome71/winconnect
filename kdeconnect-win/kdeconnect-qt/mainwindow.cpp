@@ -79,11 +79,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	m_dmodel = new DevicesModel();
 	ui->listViewDevice->setModel(m_dmodel);
 
-	// Load plugins
-	PluginManager::instance()->initialize();
-	qDebug() << "Successfully loaded:" << PluginManager::instance()->plugins();
-	PluginManager::instance()->uninitialize();
-
 	// Create tray stuff
 	createTrayActions();
 	createTrayIcon();

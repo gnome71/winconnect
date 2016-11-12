@@ -25,6 +25,13 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # Search needed libs
+find_package(Qt5Core REQUIRED)
+if(Qt5Core_FOUND)
+	message(STATUS "Qt5Core found v" ${Qt5Core_VERSION})
+endif(Qt5Core_FOUND)
+include_directories(${Qt5Core_INCLUDES})
+add_definitions(${Qt5Core_DEFINITIONS})
+
 find_package(Qt5Widgets REQUIRED)
 if(Qt5Widgets_FOUND)
 	message(STATUS "Qt5Widgets found v" ${Qt5Widgets_VERSION})
@@ -94,7 +101,7 @@ set(PKG_BASE ${_PKG_BASE}/..)
 set(DEPLOY_FILES
 	${PKG_BASE}/bin/libeay32.dll
 	${PKG_BASE}/bin/ssleay32.dll
-	${PKG_BASE}/bin/qca-qt5d.dll
+	${Qca-qt5_lib}
 )
 
 include(GenerateExportHeader)
@@ -108,11 +115,20 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::Widgets
 	Qt5::Network
 	Qt5::Concurrent
+	Qt5::WinMain
 	qca-qt5
 	pluginManager
 	crypt32
 	ws2_32
 )
+
+# VSConfig specific settings (show or hide console)
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS")
 
 # Install targets to deploy dir
 install(TARGETS ${PROJECT_NAME}

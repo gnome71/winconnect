@@ -12,8 +12,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 set(${PROJECT_NAME}_HEADERS
-	plugininterface.h
-	pluginmanager.h)
+	testplugininterface.h
+	pluginmanager.h
+)
 
 set(${PROJECT_NAME}_SOURCES
 	pluginmanager.cpp)
