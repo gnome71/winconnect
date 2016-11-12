@@ -4,7 +4,7 @@ install vcpkg according to:
 	https://github.com/Microsoft/vcpkg/blob/master/docs/EXAMPLES.md
 
 install openssl:
-	vcpkg install openssl:x64-windows
+	vcpkg install openssl:[x64|x86]-windows
 
 compile qca release:
 	add: CMAKE_INSTALL_PREFIX=d:\src\vcpkg\installed\x64-windows
@@ -12,6 +12,7 @@ compile qca release:
 	shared_libs on
 	tools off
 	tests off
+	clear CMake cache
 	add install build target
 	build
 
@@ -21,6 +22,7 @@ compile qca debug:
 	shared_libs on
 	tools off
 	tests off
+	clear CMake cache
 	add install build target
 	build
 

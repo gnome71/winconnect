@@ -1,6 +1,8 @@
-# ~ src/tstCore/CMakeLists.txt
-
 project(pluginManager)
+
+# Do not automatically link Qt executables to qtmain target on Windows.
+# Plugins use console mode only. Not need to link against qtmain.lib.
+#cmake_policy(SET CMP0020 OLD)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
