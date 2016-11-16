@@ -208,6 +208,11 @@ void DevicesModel::appendDevice(Device* dev)
     connect(dev, SIGNAL(nameChanged(QString)), SLOT(nameChanged(QString)));
 }
 
+/**
+ * @brief DevicesModel::nameChanged
+ * FIXME: where gets the name set?
+ * @param newName
+ */
 void DevicesModel::nameChanged(const QString& newName)
 {
     Q_UNUSED(newName);
