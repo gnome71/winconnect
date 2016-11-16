@@ -389,7 +389,7 @@ void Daemon::askPairingConfirmation(PairingHandler *d)
 			d->acceptPairing();
 			break;
 		case QMessageBox::Discard:
-			d->rejectPairing();		//BUG: read access violation
+			d->rejectPairing();		//BUG: read access violation?
 			break;
 	}
 }
