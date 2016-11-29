@@ -11,3 +11,18 @@ set(backends_SRCS
 
     PARENT_SCOPE
 )
+
+set(backends_HDRS
+	${backends_HDRS}
+
+	core/backends/lan/server.h
+	core/backends/lan/lanlinkprovider.h
+	core/backends/lan/landevicelink.h
+	core/backends/lan/lanpairinghandler.h
+#    backends/lan/uploadjob.h
+#    backends/lan/downloadjob.h
+	core/backends/lan/socketlinereader.h
+
+	PARENT_SCOPE
+)
+

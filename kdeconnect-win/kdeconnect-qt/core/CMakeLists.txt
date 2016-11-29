@@ -1,6 +1,9 @@
 project(kdeconnectcore)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${Qca-qt5_INCLUDES}
+)
 
 add_subdirectory(backends/lan)
 #add_subdirectory(backends/loopback)
@@ -22,13 +25,17 @@ set(core_SRCS
 	PARENT_SCOPE
 	)
 
-set(HEADERS
+set(core_HDRS
+	${backends_HDRS}
+
 	kclogger.h
 	kdeconnectconfig.h
 	deviceidhelper.h
 	networkpackage.h
 	daemon.h
 	device.h
+
+	PARENT_SCOPE
 )
 
 # Create a target for the library

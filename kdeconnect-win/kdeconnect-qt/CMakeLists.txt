@@ -24,6 +24,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+# Set Qca-qt5 path manually
+set(CMAKE_PREFIX_PATH C:/Users/devel/Projects/other/qca/qca-orig/_deploy64/debug/lib/cmake ${CMAKE_PREFIX_PATH})
+
 # Search needed libs
 find_package(Qt5Core REQUIRED)
 if(Qt5Core_FOUND)
@@ -53,17 +56,18 @@ endif(Qt5Concurrent_FOUND)
 include_directories(${Qt5Concurrent_INCLUDES})
 add_definitions(${Qt5Concurrent_DEFINITIONS})
 
-find_package(OpenSSL REQUIRED)
-if(OpenSSL_FOUND)
-	message(STATUS "OpenSSL found v" ${OPENSSL_VERSION})
-endif(OpenSSL_FOUND)
+#find_package(OpenSSL REQUIRED)
+#if(OpenSSL_FOUND)
+#	message(STATUS "OpenSSL found v" ${OPENSSL_VERSION})
+#endif(OpenSSL_FOUND)
 
-find_package(Qca-qt5 REQUIRED CONFIG)
+find_package(Qca-qt5 REQUIRED)
 if(Qca-qt5_FOUND)
     message(STATUS "Qca-qt5 found v" ${Qca-qt5_VERSION})
 	get_target_property(Qca-qt5_lib qca-qt5 LOCATION)
+	get_target_property(Qca-qt5_inc qca-qt5 INTERFACE_INCLUDE_DIRECTORIES)
 endif(Qca-qt5_FOUND)
-include_directories(${Qca-qt5_INCLUDES})
+include_directories(${Qca-qt5_inc})
 add_definitions(${Qca-qt5_DEFINITIONS})
 
 include(GenerateExportHeader)
@@ -83,6 +87,7 @@ set(SOURCES
 
     main.cpp
     mainwindow.cpp
+	core/backends/devicelink.cpp
 	core/backends/loopback/loopbacklinkprovider.cpp
 	core/backends/loopback/loopbackdevicelink.cpp
 	interfaces/devicesmodel.cpp
@@ -99,15 +104,15 @@ set(RESOURCES
 get_filename_component(_PKG_BASE ${Qca-qt5_lib} DIRECTORY)
 set(PKG_BASE ${_PKG_BASE}/..)
 set(DEPLOY_FILES
-	${PKG_BASE}/bin/libeay32.dll
-	${PKG_BASE}/bin/ssleay32.dll
+#	${PKG_BASE}/bin/libeay32.dll
+#	${PKG_BASE}/bin/ssleay32.dll
 	${Qca-qt5_lib}
 )
 
 include(GenerateExportHeader)
 
-# Build the project
-add_executable(${PROJECT_NAME} ${SOURCES} ${RESOURCES})
+# Build the project (headers included here for IDEs)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
 	Qt5::Core
