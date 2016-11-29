@@ -87,7 +87,6 @@ set(SOURCES
 
     main.cpp
     mainwindow.cpp
-	core/backends/devicelink.cpp
 	core/backends/loopback/loopbacklinkprovider.cpp
 	core/backends/loopback/loopbackdevicelink.cpp
 	interfaces/devicesmodel.cpp
