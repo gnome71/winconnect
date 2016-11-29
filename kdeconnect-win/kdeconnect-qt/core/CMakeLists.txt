@@ -23,12 +23,20 @@ set(core_SRCS
 	)
 
 set(HEADERS
-	kclogger.h
-	kdeconnectconfig.h
-	deviceidhelper.h
-	networkpackage.h
-	daemon.h
-	device.h
+	${backends_HDRS}
+
+	core/backends/linkprovider.h
+	core/backends/devicelink.h
+	core/backends/pairinghandler.h
+
+	core/kclogger.h
+	core/kdeconnectconfig.h
+	core/deviceidhelper.h
+	core/networkpackage.h
+	core/daemon.h
+	core/device.h
+
+	PARENT_SCOPE
 )
 
 # Create a target for the library
@@ -36,7 +44,7 @@ set(HEADERS
 #target_link_libraries(kdeconnectcore
 #PUBLIC
 #	Qt5::Network
-#	qca-qt5
+#	qca
 #PRIVATE
 #	Qt5::Gui
 #)

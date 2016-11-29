@@ -58,13 +58,13 @@ if(OpenSSL_FOUND)
 	message(STATUS "OpenSSL found v" ${OPENSSL_VERSION})
 endif(OpenSSL_FOUND)
 
-find_package(Qca-qt5 REQUIRED CONFIG)
-if(Qca-qt5_FOUND)
-    message(STATUS "Qca-qt5 found v" ${Qca-qt5_VERSION})
-	get_target_property(Qca-qt5_lib qca-qt5 LOCATION)
-endif(Qca-qt5_FOUND)
-include_directories(${Qca-qt5_INCLUDES})
-add_definitions(${Qca-qt5_DEFINITIONS})
+find_package(Qca REQUIRED CONFIG)
+if(Qca_FOUND)
+    message(STATUS "Qca found v" ${Qca_VERSION})
+	get_target_property(Qca_lib qca LOCATION)
+endif(Qca_FOUND)
+include_directories(${Qca_INCLUDES})
+add_definitions(${Qca_DEFINITIONS})
 
 include(GenerateExportHeader)
 
@@ -88,7 +88,17 @@ set(SOURCES
 	interfaces/devicesmodel.cpp
 	interfaces/notificationinterface.cpp
 	#plugins/ping/pingplugin.cpp
-	)
+)
+
+set(HEADERS
+	${core_HDRS}
+
+	mainwindow.h
+	core/backends/loopback/loopbacklinkprovider.h
+	core/backends/loopback/loopbackdevicelink.h
+	interfaces/devicesmodel.h
+	interfaces/notificationinterface.h
+)
 
 set(FORMS
     mainwindow.ui
@@ -96,18 +106,18 @@ set(FORMS
 set(RESOURCES
 	res/resources.qrc
 )
-get_filename_component(_PKG_BASE ${Qca-qt5_lib} DIRECTORY)
+get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
 set(PKG_BASE ${_PKG_BASE}/..)
 set(DEPLOY_FILES
 	${PKG_BASE}/bin/libeay32.dll
 	${PKG_BASE}/bin/ssleay32.dll
-	${Qca-qt5_lib}
+	${Qca_lib}
 )
 
 include(GenerateExportHeader)
 
 # Build the project
-add_executable(${PROJECT_NAME} ${SOURCES} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
 	Qt5::Core
@@ -116,7 +126,7 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::Network
 	Qt5::Concurrent
 	Qt5::WinMain
-	qca-qt5
+	qca
 	pluginManager
 	crypt32
 	ws2_32
@@ -136,7 +146,7 @@ install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 )
-install(DIRECTORY ${PKG_BASE}/lib/qca-qt5/crypto/ DESTINATION bin/crypto)
+install(DIRECTORY ${PKG_BASE}/lib/qca/crypto/ DESTINATION bin/crypto)
 install(FILES
 	${DEPLOY_FILES}
 	${CMAKE_BINARY_DIR}/pluginManager.dll
@@ -158,24 +168,24 @@ foreach(lib ${DEPLOY_FILES})
 endforeach(lib)
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
-		"${PKG_BASE}/lib/qca-qt5/crypto"
+		"${PKG_BASE}/lib/qca/crypto"
 		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-		COMMENT "Copying ${PKG_BASE}/lib/qca-qt5/crypto folder to binary dir"
+		COMMENT "Copying ${PKG_BASE}/lib/qca/crypto folder to binary dir"
 )
 
 # Run windeployqt.exe in binary dir
-get_filename_component(_WINDEPLOY_DIR ${QT_QMAKE_EXECUTABLE} DIRECTORY)
-add_custom_target(windeploy-build-dir
-	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.exe"
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-	COMMENT "Running windeployqt in " ${CMAKE_BINARY_DIR}
-)
+#get_filename_component(_WINDEPLOY_DIR ${QT_QMAKE_EXECUTABLE} DIRECTORY)
+#add_custom_target(windeploy-build-dir
+#	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.exe"
+#	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#	COMMENT "Running windeployqt in " ${CMAKE_BINARY_DIR}
+#)
 # Run windeployqt.exe in install prefix dir
-add_custom_target(windeploy-deploy-dir
-	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_INSTALL_PREFIX}/bin/${PROJECT_NAME}.exe"
-	WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin
-	COMMENT "Running windeployqt in " ${CMAKE_INSTALL_PREFIX}/bin
-)
+#add_custom_target(windeploy-deploy-dir
+#	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_INSTALL_PREFIX}/bin/${PROJECT_NAME}.exe"
+#	WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin
+#	COMMENT "Running windeployqt in " ${CMAKE_INSTALL_PREFIX}/bin
+#)
 
 # Show all files in qtcreator projects
 add_custom_target(forms EXCLUDE_FROM_ALL SOURCES ${FORMS} plugins/test/testPluginA.json)
