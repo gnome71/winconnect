@@ -1,5 +1,5 @@
 set(backends_SRCS
-	${backends_SRCS}
+#	${backends_SRCS}
 
 	core/backends/lan/server.cpp
 	core/backends/lan/lanlinkprovider.cpp
@@ -13,7 +13,7 @@ set(backends_SRCS
 )
 
 set(backends_HDRS
-	${backends_HDRS}
+#	${backends_HDRS}
 
 	core/backends/lan/server.h
 	core/backends/lan/lanlinkprovider.h

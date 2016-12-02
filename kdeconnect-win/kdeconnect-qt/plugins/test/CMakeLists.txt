@@ -26,3 +26,4 @@ target_link_libraries(${PROJECT_NAME}
 	pluginManager
 )
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Plugins")

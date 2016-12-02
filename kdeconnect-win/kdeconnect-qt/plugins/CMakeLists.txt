@@ -37,3 +37,4 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::Core
 )
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Libraries")

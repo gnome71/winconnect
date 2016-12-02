@@ -1,6 +1,9 @@
 project(kdeconnectcore)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${Qca_INCLUDES}
+)
 
 add_subdirectory(backends/lan)
 #add_subdirectory(backends/loopback)
@@ -22,12 +25,8 @@ set(core_SRCS
 	PARENT_SCOPE
 	)
 
-set(HEADERS
+set(core_HDRS
 	${backends_HDRS}
-
-	core/backends/linkprovider.h
-	core/backends/devicelink.h
-	core/backends/pairinghandler.h
 
 	core/kclogger.h
 	core/kdeconnectconfig.h
@@ -44,7 +43,7 @@ set(HEADERS
 #target_link_libraries(kdeconnectcore
 #PUBLIC
 #	Qt5::Network
-#	qca
+#	qca-qt5
 #PRIVATE
 #	Qt5::Gui
 #)
