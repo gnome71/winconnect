@@ -157,20 +157,20 @@ install(FILES
 )
 
 # Copy ssl and qca libs to bin dir
-foreach(lib ${DEPLOY_FILES})
-	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} ARGS -E copy
-			"${lib}"
-			"${CMAKE_BINARY_DIR}"
-			COMMENT "Copying ${lib} to binary dir"
-	)
-endforeach(lib)
-add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
-		"${PKG_BASE}/lib/qca-qt5/crypto"
-		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-		COMMENT "Copying ${PKG_BASE}/lib/qca-qt5/crypto folder to binary dir"
-)
+#foreach(lib ${DEPLOY_FILES})
+#	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+#		COMMAND ${CMAKE_COMMAND} ARGS -E copy
+#			"${lib}"
+#			"${CMAKE_BINARY_DIR}"
+#			COMMENT "Copying ${lib} to binary dir"
+#	)
+#endforeach(lib)
+#add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+#	COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
+#		"${PKG_BASE}/lib/qca-qt5/crypto"
+#		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+#		COMMENT "Copying ${PKG_BASE}/lib/qca-qt5/crypto folder to binary dir"
+#)
 
 # Show all files in qtcreator projects
 #add_custom_target(sources EXCLUDE_FROM_ALL SOURCES ${SOURCES})
