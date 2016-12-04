@@ -22,8 +22,7 @@
 #define DEVICELINK_H
 
 #include <QObject>
-//#include <QtCrypto>
-#include <Qca-qt5/QtCrypto/QtCrypto>
+#include <QtCrypto>
 #include "core/networkpackage.h"
 
 class PairingHandler;

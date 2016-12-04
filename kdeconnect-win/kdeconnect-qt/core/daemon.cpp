@@ -194,21 +194,6 @@ void Daemon::forceOnNetworkChange()
 }
 
 /**
- * @brief Daemon::getDevice
- * @param deviceId
- * @return
- */
-Device*Daemon::getDevice(const QString& deviceId)
-{
-	Q_FOREACH (Device* device, d->mDevices) {
-		if (device->id() == deviceId) {
-			return device;
-		}
-	}
-	return Q_NULLPTR;
-}
-
-/**
  * @brief Daemon::devices
  * @param onlyReachable
  * @param onlyTrusted
@@ -331,6 +316,21 @@ QNetworkAccessManager* Daemon::networkAccessManager()
 		manager = new QNetworkAccessManager(this);
 	}
 	return manager;
+}
+
+/**
+* @brief Daemon::getDevice
+* @param deviceId
+* @return
+*/
+Device * Daemon::getDevice(const QString & deviceId)
+{
+	Q_FOREACH(Device* device, d->mDevices) {
+		if (device->id() == deviceId) {
+			return device;
+		}
+	}
+	return nullptr;
 }
 
 /**

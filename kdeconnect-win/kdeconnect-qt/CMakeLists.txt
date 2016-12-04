@@ -23,6 +23,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+# For VS Solution Explorer
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Set Qca-qt5 path manually
+#set(CMAKE_PREFIX_PATH C:/Users/devel/Projects/other/qca/qca-orig/_deploy64/debug/lib/cmake ${CMAKE_PREFIX_PATH})
 
 # Search needed libs
 find_package(Qt5Core REQUIRED)
@@ -53,17 +58,19 @@ endif(Qt5Concurrent_FOUND)
 include_directories(${Qt5Concurrent_INCLUDES})
 add_definitions(${Qt5Concurrent_DEFINITIONS})
 
+message(STATUS "QT_NO_SSL: " ${QT_NO_SSL})
 find_package(OpenSSL REQUIRED)
 if(OpenSSL_FOUND)
-	message(STATUS "OpenSSL found v" ${OPENSSL_VERSION})
+	message(STATUS "OpenSSL found v" ${OpenSSL_VERSION})
 endif(OpenSSL_FOUND)
 
-find_package(Qca REQUIRED CONFIG)
+find_package(Qca REQUIRED)
 if(Qca_FOUND)
     message(STATUS "Qca found v" ${Qca_VERSION})
 	get_target_property(Qca_lib qca LOCATION)
+	get_target_property(Qca_inc qca INTERFACE_INCLUDE_DIRECTORIES)
 endif(Qca_FOUND)
-include_directories(${Qca_INCLUDES})
+include_directories(${Qca_inc})
 add_definitions(${Qca_DEFINITIONS})
 
 include(GenerateExportHeader)
@@ -80,20 +87,17 @@ add_subdirectory(plugins)
 # Set files
 set(SOURCES
 	${core_SRCS}
-
     main.cpp
     mainwindow.cpp
 	core/backends/loopback/loopbacklinkprovider.cpp
 	core/backends/loopback/loopbackdevicelink.cpp
 	interfaces/devicesmodel.cpp
 	interfaces/notificationinterface.cpp
-	#plugins/ping/pingplugin.cpp
-)
+	)
 
 set(HEADERS
 	${core_HDRS}
-
-	mainwindow.h
+    mainwindow.h
 	core/backends/loopback/loopbacklinkprovider.h
 	core/backends/loopback/loopbackdevicelink.h
 	interfaces/devicesmodel.h
@@ -109,15 +113,16 @@ set(RESOURCES
 get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
 set(PKG_BASE ${_PKG_BASE}/..)
 set(DEPLOY_FILES
-	${PKG_BASE}/bin/libeay32.dll
-	${PKG_BASE}/bin/ssleay32.dll
+#	${PKG_BASE}/bin/libeay32.dll
+#	${PKG_BASE}/bin/ssleay32.dll
 	${Qca_lib}
 )
 
 include(GenerateExportHeader)
 
-# Build the project
+# Build the project (headers included here for IDEs)
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
 	Qt5::Core
@@ -128,11 +133,11 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::WinMain
 	qca
 	pluginManager
-	crypt32
-	ws2_32
 )
 
 # VSConfig specific settings (show or hide console)
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Binaries")
+
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
@@ -146,7 +151,7 @@ install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 )
-install(DIRECTORY ${PKG_BASE}/lib/qca/crypto/ DESTINATION bin/crypto)
+install(DIRECTORY ${PKG_BASE}/bin/Qca/crypto/ DESTINATION bin/crypto)
 install(FILES
 	${DEPLOY_FILES}
 	${CMAKE_BINARY_DIR}/pluginManager.dll
@@ -158,34 +163,22 @@ install(FILES
 )
 
 # Copy ssl and qca libs to bin dir
-foreach(lib ${DEPLOY_FILES})
-	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} ARGS -E copy
-			"${lib}"
-			"${CMAKE_BINARY_DIR}"
-			COMMENT "Copying ${lib} to binary dir"
-	)
-endforeach(lib)
-add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
-		"${PKG_BASE}/lib/qca/crypto"
-		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-		COMMENT "Copying ${PKG_BASE}/lib/qca/crypto folder to binary dir"
-)
-
-# Run windeployqt.exe in binary dir
-#get_filename_component(_WINDEPLOY_DIR ${QT_QMAKE_EXECUTABLE} DIRECTORY)
-#add_custom_target(windeploy-build-dir
-#	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.exe"
-#	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#	COMMENT "Running windeployqt in " ${CMAKE_BINARY_DIR}
-#)
-# Run windeployqt.exe in install prefix dir
-#add_custom_target(windeploy-deploy-dir
-#	"${_WINDEPLOY_DIR}/windeployqt.exe"	"${CMAKE_INSTALL_PREFIX}/bin/${PROJECT_NAME}.exe"
-#	WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin
-#	COMMENT "Running windeployqt in " ${CMAKE_INSTALL_PREFIX}/bin
+#foreach(lib ${DEPLOY_FILES})
+#	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+#		COMMAND ${CMAKE_COMMAND} ARGS -E copy
+#			"${lib}"
+#			"${CMAKE_BINARY_DIR}"
+#			COMMENT "Copying ${lib} to binary dir"
+#	)
+#endforeach(lib)
+#add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+#	COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
+#		"${PKG_BASE}/lib/qca-qt5/crypto"
+#		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+#		COMMENT "Copying ${PKG_BASE}/lib/qca-qt5/crypto folder to binary dir"
 #)
 
 # Show all files in qtcreator projects
-add_custom_target(forms EXCLUDE_FROM_ALL SOURCES ${FORMS} plugins/test/testPluginA.json)
+#add_custom_target(sources EXCLUDE_FROM_ALL SOURCES ${SOURCES})
+#add_custom_target(headers EXCLUDE_FROM_ALL SOURCES ${HEADERS})
+#add_custom_target(forms EXCLUDE_FROM_ALL SOURCES ${FORMS} plugins/test/testPluginA.json)
