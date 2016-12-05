@@ -7,9 +7,28 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 
 cmake_minimum_required(VERSION 3.2.2)
 
-# Set policies
-#cmake_policy(SET CMP0020 NEW)
-#cmake_policy(SET CMP0003 OLD)
+### Macros, functions, ...
+macro(copy_deploy FILES)
+	add_custom_target(copy_deploy_files ALL
+		COMMENT "Copying files: ${FILES}")
+		foreach(filename ${FILES})
+			set(src "${filename}")
+			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+			add_custom_command(
+				TARGET copy_deploy_files
+				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
+				COMMENT "Copying file: ${src}"
+			)
+		endforeach(filename)
+		add_custom_command(
+			TARGET copy_deploy_files
+			COMMAND ${CMAKE_COMMAND} -E copy_directory
+				"${PKG_BASE}/qca/crypto"
+				$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto
+			COMMENT "Copying crypto folder"
+		)
+endmacro(copy_deploy)
+### End macros, functions, ...
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -Wno-microsoft-enum-value")
@@ -25,9 +44,8 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 # For VS Solution Explorer
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-# Set Qca-qt5 path manually
-#set(CMAKE_PREFIX_PATH C:/Users/devel/Projects/other/qca/qca-orig/_deploy64/debug/lib/cmake ${CMAKE_PREFIX_PATH})
+set(CMAKE_INSTALL_DEBUG_LIBRARIES ON)
+include(InstallRequiredSystemLibraries)
 
 # Search needed libs
 find_package(Qt5Core REQUIRED)
@@ -57,6 +75,11 @@ if(Qt5Concurrent_FOUND)
 endif(Qt5Concurrent_FOUND)
 include_directories(${Qt5Concurrent_INCLUDES})
 add_definitions(${Qt5Concurrent_DEFINITIONS})
+
+find_package(OpenSSL REQUIRED)
+if(OpenSSL_FOUND)
+	message(STATUS "OpenSSL found v" ${OPENSSL_VERSION})
+endif(OpenSSL_FOUND)
 
 find_package(Qca REQUIRED)
 if(Qca_FOUND)
@@ -104,13 +127,6 @@ set(FORMS
 set(RESOURCES
 	res/resources.qrc
 )
-get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
-set(PKG_BASE ${_PKG_BASE}/..)
-set(DEPLOY_FILES
-#	${PKG_BASE}/bin/libeay32.dll
-#	${PKG_BASE}/bin/ssleay32.dll
-	${Qca_lib}
-)
 
 include(GenerateExportHeader)
 
@@ -129,7 +145,7 @@ target_link_libraries(${PROJECT_NAME}
 	pluginManager
 )
 
-# VSConfig specific settings (show or hide console)
+# VSConfig specific settings (show or hide console, ...)
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Binaries")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
@@ -140,6 +156,28 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS")
 
 # Install targets to deploy dir
+get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
+set(PKG_BASE ${_PKG_BASE})
+
+set(DEPLOY_FILES
+	${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+	${Qca_lib}
+	${QT_DIR}/plugins/bearer/qgenericbearerd.dll
+	${QT_DIR}/plugins/bearer/qnativewifibearerd.dll
+	${QT_DIR}/plugins/iconengines/qsvgicond.dll
+	${QT_DIR}/plugins/imageformats/qddsd.dll
+	${QT_DIR}/plugins/imageformats/qgifd.dll
+	${QT_DIR}/plugins/imageformats/qicnsd.dll
+	${QT_DIR}/plugins/imageformats/qicod.dll
+	${QT_DIR}/plugins/imageformats/qjpegd.dll
+	${QT_DIR}/plugins/imageformats/qsvgd.dll
+	${QT_DIR}/plugins/imageformats/qtgad.dll
+	${QT_DIR}/plugins/imageformats/qtiffd.dll
+	${QT_DIR}/plugins/imageformats/qwbmpd.dll
+	${QT_DIR}/plugins/imageformats/qwebpd.dll
+	${QT_DIR}/plugins/platforms/qwindowsd.dll
+)
+
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
@@ -156,23 +194,10 @@ install(FILES
 	DESTINATION bin/plugins
 )
 
-# Copy ssl and qca libs to bin dir
-#foreach(lib ${DEPLOY_FILES})
-#	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-#		COMMAND ${CMAKE_COMMAND} ARGS -E copy
-#			"${lib}"
-#			"${CMAKE_BINARY_DIR}"
-#			COMMENT "Copying ${lib} to binary dir"
-#	)
-#endforeach(lib)
-#add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-#	COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
-#		"${PKG_BASE}/lib/qca-qt5/crypto"
-#		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-#		COMMENT "Copying ${PKG_BASE}/lib/qca-qt5/crypto folder to binary dir"
-#)
+copy_deploy(${DEPLOY_FILES})
 
-# Show all files in qtcreator projects
-#add_custom_target(sources EXCLUDE_FROM_ALL SOURCES ${SOURCES})
-#add_custom_target(headers EXCLUDE_FROM_ALL SOURCES ${HEADERS})
-#add_custom_target(forms EXCLUDE_FROM_ALL SOURCES ${FORMS} plugins/test/testPluginA.json)
+message(STATUS "Copy following files to bindir to run:")
+foreach(file ${DEPLOY_FILES})
+	message(STATUS "  ${file}")
+endforeach(file)
+
