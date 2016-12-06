@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.2.2)
 
 ### Macros, functions, ...
 macro(copy_deploy FILES)
-	add_custom_target(copy_deploy_files ALL
+	add_custom_target(copy_deploy_files		# ALL
 		COMMENT "Copying files: ${FILES}")
 		foreach(filename ${FILES})
 			set(src "${filename}")
@@ -131,7 +131,7 @@ set(RESOURCES
 include(GenerateExportHeader)
 
 # Build the project (headers included here for IDEs)
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
 
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
