@@ -9,22 +9,23 @@ cmake_minimum_required(VERSION 3.2.2)
 
 ### Macros, functions, ...
 macro(copy_deploy FILES)
+	message("#DEBUG In copy_deploy_files")				#DEBUG
 	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying files: ${FILES}")
 		foreach(filename ${FILES})
 			set(src "${filename}")
-			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>/$<$<CONFIG:Debug>:Release>$<$<CONFIG:Release>:Debug>")
 			add_custom_command(
 				TARGET copy_deploy_files
 				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
-				COMMENT "Copying file: ${src}"
+				COMMENT "Copying file to: ${dst}"
 			)
 		endforeach(filename)
 		add_custom_command(
 			TARGET copy_deploy_files
 			COMMAND ${CMAKE_COMMAND} -E copy_directory
 				"${PKG_BASE}/qca/crypto"
-				$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/$<$<CONFIG:Debug>:Release>$<$<CONFIG:Release>:Debug>/crypto"
 			COMMENT "Copying crypto folder"
 		)
 endmacro(copy_deploy)
@@ -147,7 +148,8 @@ target_link_libraries(${PROJECT_NAME}
 
 # VSConfig specific settings (show or hide console, ...)
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Binaries")
-
+source_group("Misc Files" FILES ${FORMS})
+  
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
@@ -178,6 +180,11 @@ set(DEPLOY_FILES
 	${QT_DIR}/plugins/platforms/qwindowsd.dll
 )
 
+#message("DEPLOY_FILES:")
+#foreach(f ${DEPLOY_FILES})
+#	message(" ${f}")
+#endforeach(f)
+
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
@@ -195,9 +202,3 @@ install(FILES
 )
 
 copy_deploy(${DEPLOY_FILES})
-
-message(STATUS "Copy following files to bindir to run:")
-foreach(file ${DEPLOY_FILES})
-	message(STATUS "  ${file}")
-endforeach(file)
-

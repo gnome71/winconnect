@@ -233,7 +233,7 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
 		QVariantList m_args;
 		m_args << deviceVariant;
-		testPlugin->sendPing(m_args);
+		//testPlugin->sendPing(m_args);
 
 		if (!wasReachable) {
 			Q_EMIT deviceVisibilityChanged(id, true);
