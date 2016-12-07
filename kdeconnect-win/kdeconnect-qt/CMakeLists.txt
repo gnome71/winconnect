@@ -9,14 +9,16 @@ cmake_minimum_required(VERSION 3.2.2)
 
 ### Macros, functions, ...
 macro(copy_deploy FILES)
-	message("#DEBUG In copy_deploy_files")				#DEBUG
-	add_custom_target(copy_deploy_files
+	message("#DEBUG In copy_deploy_files")	#DEBUG
+	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying files: ${FILES}")
 		foreach(filename ${FILES})
 			set(src "${filename}")
 			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+			message("#DEBUG Copy ${src} ${dst}")	#DEBUG
 			add_custom_command(
 				TARGET copy_deploy_files
+				POST_BUILD
 				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
 				COMMENT "Copying file to: ${dst}"
 			)
@@ -178,23 +180,23 @@ set(DEPLOY_FILES
 	${SSL_EAY_RELEASE}
 	${LIB_EAY_RELEASE}
 	${Qca_lib}
-	${QT_DIR}/plugins/bearer/qgenericbearerd.dll
-	${QT_DIR}/plugins/bearer/qnativewifibearerd.dll
-	${QT_DIR}/plugins/iconengines/qsvgicond.dll
-	${QT_DIR}/plugins/imageformats/qddsd.dll
-	${QT_DIR}/plugins/imageformats/qgifd.dll
-	${QT_DIR}/plugins/imageformats/qicnsd.dll
-	${QT_DIR}/plugins/imageformats/qicod.dll
-	${QT_DIR}/plugins/imageformats/qjpegd.dll
-	${QT_DIR}/plugins/imageformats/qsvgd.dll
-	${QT_DIR}/plugins/imageformats/qtgad.dll
-	${QT_DIR}/plugins/imageformats/qtiffd.dll
-	${QT_DIR}/plugins/imageformats/qwbmpd.dll
-	${QT_DIR}/plugins/imageformats/qwebpd.dll
-	${QT_DIR}/plugins/platforms/qwindowsd.dll
+#	${QT_DIR}/plugins/bearer/qgenericbearerd.dll
+#	${QT_DIR}/plugins/bearer/qnativewifibearerd.dll
+#	${QT_DIR}/plugins/iconengines/qsvgicond.dll
+#	${QT_DIR}/plugins/imageformats/qddsd.dll
+#	${QT_DIR}/plugins/imageformats/qgifd.dll
+#	${QT_DIR}/plugins/imageformats/qicnsd.dll
+#	${QT_DIR}/plugins/imageformats/qicod.dll
+#	${QT_DIR}/plugins/imageformats/qjpegd.dll
+#	${QT_DIR}/plugins/imageformats/qsvgd.dll
+#	${QT_DIR}/plugins/imageformats/qtgad.dll
+#	${QT_DIR}/plugins/imageformats/qtiffd.dll
+#	${QT_DIR}/plugins/imageformats/qwbmpd.dll
+#	${QT_DIR}/plugins/imageformats/qwebpd.dll
+#	${QT_DIR}/plugins/platforms/qwindowsd.dll
 )
 
-message("DEPLOY_FILES:")
+message("#DEBUG DEPLOY_FILES:")
 foreach(f ${DEPLOY_FILES})
 	message(" ${f}")
 endforeach(f)
@@ -204,14 +206,14 @@ install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 )
-install(DIRECTORY ${PKG_BASE}/bin/Qca/crypto/ DESTINATION bin/crypto)
+install(DIRECTORY ${PKG_BASE}/Qca/crypto/ DESTINATION bin/crypto)
 install(FILES
 	${DEPLOY_FILES}
-	${CMAKE_BINARY_DIR}/pluginManager.dll
+	${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/pluginManager.dll
 	DESTINATION bin
 )
 install(FILES
-	${CMAKE_BINARY_DIR}/plugins/testPluginA.dll
+	${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/testPluginA.dll
 	DESTINATION bin/plugins
 )
 
