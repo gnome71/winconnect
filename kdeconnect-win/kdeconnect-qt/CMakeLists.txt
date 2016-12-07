@@ -132,7 +132,7 @@ set(RESOURCES
 include(GenerateExportHeader)
 
 # Build the project (headers included here for IDEs)
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
 
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
