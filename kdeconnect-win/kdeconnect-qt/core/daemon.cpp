@@ -22,8 +22,11 @@
 #include "daemon.h"
 
 //#include <QDBusConnection>
+#include <QApplication>
 #include <QNetworkAccessManager>
 #include <QDebug>
+#include <QDir>
+#include <QObject>
 #include <QPointer>
 #include <QMessageBox>
 #include <QPluginLoader>
@@ -108,9 +111,11 @@ Daemon::Daemon(QObject *parent, bool testMode)
 
 void Daemon::loadPlugins()
 {
-	QDir path = QLibraryInfo::location(QLibraryInfo::PluginsPath);
-	foreach (QString fileName, path.entryList(QDir::Files)) {
-		QPluginLoader loader(path.absoluteFilePath(fileName));
+	QDir libpath = qApp->applicationDirPath();		//QLibraryInfo::location(QLibraryInfo::PluginsPath);
+	libpath.cd("plugins");
+	foreach (QString fileName, libpath.entryList(QDir::Files)) {
+		QString ld = libpath.absoluteFilePath(fileName);
+		QPluginLoader loader(libpath.absoluteFilePath(fileName));
 		QObject *plugin = loader.instance();
 		if (plugin) {
 			testPlugin = qobject_cast<TestPluginInterface*>(plugin);
@@ -233,7 +238,8 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
 		QVariantList m_args;
 		m_args << deviceVariant;
-		//testPlugin->sendPing(m_args);
+
+		testPlugin->sendPing(m_args);
 
 		if (!wasReachable) {
 			Q_EMIT deviceVisibilityChanged(id, true);

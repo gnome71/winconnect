@@ -10,11 +10,11 @@ cmake_minimum_required(VERSION 3.2.2)
 ### Macros, functions, ...
 macro(copy_deploy FILES)
 	message("#DEBUG In copy_deploy_files")				#DEBUG
-	add_custom_target(copy_deploy_files ALL
+	add_custom_target(copy_deploy_files
 		COMMENT "Copying files: ${FILES}")
 		foreach(filename ${FILES})
 			set(src "${filename}")
-			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>/$<$<CONFIG:Debug>:Release>$<$<CONFIG:Release>:Debug>")
+			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 			add_custom_command(
 				TARGET copy_deploy_files
 				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
@@ -23,9 +23,18 @@ macro(copy_deploy FILES)
 		endforeach(filename)
 		add_custom_command(
 			TARGET copy_deploy_files
+			POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_directory
 				"${PKG_BASE}/qca/crypto"
-				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/$<$<CONFIG:Debug>:Release>$<$<CONFIG:Release>:Debug>/crypto"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+			COMMENT "Copying crypto folder"
+		)
+		add_custom_command(
+			TARGET copy_deploy_files
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory
+				"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Release>$<$<CONFIG:Release>:Debug>"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins"
 			COMMENT "Copying crypto folder"
 		)
 endmacro(copy_deploy)
@@ -122,9 +131,12 @@ set(HEADERS
 	interfaces/notificationinterface.h
 )
 
-set(FORMS
+set(MISC
     mainwindow.ui
+	res/resources.qrc
+	plugins/test/testPluginA.json
 )
+
 set(RESOURCES
 	res/resources.qrc
 )
@@ -148,7 +160,7 @@ target_link_libraries(${PROJECT_NAME}
 
 # VSConfig specific settings (show or hide console, ...)
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Binaries")
-source_group("Misc Files" FILES ${FORMS})
+source_group("Misc Files" FILES ${MISC})
   
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
@@ -163,6 +175,8 @@ set(PKG_BASE ${_PKG_BASE})
 
 set(DEPLOY_FILES
 	${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+	${SSL_EAY_RELEASE}
+	${LIB_EAY_RELEASE}
 	${Qca_lib}
 	${QT_DIR}/plugins/bearer/qgenericbearerd.dll
 	${QT_DIR}/plugins/bearer/qnativewifibearerd.dll
@@ -180,10 +194,10 @@ set(DEPLOY_FILES
 	${QT_DIR}/plugins/platforms/qwindowsd.dll
 )
 
-#message("DEPLOY_FILES:")
-#foreach(f ${DEPLOY_FILES})
-#	message(" ${f}")
-#endforeach(f)
+message("DEPLOY_FILES:")
+foreach(f ${DEPLOY_FILES})
+	message(" ${f}")
+endforeach(f)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
