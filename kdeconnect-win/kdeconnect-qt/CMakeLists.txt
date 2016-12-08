@@ -11,7 +11,8 @@ cmake_minimum_required(VERSION 3.2.2)
 macro(copy_deploy FILES)
 	message("#DEBUG In copy_deploy_files")	#DEBUG
 	add_custom_target(copy_deploy_files ALL
-		COMMENT "Copying files: ${FILES}")
+		COMMENT "Copying deploy files"
+	)
 		foreach(filename ${FILES})
 			set(src "${filename}")
 			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
