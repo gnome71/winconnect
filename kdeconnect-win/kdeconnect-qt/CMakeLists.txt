@@ -134,13 +134,16 @@ set(HEADERS
 	interfaces/notificationinterface.h
 )
 
-set(MISC
-    mainwindow.ui
-	res/resources.qrc
-	plugins/test/testPluginA.json
+set(FORMS
+	mainwindow.ui
 )
 
 set(RESOURCES
+	res/resources.qrc
+)
+
+set(MISC
+    mainwindow.ui
 	res/resources.qrc
 )
 

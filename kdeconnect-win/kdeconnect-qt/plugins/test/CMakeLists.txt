@@ -26,4 +26,9 @@ target_link_libraries(${PROJECT_NAME}
 	pluginManager
 )
 
+set(MISC
+	plugins/test/testPluginA.json
+)
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Plugins")
+source_group("Misc Files" FILES ${MISC})
