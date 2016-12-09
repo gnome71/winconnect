@@ -235,6 +235,7 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		device->addLink(identityPackage, dl);
 
 		// adding plugin for device
+		qDebug() << device->name();
 		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
 		QVariantList m_args;
 		m_args << deviceVariant;
