@@ -49,7 +49,7 @@ class Device
 	Q_PROPERTY(QString statusIconName READ statusIconName)
 	Q_PROPERTY(bool isReachable READ isReachable NOTIFY reachableStatusChanged)
 	Q_PROPERTY(bool isTrusted READ isTrusted NOTIFY trustedChanged)
-//	Q_PROPERTY(QStringList supportedPlugins READ supportedPlugins NOTIFY pluginsChanged)
+	Q_PROPERTY(QStringList supportedPlugins READ supportedPlugins NOTIFY pluginsChanged)
 
 public:
 
@@ -105,8 +105,8 @@ public:
 	Q_SCRIPTABLE QStringList availableLinks() const;
 	bool isReachable() const { return !m_deviceLinks.isEmpty(); }
 
-//	Q_SCRIPTABLE QStringList loadedPlugins() const;
-//	Q_SCRIPTABLE bool hasPlugin(const QString& name) const;
+	Q_SCRIPTABLE QStringList loadedPlugins() const;
+	Q_SCRIPTABLE bool hasPlugin(const QString& name) const;
 
 //	Q_SCRIPTABLE QString pluginsConfigFile() const;
 
@@ -117,7 +117,7 @@ public:
 	void cleanUnneededLinks();
 
 	int protocolVersion() { return m_protocolVersion; }
-	//QStringList supportedPlugins() const { return m_supportedPlugins.toList(); }
+	QStringList supportedPlugins() const { return m_supportedPlugins.toList(); }
 
 public Q_SLOTS:
 	//!sends a @p np package to the device
@@ -160,7 +160,7 @@ private: //Fields (TODO: dPointer!)
 
 	//Capabilities stuff
 //	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;
-//	QSet<QString> m_supportedPlugins;
+	QSet<QString> m_supportedPlugins;
 };
 
 Q_DECLARE_METATYPE(Device*)

@@ -35,7 +35,7 @@
 
 #include "kclogger.h"
 //#include "kdeconnectplugin.h"
-//#include "pluginloader.h"
+#include "plugins/pluginmanager.h"
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "networkpackage.h"
@@ -68,6 +68,8 @@ Device::Device(QObject* parent, const QString& id)
 	// TODO: NotificationInterface* m_notificationInterface = new NotificationInterface(this, m_deviceId);
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	//m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
+	m_supportedPlugins = PluginManager::instance()->plugins().toSet();
+	qDebug() << PluginManager::instance()->plugins();
 
 	connect(this, &Device::pairingError, this, &warn);
 }
@@ -210,7 +212,7 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 //		m_supportedPlugins = PluginLoader::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
 		//qDebug() << "new plugins for" << m_deviceName << m_supportedPlugins << incomingCapabilities << outgoingCapabilities;
 	} else {
-//		m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
+		m_supportedPlugins = PluginManager::instance()->plugins().toSet();
 	}
 
 	//reloadPlugins();
@@ -295,6 +297,16 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 bool Device::isTrusted() const
 {
 	return KdeConnectConfig::instance()->trustedDevices().contains(id());
+}
+
+Q_SCRIPTABLE QStringList Device::loadedPlugins() const
+{
+	return Q_SCRIPTABLE QStringList();
+}
+
+Q_SCRIPTABLE bool Device::hasPlugin(const QString & name) const
+{
+	return Q_SCRIPTABLE bool();
 }
 
 /**

@@ -257,7 +257,7 @@ QVariant DevicesModel::data(const QModelIndex& index, int role) const
     //This function gets called lots of times, producing lots of dbus calls. Add a cache?
     switch (role) {
         case IconModelRole: {
-			QString icon = ":/icons/" + data(index, IconNameRole).toString() + ".svg";
+			QString icon = ":/icons/" + data(index, IconNameRole).toString() + ".png";
 			return QIcon(icon);
         }
         case IdModelRole:
