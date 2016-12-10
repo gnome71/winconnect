@@ -2,16 +2,16 @@
 #define TESTPLUGINA_H
 
 #include "testPluginAExport.h"
-#include "plugins/testplugininterface.h"
+#include "plugins/plugininterface.h"
 
 #include <QtCore>
 
 class TESTPLUGINA_EXPORT TestPluginA
-		: public TestPluginInterface
+		: public PluginInterface
 {
 	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "at.winconnect.TestPluginInterface" FILE "testPluginA.json")
-	Q_INTERFACES(TestPluginInterface)
+	Q_PLUGIN_METADATA(IID "at.winconnect.PluginInterface" FILE "testPluginA.json")
+	Q_INTERFACES(PluginInterface)
 
 public:
 	//TestPluginA(QObject* parent = 0);

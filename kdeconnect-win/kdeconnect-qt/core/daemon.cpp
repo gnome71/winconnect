@@ -41,7 +41,6 @@
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "interfaces/notificationinterface.h"
-#include "plugins/testplugininterface.h"
 
 Q_GLOBAL_STATIC(Daemon*, s_instance)
 
@@ -118,10 +117,23 @@ void Daemon::loadPlugins()
 		QPluginLoader loader(libpath.absoluteFilePath(fileName));
 		QObject *plugin = loader.instance();
 		if (plugin) {
-			testPlugin = qobject_cast<TestPluginInterface*>(plugin);
-			if(testPlugin) {
-				pluginFileNames += fileName;
-				qDebug() << "From testPlugin: " << testPlugin->info(fileName);
+			pluginFileNames += fileName;
+			QJsonValue pluginMetadata(loader.metaData().value("MetaData"));
+			QJsonObject metaDataObject = pluginMetadata.toObject();
+			qDebug() << "PluginName: " << metaDataObject.value("name").toString();
+			qDebug() << "PluginVer.: " << metaDataObject.value("version").toString();
+			QString pName = metaDataObject.value("name").toString();
+			if (pName == "BatteryPlugin") {
+				batteryPlugin = qobject_cast<BatteryPluginInterface*>(plugin);
+				if (batteryPlugin) {
+					qDebug() << "From batteryPlugin: " << batteryPlugin->charge();
+				}
+			}
+			else if (pName == "TestPluginA") {
+				testPlugin = qobject_cast<PluginInterface*>(plugin);
+				if (testPlugin) {
+					qDebug() << "From testPlugin: " << testPlugin->info(fileName);
+				}
 			}
 		}
 	}

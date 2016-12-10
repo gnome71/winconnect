@@ -12,7 +12,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 set(${PROJECT_NAME}_HEADERS
-	testplugininterface.h
+	battery/batteryplugininterface.h
+	plugininterface.h
 	pluginmanager.h
 )
 
@@ -27,6 +28,7 @@ generate_export_header(${PROJECT_NAME}
 	EXPORT_FILE_NAME "${PROJECT_NAME}Export.h")
 
 add_subdirectory(test)
+add_subdirectory(battery)
 
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
   COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}Export.h" "${CMAKE_BINARY_DIR}"

@@ -1,4 +1,4 @@
-#include "testplugininterface.h"
+#include "plugininterface.h"
 #include "pluginmanager.h"
 
 #include <QtCore>
@@ -109,7 +109,7 @@ void PluginManager::load(const QString& path)
 
 	QPluginLoader *loader = new QPluginLoader(path);
 
-	if(TestPluginInterface *plugin = qobject_cast<TestPluginInterface *>(loader->instance()))
+	if(PluginInterface *plugin = qobject_cast<PluginInterface *>(loader->instance()))
 		d->loaders.insert(path, loader);
 	else
 		delete loader;
