@@ -112,7 +112,10 @@ void Daemon::loadPlugins()
 {
 	QDir libpath = qApp->applicationDirPath();		//QLibraryInfo::location(QLibraryInfo::PluginsPath);
 	libpath.cd("plugins");
-	foreach (QString fileName, libpath.entryList(QDir::Files)) {
+	QStringList filters;
+	filters << "*.dll";
+	libpath.setNameFilters(filters);
+	foreach (QString fileName, libpath.entryList(filters)) {
 		QString ld = libpath.absoluteFilePath(fileName);
 		QPluginLoader loader(libpath.absoluteFilePath(fileName));
 		QObject *plugin = loader.instance();

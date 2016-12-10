@@ -6,6 +6,8 @@
 
 #include <QtCore>
 
+class Device;
+
 class BATTERYPLUGIN_EXPORT BatteryPlugin
 	: public BatteryPluginInterface
 {

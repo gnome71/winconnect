@@ -1,4 +1,5 @@
 #include "plugininterface.h"
+#include "battery/batteryplugininterface.h"
 #include "pluginmanager.h"
 
 #include <QtCore>
@@ -70,7 +71,8 @@ void PluginManager::initialize(void)
 {
 	qDebug() << "PluginManager: initialize";
 
-	QDir path = QLibraryInfo::location(QLibraryInfo::PluginsPath);
+	QDir path = qApp->applicationDirPath();
+	path.cd("plugins");
 	foreach(QFileInfo info, path.entryInfoList(QDir::Files | QDir::NoDotAndDotDot))
 		this->scan(info.absoluteFilePath());
 
@@ -111,6 +113,8 @@ void PluginManager::load(const QString& path)
 
 	if(PluginInterface *plugin = qobject_cast<PluginInterface *>(loader->instance()))
 		d->loaders.insert(path, loader);
+	else if(BatteryPluginInterface *plugin = qobject_cast<BatteryPluginInterface *>(loader->instance()))
+		d->loaders.insert(path, loader);
 	else
 		delete loader;
 }
@@ -127,12 +131,13 @@ void PluginManager::unload(const QString& path)
 
 QStringList PluginManager::plugins(void)
 {
+	qDebug() << "Plugins:" << d->loaders;
 	return d->loaders.keys();
 }
 
 QString PluginManager::pluginName(const QString& path)
 {
-	qDebug() << "Loaders:" << d->loaders;
+	//qDebug() << "Loaders:" << d->loaders;
 	return d->names.value(path).toString();
 }
 

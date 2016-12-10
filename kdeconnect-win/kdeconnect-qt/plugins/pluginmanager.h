@@ -28,8 +28,6 @@ protected:
 
 private:
 	static PluginManager *s_instance;
-
-private:
 	PluginManagerPrivate *d;
 };
 

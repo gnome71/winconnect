@@ -33,7 +33,7 @@
 #include "interfaces/notificationinterface.h"
 
 class DeviceLink;
-//class KdeConnectPlugin;
+// TODO: class KdeConnectPlugin;
 
 /**
  * @brief The Device class
@@ -156,7 +156,7 @@ private: //Fields (TODO: dPointer!)
 
 	QVector<DeviceLink*> m_deviceLinks;
 
-	//	QHash<QString, KdeConnectPlugin*> m_plugins;
+//	QHash<QString, KdeConnectPlugin*> m_plugins;
 
 	//Capabilities stuff
 //	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;

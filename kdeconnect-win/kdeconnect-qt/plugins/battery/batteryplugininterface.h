@@ -17,7 +17,6 @@ class PLUGINMANAGER_EXPORT BatteryPluginInterface
 	Q_OBJECT
 
 public:
-	
 	virtual ~BatteryPluginInterface(void) {}
 
 	virtual int charge() const = 0;
