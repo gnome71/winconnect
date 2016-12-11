@@ -17,6 +17,8 @@ public:
 	QHash<QString, QVariant> names;
 	QHash<QString, QVariant> versions;
 	QHash<QString, QVariantList> dependencies;
+	QHash<QString, QVariantList> outgoing;
+	QHash<QString, QVariantList> supported;
 
 public:
 	QHash<QString, QPluginLoader *> loaders;
@@ -97,7 +99,9 @@ void PluginManager::scan(const QString& path)
 	d->names.insert(path, loader->metaData().value("MetaData").toObject().value("name").toVariant());
 	d->versions.insert(path, loader->metaData().value("MetaData").toObject().value("version").toVariant());
 	d->dependencies.insert(path, loader->metaData().value("MetaData").toObject().value("dependencies").toArray().toVariantList());
-
+	d->outgoing.insert(path, loader->metaData().value("MetaData").toObject().value("X-WinConnect-OutgoingPackageType").toArray().toVariantList());
+	d->supported.insert(path, loader->metaData().value("MetaData").toObject().value("X-WinConnect-SupportedPackageType").toArray().toVariantList());
+	
 	delete loader;
 }
 
@@ -139,6 +143,22 @@ QString PluginManager::pluginName(const QString& path)
 {
 	//qDebug() << "Loaders:" << d->loaders;
 	return d->names.value(path).toString();
+}
+
+QSet<QString> PluginManager::pluginsForCapabilities(const QSet<QString> &incoming, const QSet<QString> &outgoing)
+{
+	QSet<QString> ret;
+	
+	// TODO: for loop
+	for (const QString &service : d->loaders.keys()) {
+		qDebug() << "service key: "  << service;
+		const QSet<QVariantList> pluginIncomingCapabilities = d->supported.values().toSet();
+		const QSet<QVariantList> pluginOutgoingCapabilities = d->outgoing.values().toSet();
+		qDebug() << "Incoming cap: " << pluginIncomingCapabilities;
+		qDebug() << "Outgoing cap: " << pluginOutgoingCapabilities;
+	}
+
+	return ret;
 }
 
 PluginManager::PluginManager(void) : d(new PluginManagerPrivate)

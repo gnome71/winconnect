@@ -21,6 +21,7 @@ public:
 	void unload(const QString& path);
 	QStringList plugins(void);
 	QString pluginName(const QString& path);
+	QSet<QString> pluginsForCapabilities(const QSet<QString> &incoming, const QSet<QString> &outgoing);
 
 protected:
 	 PluginManager(void);
