@@ -1,6 +1,8 @@
 {
   "dependencies": [],
   "name": "PluginA",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "X-WinConnect-OutgoingPackageType": [ "winconnect.testplugin.request" ],
+  "X-WinConnect-SupportedPackageType": [ "winconnect.testplugin" ]
 }
 

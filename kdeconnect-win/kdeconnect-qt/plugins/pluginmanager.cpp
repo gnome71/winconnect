@@ -145,17 +145,27 @@ QString PluginManager::pluginName(const QString& path)
 	return d->names.value(path).toString();
 }
 
-QSet<QString> PluginManager::pluginsForCapabilities(const QSet<QString> &incoming, const QSet<QString> &outgoing)
+QSet<QString> PluginManager::pluginsForCapabilities(
+	const QSet<QString> &incoming, 
+	const QSet<QString> &outgoing)
 {
 	QSet<QString> ret;
 	
 	// TODO: for loop
-	for (const QString &service : d->loaders.keys()) {
-		qDebug() << "service key: "  << service;
-		const QSet<QVariantList> pluginIncomingCapabilities = d->supported.values().toSet();
-		const QSet<QVariantList> pluginOutgoingCapabilities = d->outgoing.values().toSet();
-		qDebug() << "Incoming cap: " << pluginIncomingCapabilities;
-		qDebug() << "Outgoing cap: " << pluginOutgoingCapabilities;
+	for (const QVariantList &service : d->supported) {
+		qDebug() << "#pluginsForCap: supported:" << service;
+		//const QVariantList pluginIncomingCapabilities = 
+		//	d->supported.value("X-WinConnect-SupportedPackageType");
+		//qDebug() << "#pluginsForCap: val(2):" << pluginIncomingCapabilities.value(2).toMap().values();
+		//const QSet<QVariantList> pluginOutgoingCapabilities = d->outgoing.values("X-WinConnect-OutgoingPackageType").toSet();
+		//qDebug() << "Incoming cap: " << pluginIncomingCapabilities;
+		//qDebug() << "Outgoing cap: " << pluginOutgoingCapabilities;
+
+		//bool capabilitiesEmpty = (pluginIncomingCapabilities.isEmpty() 
+		//	&& pluginOutgoingCapabilities.isEmpty());
+//#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+		//bool capabilitiesIntersect = (outgoing.intersects(pluginIncomingCapabilities)
+		//	|| incoming.intersects(pluginOutgoingCapabilities));
 	}
 
 	return ret;

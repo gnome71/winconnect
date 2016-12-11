@@ -217,7 +217,7 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 		for (const QString &s : qAsConst(incomingCapabilities))
 			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
 
-//		m_supportedPlugins = PluginLoader::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
+		m_supportedPlugins = PluginManager::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
 		//qDebug() << "new plugins for" << m_deviceName << m_supportedPlugins << incomingCapabilities << outgoingCapabilities;
 	} else {
 		m_supportedPlugins = PluginManager::instance()->plugins().toSet();
