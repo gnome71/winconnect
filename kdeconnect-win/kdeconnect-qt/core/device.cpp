@@ -210,15 +210,20 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 		const QSet<QString> outgoingCapabilities = identityPackage.get<QStringList>("outgoingCapabilities").toSet()
 						  , incomingCapabilities = identityPackage.get<QStringList>("incomingCapabilities").toSet();
 
-		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Outgoing capabilities: ");
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Remote outgoing capabilities: ");
 		for(const QString &s : qAsConst(outgoingCapabilities))
 			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
-		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Incoming capabilities: ");
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "Remote incoming capabilities: ");
 		for (const QString &s : qAsConst(incomingCapabilities))
 			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
 
 		m_supportedPlugins = PluginManager::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
-		//qDebug() << "new plugins for" << m_deviceName << m_supportedPlugins << incomingCapabilities << outgoingCapabilities;
+		
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "New plugins for: " + m_deviceName);
+		for (const QString &s : qAsConst(m_supportedPlugins))
+			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
+
+		qDebug() << "New plugins for" << m_deviceName << m_supportedPlugins;
 	} else {
 		m_supportedPlugins = PluginManager::instance()->plugins().toSet();
 	}

@@ -105,6 +105,7 @@ void PluginManager::scan(const QString& path)
 	delete loader;
 }
 
+
 void PluginManager::load(const QString& path)
 {
 	if(!QLibrary::isLibrary(path))
@@ -145,27 +146,47 @@ QString PluginManager::pluginName(const QString& path)
 	return d->names.value(path).toString();
 }
 
+/**
+ * 
+ */
 QSet<QString> PluginManager::pluginsForCapabilities(
 	const QSet<QString> &incoming, 
 	const QSet<QString> &outgoing)
 {
 	QSet<QString> ret;
-	
-	// TODO: for loop
-	for (const QVariantList &service : d->supported) {
-		qDebug() << "#pluginsForCap: supported:" << service;
-		//const QVariantList pluginIncomingCapabilities = 
-		//	d->supported.value("X-WinConnect-SupportedPackageType");
-		//qDebug() << "#pluginsForCap: val(2):" << pluginIncomingCapabilities.value(2).toMap().values();
-		//const QSet<QVariantList> pluginOutgoingCapabilities = d->outgoing.values("X-WinConnect-OutgoingPackageType").toSet();
-		//qDebug() << "Incoming cap: " << pluginIncomingCapabilities;
-		//qDebug() << "Outgoing cap: " << pluginOutgoingCapabilities;
+	QSet<QString> pluginIncomingCapabilities;
+	QSet<QString> pluginOutgoingCapabilities;
 
-		//bool capabilitiesEmpty = (pluginIncomingCapabilities.isEmpty() 
-		//	&& pluginOutgoingCapabilities.isEmpty());
-//#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-		//bool capabilitiesIntersect = (outgoing.intersects(pluginIncomingCapabilities)
-		//	|| incoming.intersects(pluginOutgoingCapabilities));
+	// Iterating plugins
+	for (auto s : d->loaders.keys()) {
+		qDebug() << "## Loaders:" << s;
+		// Resetting capabilities for next plugin
+		pluginIncomingCapabilities.clear();
+		pluginOutgoingCapabilities.clear();
+		// Iterating supported values
+		for (QVariantList::iterator j = d->supported[s].begin(); j != d->supported[s].end(); j++) {
+			qDebug() << "## Supported:" << (*j).toString();
+			pluginIncomingCapabilities.insert((*j).toString());
+		}
+		for (QVariantList::iterator j = d->outgoing[s].begin(); j != d->outgoing[s].end(); j++) {
+			qDebug() << "## Outgoing:" << (*j).toString();
+			pluginOutgoingCapabilities.insert((*j).toString());
+		}
+
+		qDebug() << pluginIncomingCapabilities;
+		qDebug() << outgoing;
+		qDebug() << pluginOutgoingCapabilities;
+		qDebug() << incoming;
+		
+		bool capabilitiesEmpty = (pluginIncomingCapabilities.isEmpty()
+			&& pluginOutgoingCapabilities.isEmpty());
+		// Needs Qt >= 5.6
+		bool capabilitiesIntersect = (outgoing.intersects(pluginIncomingCapabilities)
+			|| incoming.intersects(pluginOutgoingCapabilities));
+
+		if (capabilitiesIntersect || capabilitiesEmpty) {
+			ret += s;
+		}
 	}
 
 	return ret;

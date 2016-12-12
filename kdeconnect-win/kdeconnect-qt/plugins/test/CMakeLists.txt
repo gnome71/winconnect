@@ -11,7 +11,9 @@ add_definitions(-DQT_PLUGIN)
 
 add_library(${PROJECT_NAME} SHARED
   testplugina.h
-  testplugina.cpp)
+  testplugina.cpp
+  testPluginA.json
+)
 
 generate_export_header(${PROJECT_NAME}
 	 EXPORT_FILE_NAME "${PROJECT_NAME}Export.h")

@@ -13,17 +13,17 @@ macro(copy_deploy FILES)
 	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying deploy files"
 	)
-		foreach(filename ${FILES})
-			set(src "${filename}")
-			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
-			message("#DEBUG Copy ${src} ${dst}")	#DEBUG
-			add_custom_command(
-				TARGET copy_deploy_files
-				POST_BUILD
-				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
-				COMMENT "Copying file to: ${dst}"
-			)
-		endforeach(filename)
+#		foreach(filename ${FILES})
+#			set(src "${filename}")
+#			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+#			message("#DEBUG Copy ${src} ${dst}")	#DEBUG
+#			add_custom_command(
+#				TARGET copy_deploy_files
+#				POST_BUILD
+#				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
+#				COMMENT "Copying file to: ${dst}"
+#			)
+#		endforeach(filename)
 		add_custom_command(
 			TARGET copy_deploy_files
 			POST_BUILD
@@ -36,9 +36,9 @@ macro(copy_deploy FILES)
 			TARGET copy_deploy_files
 			POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_directory
-				"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Release>$<$<CONFIG:Release>:Debug>"
+				"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>"
 				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins"
-			COMMENT "Copying crypto folder"
+			COMMENT "Copying plugins folder"
 		)
 endmacro(copy_deploy)
 ### End macros, functions, ...
@@ -202,10 +202,10 @@ set(DEPLOY_FILES
 #	${QT_DIR}/plugins/platforms/qwindowsd.dll
 )
 
-message("#DEBUG DEPLOY_FILES:")
-foreach(f ${DEPLOY_FILES})
-	message(" ${f}")
-endforeach(f)
+#message("#DEBUG DEPLOY_FILES:")
+#foreach(f ${DEPLOY_FILES})
+#	message(" ${f}")
+#endforeach(f)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
