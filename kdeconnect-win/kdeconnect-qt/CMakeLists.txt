@@ -13,17 +13,6 @@ macro(copy_deploy FILES)
 	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying deploy files"
 	)
-#		foreach(filename ${FILES})
-#			set(src "${filename}")
-#			set(dst "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
-#			message("#DEBUG Copy ${src} ${dst}")	#DEBUG
-#			add_custom_command(
-#				TARGET copy_deploy_files
-#				POST_BUILD
-#				COMMAND ${CMAKE_COMMAND} -E copy ${src} ${dst}
-#				COMMENT "Copying file to: ${dst}"
-#			)
-#		endforeach(filename)
 		add_custom_command(
 			TARGET copy_deploy_files
 			POST_BUILD

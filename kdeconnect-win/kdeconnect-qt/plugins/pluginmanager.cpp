@@ -1,7 +1,6 @@
-//#include "plugininterface.h"
+#include "pluginmanager.h"
 #include "battery/batteryplugininterface.h"
 #include "test/testpluginainterface.h"
-#include "pluginmanager.h"
 
 #include <QtCore>
 #include <QtDebug>
@@ -174,10 +173,10 @@ QSet<QString> PluginManager::pluginsForCapabilities(
 			pluginOutgoingCapabilities.insert((*j).toString());
 		}
 
-		qDebug() << pluginIncomingCapabilities;
-		qDebug() << outgoing;
-		qDebug() << pluginOutgoingCapabilities;
-		qDebug() << incoming;
+		//qDebug() << pluginIncomingCapabilities;
+		//qDebug() << outgoing;
+		//qDebug() << pluginOutgoingCapabilities;
+		//qDebug() << incoming;
 		
 		bool capabilitiesEmpty = (pluginIncomingCapabilities.isEmpty()
 			&& pluginOutgoingCapabilities.isEmpty());

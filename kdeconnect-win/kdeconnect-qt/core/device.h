@@ -33,7 +33,7 @@
 #include "interfaces/notificationinterface.h"
 
 class DeviceLink;
-// TODO: class KdeConnectPlugin;
+class KdeConnectPlugin;
 
 /**
  * @brief The Device class
@@ -108,11 +108,11 @@ public:
 	Q_SCRIPTABLE QStringList loadedPlugins() const;
 	Q_SCRIPTABLE bool hasPlugin(const QString& name) const;
 
-//	Q_SCRIPTABLE QString pluginsConfigFile() const;
+	Q_SCRIPTABLE QString pluginsConfigFile() const;
 
-	//KdeConnectPlugin* plugin(const QString& pluginName) const;
-	//void setPluginEnabled(const QString& pluginName, bool enabled);
-	//bool isPluginEnabled(const QString& pluginName) const;
+	KdeConnectPlugin* plugin(const QString& pluginName) const;
+	void setPluginEnabled(const QString& pluginName, bool enabled);
+	bool isPluginEnabled(const QString& pluginName) const;
 
 	void cleanUnneededLinks();
 
@@ -125,7 +125,7 @@ public Q_SLOTS:
 	virtual bool sendPackage(NetworkPackage& np);
 	Q_SCRIPTABLE void requestPair(); //! user requests pair
 	Q_SCRIPTABLE void unpair(); //! user requests unpair
-	//Q_SCRIPTABLE void reloadPlugins(); //from kconf
+	Q_SCRIPTABLE void reloadPlugins(); //from kconf
 
 private Q_SLOTS:
 	void privateReceivedPackage(const NetworkPackage& np); //! receieved a pairing package
@@ -156,10 +156,10 @@ private: //Fields (TODO: dPointer!)
 
 	QVector<DeviceLink*> m_deviceLinks;
 
-//	QHash<QString, KdeConnectPlugin*> m_plugins;
+	QHash<QString, KdeConnectPlugin*> m_plugins;
 
 	//Capabilities stuff
-//	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;
+	QMultiMap<QString, KdeConnectPlugin*> m_pluginsByIncomingCapability;
 	QSet<QString> m_supportedPlugins;
 };
 
