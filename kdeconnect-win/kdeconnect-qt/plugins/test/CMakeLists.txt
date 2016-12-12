@@ -29,7 +29,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 set(MISC
-	plugins/test/testPluginA.json
+	testPluginA.json
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Plugins")

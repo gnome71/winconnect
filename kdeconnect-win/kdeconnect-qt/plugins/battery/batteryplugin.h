@@ -12,7 +12,7 @@ class BATTERYPLUGIN_EXPORT BatteryPlugin
 	: public BatteryPluginInterface
 {
 	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "at.winconnect.BatteryPlugin" FILE "batteryplugin.json")
+	Q_PLUGIN_METADATA(IID "at.winconnect.BatteryPlugin" FILE "batteryPlugin.json")
 	Q_INTERFACES(BatteryPluginInterface)
 
 public:
