@@ -4,6 +4,9 @@
 #pragma once
 
 #include "pluginManagerExport.h"
+#include "core/device.h"
+#include "core/networkpackage.h"
+
 #include <QObject>
 
 /**
@@ -19,6 +22,8 @@ class PLUGINMANAGER_EXPORT BatteryPluginInterface
 public:
 	virtual ~BatteryPluginInterface(void) {}
 
+	virtual void initialize(const Device *device) = 0;
+	virtual void connected() = 0;
 	virtual int charge() const = 0;
 	virtual bool isCharging() const = 0;
 	virtual void updateValues(bool isCharging, int currentCharge) = 0;

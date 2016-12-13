@@ -6,7 +6,10 @@
 
 #include <QtCore>
 
+#define PACKAGE_TYPE_BATTERY_REQUEST "kdeconnect.battery.request"
+
 class Device;
+class NetworkPackage;
 
 class BATTERYPLUGIN_EXPORT BatteryPlugin
 	: public BatteryPluginInterface
@@ -17,6 +20,8 @@ class BATTERYPLUGIN_EXPORT BatteryPlugin
 
 public:
 	QString info(const QString& name) Q_DECL_OVERRIDE;
+	void initialize(const Device *device) Q_DECL_OVERRIDE;
+	void connected() Q_DECL_OVERRIDE;
 	int charge() const Q_DECL_OVERRIDE { return m_charge; }
 	bool isCharging() const Q_DECL_OVERRIDE { return m_isCharging; }
 	void updateValues(bool isCharging, int currentCharge) Q_DECL_OVERRIDE;
@@ -26,6 +31,7 @@ Q_SIGNALS:
 	void chargeChanged(int charge);
 
 private:
+	Device *m_device;
 	int m_charge = -1;
 	bool m_isCharging = false;
 

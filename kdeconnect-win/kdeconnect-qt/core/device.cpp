@@ -68,7 +68,7 @@ Device::Device(QObject* parent, const QString& id)
 	// TODO: NotificationInterface* m_notificationInterface = new NotificationInterface(this, m_deviceId);
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	//m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
-	PluginManager::instance()->initialize();
+	PluginManager::instance()->initialize(this);
 	m_supportedPlugins = PluginManager::instance()->plugins().toSet();
 	qDebug() << "m_supportedPlugins: " << m_supportedPlugins;
 
@@ -251,7 +251,7 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 	qSort(m_deviceLinks.begin(), m_deviceLinks.end(), lessThan);
 
 	const bool capabilitiesSupported = identityPackage.has("incomingCapabilities") || identityPackage.has("outgoingCapabilities");
-	if (capabilitiesSupported) {
+ 	if (capabilitiesSupported) {
 		const QSet<QString> outgoingCapabilities = identityPackage.get<QStringList>("outgoingCapabilities").toSet()
 						  , incomingCapabilities = identityPackage.get<QStringList>("incomingCapabilities").toSet();
 

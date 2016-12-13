@@ -2,6 +2,7 @@
 #define PLUGINMANAGER_H
 
 #include "pluginManagerExport.h"
+#include "core/device.h"
 
 #include <QtCore/QObject>
 
@@ -14,8 +15,8 @@ class PLUGINMANAGER_EXPORT PluginManager : public QObject
 public:
 	static PluginManager *instance(void);
 
-	void initialize(void);
-	void uninitialize(void);
+	void initialize(const Device *device);
+	void uninitialize(const Device *device);
 	void scan(const QString& path);
 	void load(const QString& path);
 	void unload(const QString& path);
@@ -30,6 +31,7 @@ protected:
 private:
 	static PluginManager *s_instance;
 	PluginManagerPrivate *d;
+	Device *m_device;
 };
 
 #endif // PLUGINMANAGER_H
