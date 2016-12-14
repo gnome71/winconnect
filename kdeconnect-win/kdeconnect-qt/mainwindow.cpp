@@ -314,7 +314,7 @@ void MainWindow::on_pushButtonOk_clicked()
 void MainWindow::createTrayIcon()
 {
 	qDebug() << "MainWindow Tray:" << m_daemon->devices();
-	trayIcon = new QSystemTrayIcon(QIcon(":/icons/AppIcon.svg"), this);
+	trayIcon = new QSystemTrayIcon(QIcon(":/icons/AppIcon.png"), this);
 	trayIcon->setToolTip("WinConnect");
 	trayIconMenu = new QMenu(this);
 	trayIconMenu->addAction(minimizeAction);

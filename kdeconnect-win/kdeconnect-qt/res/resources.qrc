@@ -1,11 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/AppIcon.svg</file>
-        <file>icons/smartphone-connected.svg</file>
-        <file>icons/smartphone-disconnected.svg</file>
-        <file>icons/smartphone-trusted.svg</file>
-        <file>icons/tablet-connected.svg</file>
-        <file>icons/tablet-disconnected.svg</file>
-        <file>icons/tablet-trusted.svg</file>
+      <file>icons/AppIcon.png</file>
+        <file>icons/smartphone-connected.png</file>
+        <file>icons/smartphone-disconnected.png</file>
+        <file>icons/smartphone-trusted.png</file>
+        <file>icons/tablet-connected.png</file>
+        <file>icons/tablet-disconnected.png</file>
+        <file>icons/tablet-trusted.png</file>
     </qresource>
 </RCC>

@@ -27,8 +27,8 @@
 #include <QMap>
 
 #include "device.h"
-//#include "plugins/pluginmanager.h"
-#include "plugins/testplugininterface.h"
+#include "plugins/plugininterface.h"
+#include "plugins/battery/batteryplugininterface.h"
 
 class NetworkPackage;
 class DeviceLink;
@@ -94,7 +94,8 @@ private:
 	void cleanDevices();	//! remove untrusted devices
 	void loadPlugins();
 
-	TestPluginInterface* testPlugin;
+	BatteryPluginInterface* batteryPlugin;
+	PluginInterface* testPlugin;
 	QStringList pluginFileNames;
 	QScopedPointer<struct DaemonPrivate> d;	//! LinkProviders, Devices and DiscoveryModeAcquisitions
 	const QString& prefix = "Daemon    ";

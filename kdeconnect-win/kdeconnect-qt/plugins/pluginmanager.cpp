@@ -1,5 +1,6 @@
-#include "testplugininterface.h"
 #include "pluginmanager.h"
+#include "battery/batteryplugininterface.h"
+#include "test/testpluginainterface.h"
 
 #include <QtCore>
 #include <QtDebug>
@@ -16,6 +17,8 @@ public:
 	QHash<QString, QVariant> names;
 	QHash<QString, QVariant> versions;
 	QHash<QString, QVariantList> dependencies;
+	QHash<QString, QVariantList> outgoing;
+	QHash<QString, QVariantList> supported;
 
 public:
 	QHash<QString, QPluginLoader *> loaders;
@@ -66,11 +69,13 @@ PluginManager *PluginManager::instance(void)
 	return s_instance;
 }
 
-void PluginManager::initialize(void)
+void PluginManager::initialize(const Device *device)
 {
-	qDebug() << "PluginManager: initialize";
+	m_device = const_cast<Device*>(device);
+	qDebug() << "PluginManager instance:" << s_instance << "initialize for" << m_device->name();
 
-	QDir path = QLibraryInfo::location(QLibraryInfo::PluginsPath);
+	QDir path = qApp->applicationDirPath();
+	path.cd("plugins");
 	foreach(QFileInfo info, path.entryInfoList(QDir::Files | QDir::NoDotAndDotDot))
 		this->scan(info.absoluteFilePath());
 
@@ -78,7 +83,7 @@ void PluginManager::initialize(void)
 		this->load(info.absoluteFilePath());
 }
 
-void PluginManager::uninitialize(void)
+void PluginManager::uninitialize(const Device *device)
 {
 	foreach(const QString &path, d->loaders.keys())
 		this->unload(path);
@@ -95,9 +100,12 @@ void PluginManager::scan(const QString& path)
 	d->names.insert(path, loader->metaData().value("MetaData").toObject().value("name").toVariant());
 	d->versions.insert(path, loader->metaData().value("MetaData").toObject().value("version").toVariant());
 	d->dependencies.insert(path, loader->metaData().value("MetaData").toObject().value("dependencies").toArray().toVariantList());
-
+	d->outgoing.insert(path, loader->metaData().value("MetaData").toObject().value("X-WinConnect-OutgoingPackageType").toArray().toVariantList());
+	d->supported.insert(path, loader->metaData().value("MetaData").toObject().value("X-WinConnect-SupportedPackageType").toArray().toVariantList());
+	
 	delete loader;
 }
+
 
 void PluginManager::load(const QString& path)
 {
@@ -109,7 +117,9 @@ void PluginManager::load(const QString& path)
 
 	QPluginLoader *loader = new QPluginLoader(path);
 
-	if(TestPluginInterface *plugin = qobject_cast<TestPluginInterface *>(loader->instance()))
+	if(TestPluginAInterface *plugin = qobject_cast<TestPluginAInterface *>(loader->instance()))
+		d->loaders.insert(path, loader);
+	else if(BatteryPluginInterface *plugin = qobject_cast<BatteryPluginInterface *>(loader->instance()))
 		d->loaders.insert(path, loader);
 	else
 		delete loader;
@@ -127,13 +137,63 @@ void PluginManager::unload(const QString& path)
 
 QStringList PluginManager::plugins(void)
 {
+	qDebug() << "Plugins:" << d->loaders;
 	return d->loaders.keys();
 }
 
 QString PluginManager::pluginName(const QString& path)
 {
-	qDebug() << "Loaders:" << d->loaders;
+	//qDebug() << "Loaders:" << d->loaders;
 	return d->names.value(path).toString();
+}
+
+/**
+ * 
+ */
+QSet<QString> PluginManager::pluginsForCapabilities(
+	const QSet<QString> &incoming, 
+	const QSet<QString> &outgoing)
+{
+	QSet<QString> ret;
+	QSet<QString> pluginIncomingCapabilities;
+	QSet<QString> pluginOutgoingCapabilities;
+
+	// Iterating plugins
+	for (auto s : d->loaders.keys()) {
+		qDebug() << "## Loaders:" << s;
+		// Resetting capabilities for next plugin
+		pluginIncomingCapabilities.clear();
+		pluginOutgoingCapabilities.clear();
+		// Iterating supported values
+		for (QVariantList::iterator j = d->supported[s].begin(); j != d->supported[s].end(); j++) {
+			qDebug() << "## Supported:" << (*j).toString();
+			pluginIncomingCapabilities.insert((*j).toString());
+		}
+		for (QVariantList::iterator j = d->outgoing[s].begin(); j != d->outgoing[s].end(); j++) {
+			qDebug() << "## Outgoing:" << (*j).toString();
+			pluginOutgoingCapabilities.insert((*j).toString());
+		}
+
+		//qDebug() << pluginIncomingCapabilities;
+		//qDebug() << outgoing;
+		//qDebug() << pluginOutgoingCapabilities;
+		//qDebug() << incoming;
+		
+		bool capabilitiesEmpty = (pluginIncomingCapabilities.isEmpty()
+			&& pluginOutgoingCapabilities.isEmpty());
+		// Needs Qt >= 5.6
+		bool capabilitiesIntersect = (outgoing.intersects(pluginIncomingCapabilities)
+			|| incoming.intersects(pluginOutgoingCapabilities));
+
+		if (capabilitiesIntersect || capabilitiesEmpty) {
+			ret += s;
+		}
+		else {
+			qDebug() << "Not loading plugin" << s << "because device doesn't support it";
+		}
+	}
+
+	return ret;
 }
 
 PluginManager::PluginManager(void) : d(new PluginManagerPrivate)

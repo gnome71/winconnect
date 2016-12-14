@@ -34,8 +34,8 @@
 //#include <KLocalizedString>
 
 #include "kclogger.h"
-//#include "kdeconnectplugin.h"
-//#include "pluginloader.h"
+#include "kdeconnectplugin.h"
+#include "plugins/pluginmanager.h"
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "networkpackage.h"
@@ -68,6 +68,9 @@ Device::Device(QObject* parent, const QString& id)
 	// TODO: NotificationInterface* m_notificationInterface = new NotificationInterface(this, m_deviceId);
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	//m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
+	PluginManager::instance()->initialize(this);
+	m_supportedPlugins = PluginManager::instance()->plugins().toSet();
+	qDebug() << "m_supportedPlugins: " << m_supportedPlugins;
 
 	connect(this, &Device::pairingError, this, &warn);
 }
@@ -98,6 +101,51 @@ Device::~Device()
 	qDeleteAll(m_deviceLinks);
 	m_deviceLinks.clear();
 	//delete m_notifications;
+}
+
+QString Device::pluginsConfigFile() const
+{
+	qDebug() << "Device config dir:" << KdeConnectConfig::instance()->deviceConfigDir(id()).absoluteFilePath("config");
+	return KdeConnectConfig::instance()->deviceConfigDir(id()).absoluteFilePath("config");
+}
+
+bool Device::hasPlugin(const QString& name) const
+{
+	return m_plugins.contains(name);
+}
+
+void Device::setPluginEnabled(const QString& pluginName, bool enabled)
+{
+	//KConfigGroup pluginStates = KSharedConfig::openConfig(pluginsConfigFile())->group("Plugins");
+
+	const QString enabledKey = pluginName + QStringLiteral("Enabled");
+	//pluginStates.writeEntry(enabledKey, enabled);
+	//reloadPlugins();
+}
+
+bool Device::isPluginEnabled(const QString& pluginName) const
+{
+	const QString enabledKey = pluginName + QStringLiteral("Enabled");
+	//KConfigGroup pluginStates = KSharedConfig::openConfig(pluginsConfigFile())->group("Plugins");
+
+	//return (pluginStates.hasKey(enabledKey) ? pluginStates.readEntry(enabledKey, false)
+	//	: PluginLoader::instance()->getPluginInfo(pluginName).isEnabledByDefault());
+	return false;
+}
+
+void Device::reloadPlugins()
+{
+	QHash<QString, KdeConnectPlugin*> newPluginMap, oldPluginMap = m_plugins;
+	QMultiMap<QString, KdeConnectPlugin*> newPluginsByIncomingCapability;
+
+	if (isTrusted() && isReachable()) {
+		PluginManager* loader = PluginManager::instance();
+
+		for (const QString& pluginName : m_supportedPlugins) {
+			//const bool pluginEnabled = isPlugin
+		}
+	}
+	pluginsConfigFile();	//DEBUG
 }
 
 /**
@@ -149,7 +197,7 @@ void Device::pairStatusChanged(DeviceLink::PairStatus status)
 		KdeConnectConfig::instance()->addTrustedDevice(id(), name(), type());
 	}
 
-	//reloadPlugins(); //Will load/unload plugins
+	reloadPlugins(); //Will load/unload plugins
 
 	bool isTrusted = (status == DeviceLink::Paired);
 	Q_EMIT trustedChanged(isTrusted? Trusted : NotTrusted);
@@ -203,17 +251,27 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 	qSort(m_deviceLinks.begin(), m_deviceLinks.end(), lessThan);
 
 	const bool capabilitiesSupported = identityPackage.has("incomingCapabilities") || identityPackage.has("outgoingCapabilities");
-	if (capabilitiesSupported) {
+ 	if (capabilitiesSupported) {
 		const QSet<QString> outgoingCapabilities = identityPackage.get<QStringList>("outgoingCapabilities").toSet()
 						  , incomingCapabilities = identityPackage.get<QStringList>("incomingCapabilities").toSet();
 
-//		m_supportedPlugins = PluginLoader::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
-		//qDebug() << "new plugins for" << m_deviceName << m_supportedPlugins << incomingCapabilities << outgoingCapabilities;
+//		for(const QString &s : qAsConst(outgoingCapabilities))
+//			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
+//		for (const QString &s : qAsConst(incomingCapabilities))
+//			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
+
+		m_supportedPlugins = PluginManager::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
+		
+		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "New plugins for: " + m_deviceName);
+		for (const QString &s : qAsConst(m_supportedPlugins))
+			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
+
+		qDebug() << "New plugins for" << m_deviceName << m_supportedPlugins;
 	} else {
-//		m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
+		m_supportedPlugins = PluginManager::instance()->plugins().toSet();
 	}
 
-	//reloadPlugins();
+	reloadPlugins();
 
 	if (m_deviceLinks.size() == 1) {
 		Q_EMIT reachableStatusChanged();
@@ -274,13 +332,13 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 {
 	Q_ASSERT(np.type() != PACKAGE_TYPE_PAIR);
 	if (isTrusted()) {
-//		const QList<KdeConnectPlugin*> plugins = m_pluginsByIncomingCapability.values(np.type());
-//		if (plugins.isEmpty()) {
-//			qWarning() << "discarding unsupported package" << np.type() << "for" << name();
-//		}
-//		Q_FOREACH (KdeConnectPlugin* plugin, plugins) {
-//TODO:			plugin->receivePackage(np);
-//		}
+		const QList<KdeConnectPlugin*> plugins = m_pluginsByIncomingCapability.values(np.type());
+		if (plugins.isEmpty()) {
+			qWarning() << "discarding unsupported package" << np.type() << "for" << name();
+		}
+		Q_FOREACH (KdeConnectPlugin* plugin, plugins) {
+			plugin->receivePackage(np);
+		}
 	} else {
 		qDebug() << "Device: device" << name() << "not paired, ignoring package" << np.type();
 		unpair();
@@ -295,6 +353,11 @@ void Device::privateReceivedPackage(const NetworkPackage& np)
 bool Device::isTrusted() const
 {
 	return KdeConnectConfig::instance()->trustedDevices().contains(id());
+}
+
+Q_SCRIPTABLE QStringList Device::loadedPlugins() const
+{
+	return Q_SCRIPTABLE QStringList();
 }
 
 /**

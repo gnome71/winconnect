@@ -22,8 +22,11 @@
 #include "daemon.h"
 
 //#include <QDBusConnection>
+#include <QApplication>
 #include <QNetworkAccessManager>
 #include <QDebug>
+#include <QDir>
+#include <QObject>
 #include <QPointer>
 #include <QMessageBox>
 #include <QPluginLoader>
@@ -38,7 +41,6 @@
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "interfaces/notificationinterface.h"
-#include "plugins/testplugininterface.h"
 
 Q_GLOBAL_STATIC(Daemon*, s_instance)
 
@@ -108,15 +110,33 @@ Daemon::Daemon(QObject *parent, bool testMode)
 
 void Daemon::loadPlugins()
 {
-	QDir path = QLibraryInfo::location(QLibraryInfo::PluginsPath);
-	foreach (QString fileName, path.entryList(QDir::Files)) {
-		QPluginLoader loader(path.absoluteFilePath(fileName));
+	QDir libpath = qApp->applicationDirPath();		//QLibraryInfo::location(QLibraryInfo::PluginsPath);
+	libpath.cd("plugins");
+	QStringList filters;
+	filters << "*.dll";
+	libpath.setNameFilters(filters);
+	foreach (QString fileName, libpath.entryList(filters)) {
+		QString ld = libpath.absoluteFilePath(fileName);
+		QPluginLoader loader(libpath.absoluteFilePath(fileName));
 		QObject *plugin = loader.instance();
 		if (plugin) {
-			testPlugin = qobject_cast<TestPluginInterface*>(plugin);
-			if(testPlugin) {
-				pluginFileNames += fileName;
-				qDebug() << "From testPlugin: " << testPlugin->info(fileName);
+			pluginFileNames += fileName;
+			QJsonValue pluginMetadata(loader.metaData().value("MetaData"));
+			QJsonObject metaDataObject = pluginMetadata.toObject();
+			qDebug() << "PluginName: " << metaDataObject.value("name").toString();
+			qDebug() << "PluginVer.: " << metaDataObject.value("version").toString();
+			QString pName = metaDataObject.value("name").toString();
+			if (pName == "BatteryPlugin") {
+				batteryPlugin = qobject_cast<BatteryPluginInterface*>(plugin);
+				if (batteryPlugin) {
+					qDebug() << "From batteryPlugin: " << batteryPlugin->charge();
+				}
+			}
+			else if (pName == "TestPluginA") {
+				testPlugin = qobject_cast<PluginInterface*>(plugin);
+				if (testPlugin) {
+					qDebug() << "From testPlugin: " << testPlugin->info(fileName);
+				}
 			}
 		}
 	}
@@ -194,21 +214,6 @@ void Daemon::forceOnNetworkChange()
 }
 
 /**
- * @brief Daemon::getDevice
- * @param deviceId
- * @return
- */
-Device*Daemon::getDevice(const QString& deviceId)
-{
-	Q_FOREACH (Device* device, d->mDevices) {
-		if (device->id() == deviceId) {
-			return device;
-		}
-	}
-	return Q_NULLPTR;
-}
-
-/**
  * @brief Daemon::devices
  * @param onlyReachable
  * @param onlyTrusted
@@ -245,10 +250,12 @@ void Daemon::onNewDeviceLink(const NetworkPackage& identityPackage, DeviceLink* 
 		device->addLink(identityPackage, dl);
 
 		// adding plugin for device
+		qDebug() << device->name();
 		QVariant deviceVariant = QVariant::fromValue<Device*>(device);
 		QVariantList m_args;
 		m_args << deviceVariant;
-		testPlugin->sendPing(m_args);
+
+		//testPlugin->sendPing(m_args);
 
 		if (!wasReachable) {
 			Q_EMIT deviceVisibilityChanged(id, true);
@@ -331,6 +338,21 @@ QNetworkAccessManager* Daemon::networkAccessManager()
 		manager = new QNetworkAccessManager(this);
 	}
 	return manager;
+}
+
+/**
+* @brief Daemon::getDevice
+* @param deviceId
+* @return
+*/
+Device * Daemon::getDevice(const QString & deviceId)
+{
+	Q_FOREACH(Device* device, d->mDevices) {
+		if (device->id() == deviceId) {
+			return device;
+		}
+	}
+	return nullptr;
 }
 
 /**

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="res/resources.qrc">
-    <normaloff>:/icons/AppIcon.svg</normaloff>:/icons/AppIcon.svg</iconset>
+    <normaloff>:/icons/AppIcon.png</normaloff>:/icons/AppIcon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -302,7 +302,7 @@
      <x>0</x>
      <y>0</y>
      <width>982</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

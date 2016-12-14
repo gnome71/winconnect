@@ -1,4 +1,4 @@
-project(testPluginA)
+project(batteryPlugin)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
@@ -10,9 +10,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins)
 add_definitions(-DQT_PLUGIN)
 
 add_library(${PROJECT_NAME} SHARED
-  testplugina.h
-  testplugina.cpp
-  testPluginA.json
+  batteryplugin.h
+  batteryplugin.cpp
+  batteryPlugin.json
 )
 
 generate_export_header(${PROJECT_NAME}
@@ -29,7 +29,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 set(MISC
-	testPluginA.json
+	batteryPlugin.json
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Plugins")

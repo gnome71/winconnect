@@ -13,18 +13,18 @@
  *
  * Interface class for plugins
  */
-class PLUGINMANAGER_EXPORT TestPluginInterface
+class PLUGINMANAGER_EXPORT PluginInterface
 		: public QObject
 {
 	Q_OBJECT
 
 public:
-	virtual ~TestPluginInterface(void) {}
+	virtual ~PluginInterface(void) {}
 
 	virtual QString info(const QString& name) = 0;
 	virtual void sendPing(const QVariantList &args) = 0;
 };
 
-Q_DECLARE_INTERFACE(TestPluginInterface, "at.winconnect.TestPluginInterface")
+Q_DECLARE_INTERFACE(PluginInterface, "at.winconnect.PluginInterface")
 
 #endif // PLUGIN_H
