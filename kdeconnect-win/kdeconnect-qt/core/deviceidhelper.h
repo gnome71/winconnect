@@ -22,10 +22,11 @@
 #ifndef DEVICEIDHELPER_H
 #define DEVICEIDHELPER_H
 
+#include "core/coreLibExport.h"
 
 #include <QString>
 
-namespace DeviceIdHelper {
+namespace CORELIB_EXPORT DeviceIdHelper {
 	void filterNonExportableCharacters(QString& s);
 }
 

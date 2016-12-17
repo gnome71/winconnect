@@ -26,6 +26,8 @@
 #include <QSet>
 #include <QMap>
 
+#include "core/coreLibExport.h"
+
 #include "device.h"
 #include "plugins/plugininterface.h"
 #include "plugins/battery/batteryplugininterface.h"
@@ -40,7 +42,7 @@ class QNetworkAccessManager;
  *
  * The daemon runs in the GUI Thread and handles devices and connections
  */
-class Daemon
+class CORELIB_EXPORT Daemon
 		: public QObject
 {
 	Q_OBJECT

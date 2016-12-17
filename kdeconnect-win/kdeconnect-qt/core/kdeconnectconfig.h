@@ -1,11 +1,11 @@
 #ifndef KDECONNECTCONFIG_H
 #define KDECONNECTCONFIG_H
 
+#include "core/coreLibExport.h"
+
 #include <QObject>
-//#include <QString>
 #include <QDir>
 #include <QtCrypto>
-//#include <QSslCertificate>
 
 class QSslCertificate;
 namespace QCA {
@@ -14,7 +14,7 @@ namespace QCA {
 }
 
 //! KdeConnectConfig class definition
-class  KdeConnectConfig
+class CORELIB_EXPORT KdeConnectConfig
 		: public QObject
 {
 	Q_OBJECT
@@ -54,7 +54,9 @@ public:
 	QDir deviceConfigDir(const QString &deviceId);
 	QDir pluginConfigDir(const QString &deviceId, const QString &pluginName); //Used by KdeConnectPluginConfig
 
-public Q_SLOTS:
+	static void filterNonExportableCharacters(QString& s);
+
+	public Q_SLOTS:
 	QString getQcaInfo();
 
 Q_SIGNALS:

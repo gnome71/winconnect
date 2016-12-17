@@ -105,20 +105,14 @@ add_subdirectory(plugins)
 
 # Set files
 set(SOURCES
-	${core_SRCS}
     main.cpp
     mainwindow.cpp
-	core/backends/loopback/loopbacklinkprovider.cpp
-	core/backends/loopback/loopbackdevicelink.cpp
 	interfaces/devicesmodel.cpp
 	interfaces/notificationinterface.cpp
 	)
 
 set(HEADERS
-	${core_HDRS}
     mainwindow.h
-	core/backends/loopback/loopbacklinkprovider.h
-	core/backends/loopback/loopbackdevicelink.h
 	interfaces/devicesmodel.h
 	interfaces/notificationinterface.h
 )
@@ -151,7 +145,7 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::WinMain
 	qca
 	pluginManager
-	kcLogger
+	coreLib
 )
 
 # VSConfig specific settings (show or hide console, ...)

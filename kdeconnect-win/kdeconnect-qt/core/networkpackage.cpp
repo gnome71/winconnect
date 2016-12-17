@@ -21,7 +21,7 @@
 
 #include "networkpackage.h"
 #include "kclogger.h"
-#include "deviceidhelper.h"
+//#include "deviceidhelper.h"
 //#include "filetransferjob.h"
 //#include "pluginloader.h"
 #include "kdeconnectconfig.h"
@@ -170,7 +170,7 @@ bool NetworkPackage::unserialize(const QByteArray& a, NetworkPackage* np)
     if (np->mBody.contains("deviceId"))
     {
         QString deviceId = np->get<QString>("deviceId");
-		DeviceIdHelper::filterNonExportableCharacters(deviceId);
+		KdeConnectConfig::filterNonExportableCharacters(deviceId);
         np->set("deviceId", deviceId);
     }
 

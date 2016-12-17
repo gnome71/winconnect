@@ -28,11 +28,13 @@
 #include <QSharedPointer>
 #include <QUrl>
 
+#include "core/coreLibExport.h"
+
 #include "networkpackagetypes.h"
 
-class FileTransferJob;
+//class FileTransferJob;
 
-class NetworkPackage
+class CORELIB_EXPORT NetworkPackage
 		: public QObject
 {
 	Q_GADGET

@@ -23,12 +23,14 @@
 
 #include <QObject>
 
+#include "core/coreLibExport.h"
+
 #include "core/networkpackage.h"
 #include "pairinghandler.h"
 
 class DeviceLink;
 
-class LinkProvider
+class CORELIB_EXPORT LinkProvider
     : public QObject
 {
     Q_OBJECT

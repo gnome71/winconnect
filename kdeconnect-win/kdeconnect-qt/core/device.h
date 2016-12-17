@@ -28,6 +28,8 @@
 #include <QVector>
 #include <QSet>
 
+#include "core/coreLibExport.h"
+
 #include "networkpackage.h"
 #include "backends/devicelink.h"
 #include "interfaces/notificationinterface.h"
@@ -39,7 +41,7 @@ class KdeConnectPluginConfig;
 /**
  * @brief The Device class
  */
-class Device
+class CORELIB_EXPORT Device
 	: public QObject
 {
 	Q_OBJECT

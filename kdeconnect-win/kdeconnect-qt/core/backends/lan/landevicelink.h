@@ -26,12 +26,14 @@
 #include <QSslSocket>
 #include <QSslCertificate>
 
+#include "core/coreLibExport.h"
+
 #include "core/backends/devicelink.h"
 //#include "uploadjob.h"
 
 class SocketLineReader;
 
-class LanDeviceLink
+class CORELIB_EXPORT LanDeviceLink
     : public DeviceLink
 {
     Q_OBJECT

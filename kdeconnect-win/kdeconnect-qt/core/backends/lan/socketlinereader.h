@@ -26,11 +26,13 @@
 #include <QSslSocket>
 #include <QHostAddress>
 
+#include "core/coreLibExport.h"
+
 /*
  * Encapsulates a QTcpSocket and implements the same methods of its API that are
  * used by LanDeviceLink, but readyRead is emitted only when a newline is found.
  */
-class SocketLineReader
+class CORELIB_EXPORT SocketLineReader
     : public QObject
 {
     Q_OBJECT

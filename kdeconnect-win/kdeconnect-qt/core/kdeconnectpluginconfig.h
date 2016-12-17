@@ -28,12 +28,14 @@
 #include <QStringList>
 #include <QVariant>
 
+#include "core/coreLibExport.h"
+
 struct KdeConnectPluginConfigPrivate;
 
 /**
  * @brief The KdeConnectPluginConfig class
  */
-class KdeConnectPluginConfig : public QObject
+class CORELIB_EXPORT KdeConnectPluginConfig : public QObject
 {
     Q_OBJECT
 

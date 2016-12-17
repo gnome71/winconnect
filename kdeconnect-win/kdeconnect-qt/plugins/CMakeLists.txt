@@ -40,6 +40,7 @@ add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
 
 target_link_libraries(${PROJECT_NAME}
 	Qt5::Core
+	coreLib
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Libraries")

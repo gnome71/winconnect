@@ -1,11 +1,11 @@
 #ifndef KCLOGGER_H
 #define KCLOGGER_H
 
-#include "core/kcLoggerExport.h"
+#include "core/coreLibExport.h"
 
 #include <QObject>
 
-class KCLOGGER_EXPORT KcLogger
+class CORELIB_EXPORT KcLogger
 		: public QObject
 {
 	Q_OBJECT

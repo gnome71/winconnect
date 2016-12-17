@@ -1,6 +1,6 @@
 #include "kdeconnectconfig.h"
 #include "kclogger.h"
-#include "deviceidhelper.h"
+//#include "deviceidhelper.h"
 #include "daemon.h"
 
 #include <QFile>
@@ -56,7 +56,7 @@ KdeConnectConfig::KdeConnectConfig()
 	//Register my own id if not there yet
 	if(!d->config->contains("id")) {
 		QString uuid = QUuid::createUuid().toString();
-		DeviceIdHelper::filterNonExportableCharacters(uuid);
+		filterNonExportableCharacters(uuid);
 		d->config->setValue("id", uuid);
 		d->config->sync();
 		qDebug() << "My id:" << uuid;
@@ -280,3 +280,7 @@ QDir KdeConnectConfig::pluginConfigDir(const QString &deviceId, const QString &p
 	return QDir(pluginConfigDir);
 }
 
+void KdeConnectConfig::filterNonExportableCharacters(QString& s) {
+	static QRegExp regexp("[^A-Za-z0-9_]", Qt::CaseSensitive, QRegExp::Wildcard);
+	s.replace(regexp, "_");
+}

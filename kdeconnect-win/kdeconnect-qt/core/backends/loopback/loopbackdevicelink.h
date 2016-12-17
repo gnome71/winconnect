@@ -21,11 +21,13 @@
 #ifndef LOOPBACKDEVICELINK_H
 #define LOOPBACKDEVICELINK_H
 
+#include "core/coreLibExport.h"
+
 #include "../devicelink.h"
 
 class LoopbackLinkProvider;
 
-class LoopbackDeviceLink
+class CORELIB_EXPORT LoopbackDeviceLink
     : public DeviceLink
 {
     Q_OBJECT

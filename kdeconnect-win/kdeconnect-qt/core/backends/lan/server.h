@@ -24,8 +24,10 @@
 #include <QTcpServer>
 #include <QSslSocket>
 
+#include "core/coreLibExport.h"
+
 // This class overrides QTcpServer to bind QSslSocket to native socket descriptor instead of QTcpSocket
-class Server
+class CORELIB_EXPORT Server
     : public QTcpServer
 {
 

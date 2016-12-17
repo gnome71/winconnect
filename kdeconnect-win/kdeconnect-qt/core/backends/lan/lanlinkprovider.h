@@ -29,12 +29,15 @@
 #include <QNetworkSession>
 #include <QSslSocket>
 
+#include "core/coreLibExport.h"
+
 #include "core/backends/linkprovider.h"
 #include "server.h"
 #include "landevicelink.h"
 
 class LanPairingHandler;
-class LanLinkProvider
+
+class CORELIB_EXPORT LanLinkProvider
     : public LinkProvider
 {
     Q_OBJECT

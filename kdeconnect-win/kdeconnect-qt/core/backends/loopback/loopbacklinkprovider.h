@@ -21,11 +21,13 @@
 #ifndef LOOPBACKLINKPROVIDER_H
 #define LOOPBACKLINKPROVIDER_H
 
+#include "core/coreLibExport.h"
 #include "../linkprovider.h"
 #include "loopbackdevicelink.h"
+
 #include <QPointer>
 
-class LoopbackLinkProvider
+class CORELIB_EXPORT LoopbackLinkProvider
     : public LinkProvider
 {
     Q_OBJECT

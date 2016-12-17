@@ -25,13 +25,15 @@
 #include <QObject>
 #include <QVariantList>
 
+#include "core/coreLibExport.h"
+
 #include "kdeconnectpluginconfig.h"
 #include "networkpackage.h"
 #include "device.h"
 
 struct KdeConnectPluginPrivate;
 
-class KdeConnectPlugin
+class CORELIB_EXPORT KdeConnectPlugin
     : public QObject
 {
     Q_OBJECT

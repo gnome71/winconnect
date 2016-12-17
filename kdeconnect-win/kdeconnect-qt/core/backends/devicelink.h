@@ -23,6 +23,9 @@
 
 #include <QObject>
 #include <QtCrypto>
+
+#include "core/coreLibExport.h"
+
 #include "core/networkpackage.h"
 
 class PairingHandler;
@@ -30,7 +33,7 @@ class NetworkPackage;
 class LinkProvider;
 class Device;
 
-class DeviceLink
+class CORELIB_EXPORT DeviceLink
     : public QObject
 {
     Q_OBJECT

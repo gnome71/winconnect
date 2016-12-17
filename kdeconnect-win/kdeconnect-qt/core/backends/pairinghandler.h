@@ -21,6 +21,8 @@
 #ifndef KDECONNECT_PAIRINGHANDLER_H
 #define KDECONNECT_PAIRINGHANDLER_H
 
+#include "core/coreLibExport.h"
+
 #include "core/networkpackage.h"
 #include "devicelink.h"
 
@@ -35,7 +37,7 @@
  * After that if any one of the link is paired, then we can say that device is paired, so new link will pair automatically
  */
 
-class PairingHandler
+class CORELIB_EXPORT PairingHandler
     : public QObject
 {
     Q_OBJECT
