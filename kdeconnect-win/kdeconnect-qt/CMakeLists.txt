@@ -151,6 +151,7 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::WinMain
 	qca
 	pluginManager
+	kcLogger
 )
 
 # VSConfig specific settings (show or hide console, ...)
