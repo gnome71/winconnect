@@ -248,3 +248,5 @@ ModelManifest.xml
 _build*/
 _deploy*/
 doc/
+/kdeconnect-android/
+/kdeconnect-kde/

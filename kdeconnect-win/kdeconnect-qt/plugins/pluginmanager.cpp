@@ -1,5 +1,6 @@
 #include "pluginmanager.h"
 #include "battery/batteryplugininterface.h"
+#include "ping/pingplugininterface.h"
 #include "test/testpluginainterface.h"
 
 #include <QtCore>
@@ -120,6 +121,8 @@ void PluginManager::load(const QString& path)
 	if(TestPluginAInterface *plugin = qobject_cast<TestPluginAInterface *>(loader->instance()))
 		d->loaders.insert(path, loader);
 	else if(BatteryPluginInterface *plugin = qobject_cast<BatteryPluginInterface *>(loader->instance()))
+		d->loaders.insert(path, loader);
+	else if (PingPluginInterface *plugin = qobject_cast<PingPluginInterface *>(loader->instance()))
 		d->loaders.insert(path, loader);
 	else
 		delete loader;

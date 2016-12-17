@@ -25,20 +25,9 @@
 
 #include "core/device.h"
 #include "core/kclogger.h"
+#include "core/networkpackage.h"
 
-//K_PLUGIN_FACTORY_WITH_JSON( KdeConnectPluginFactory, "kdeconnect_ping.json", registerPlugin< PingPlugin >(); )
-
-PingPlugin::PingPlugin(QObject* parent, const QVariantList& args)
-    : KdeConnectPlugin(parent, args)
-{
-//     qCDebug(KDECONNECT_PLUGIN_PING) << "Ping plugin constructor for device" << device()->name();
-}
-
-PingPlugin::~PingPlugin()
-{
-//     qCDebug(KDECONNECT_PLUGIN_PING) << "Ping plugin destructor for device" << device()->name();
-}
-
+/*
 bool PingPlugin::receivePackage(const NetworkPackage& np)
 {
 /*
@@ -49,25 +38,29 @@ bool PingPlugin::receivePackage(const NetworkPackage& np)
     notification->setText(np.get<QString>("message",i18n("Ping!"))); //This can be a source of spam
     notification->sendEvent();
 */
-	qDebug() << "pingplugin" << device()->name() << np.get<QString>("message",tr("Ping!"));
-    return true;
+//	qDebug() << "pingplugin" << device()->name() << np.get<QString>("message",tr("Ping!"));
+//    return true;
+//}
+
+void PingPlugin::sendPing() const
+{
+    //NetworkPackage np(PACKAGE_TYPE_PING);
+    //bool success = sendPackage(np);
+	//qDebug() << "sendPing:" << success;
 }
 
-void PingPlugin::sendPing()
+void PingPlugin::sendPing(const QString& customMessage) const
 {
-    NetworkPackage np(PACKAGE_TYPE_PING);
-    bool success = sendPackage(np);
-	qDebug() << "sendPing:" << success;
-}
-
-void PingPlugin::sendPing(const QString& customMessage)
-{
-    NetworkPackage np(PACKAGE_TYPE_PING);
+    //NetworkPackage np(PACKAGE_TYPE_PING);
     if (!customMessage.isEmpty()) {
-        np.set("message", customMessage);
+        //np.set("message", customMessage);
     }
-    bool success = sendPackage(np);
-	qDebug() << "sendPing:" << success;
+    //bool success = sendPackage(np);
+	//qDebug() << "sendPing:" << success;
+}
+
+void PingPlugin::initialize(const Device *device) {
+	m_device = const_cast<Device*>(device);
 }
 
 void PingPlugin::connected()
@@ -75,11 +68,7 @@ void PingPlugin::connected()
 	//TODO:QDBusConnection::sessionBus().registerObject(dbusPath(), this, QDBusConnection::ExportAllContents);
 }
 
-QString PingPlugin::dbusPath() const
-{
-	//TODO:
-	return "/modules/kdeconnect/devices/" + device()->id() + "/ping";
+QString PingPlugin::info(const QString& name) {
+	QString info = "PingPlugin for: " + m_device->name();
+	return info;
 }
-
-#include "pingplugin.moc"
-

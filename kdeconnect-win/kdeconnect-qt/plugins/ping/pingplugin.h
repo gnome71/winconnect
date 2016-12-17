@@ -22,31 +22,35 @@
 #ifndef PINGPLUGIN_H
 #define PINGPLUGIN_H
 
-#include <QObject>
+//#include <QObject>
 
-#include <core/kdeconnectplugin.h>
+#include "pingpluginExport.h"
+#include "pingplugininterface.h"
 
-#define PACKAGE_TYPE_PING QLatin1String("kdeconnect.ping")
+#define PACKAGE_TYPE_PING "kdeconnect.ping"
 
-class Q_DECL_EXPORT PingPlugin
-    : public KdeConnectPlugin
+class Device;
+class NetworkPackage;
+
+class PINGPLUGIN_EXPORT PingPlugin
+    : public PingPluginInterface	//KdeConnectPlugin
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.kde.kdeconnect.device.ping")
+	Q_PLUGIN_METADATA(IID "at.winconnect.PingPlugin" FILE "pingPlugin.json")
+	Q_INTERFACES(PingPluginInterface)
 
 public:
-    explicit PingPlugin(QObject *parent, const QVariantList &args);
-    ~PingPlugin() override;
-
-    Q_SCRIPTABLE void sendPing();
-    Q_SCRIPTABLE void sendPing(const QString& customMessage);
+	void initialize(const Device *device) Q_DECL_OVERRIDE;	void connected() Q_DECL_OVERRIDE;
+	void sendPing() const Q_DECL_OVERRIDE;
+    void sendPing(const QString& customMessage) const Q_DECL_OVERRIDE;
+	QString info(const QString& name) Q_DECL_OVERRIDE;
 
 public Q_SLOTS:
-    bool receivePackage(const NetworkPackage& np) override;
-    void connected() override;
+    //bool receivePackage(const NetworkPackage& np) override;
+    //void connected() override;
 
 private:
-    QString dbusPath() const;
+	Device *m_device;
 };
 
-#endif
+#endif	// PINGPLUGIN_H

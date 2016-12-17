@@ -4,7 +4,7 @@
 #include "batterypluginExport.h"
 #include "batteryplugininterface.h"
 
-#include <QtCore>
+//#include <QtCore>
 
 #define PACKAGE_TYPE_BATTERY_REQUEST "kdeconnect.battery.request"
 

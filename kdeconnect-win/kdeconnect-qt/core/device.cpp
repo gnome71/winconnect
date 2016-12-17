@@ -117,10 +117,13 @@ bool Device::hasPlugin(const QString& name) const
 void Device::setPluginEnabled(const QString& pluginName, bool enabled)
 {
 	//KConfigGroup pluginStates = KSharedConfig::openConfig(pluginsConfigFile())->group("Plugins");
+	m_plugin_config = new KdeConnectPluginConfig(m_deviceId, pluginName);
 
 	const QString enabledKey = pluginName + QStringLiteral("Enabled");
+	m_plugin_config->set(m_deviceId, enabledKey);
 	//pluginStates.writeEntry(enabledKey, enabled);
-	//reloadPlugins();
+	m_plugin_config->deleteLater();
+	reloadPlugins();
 }
 
 bool Device::isPluginEnabled(const QString& pluginName) const
@@ -142,7 +145,8 @@ void Device::reloadPlugins()
 		PluginManager* loader = PluginManager::instance();
 
 		for (const QString& pluginName : m_supportedPlugins) {
-			//const bool pluginEnabled = isPlugin
+			//const bool pluginEnabled = isPluginEnabled(pluginName);
+			//const QSet<QString> incomingCapabilities = 
 		}
 	}
 	pluginsConfigFile();	//DEBUG
@@ -263,13 +267,18 @@ void Device::addLink(const NetworkPackage& identityPackage, DeviceLink* link)
 		m_supportedPlugins = PluginManager::instance()->pluginsForCapabilities(incomingCapabilities, outgoingCapabilities);
 		
 		KcLogger::instance()->write(QtMsgType::QtInfoMsg, prefix, "New plugins for: " + m_deviceName);
-		for (const QString &s : qAsConst(m_supportedPlugins))
-			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " + s);
+		for (const QString &s : qAsConst(m_supportedPlugins)) {
+			KcLogger::instance()->write(QtMsgType::QtDebugMsg, prefix, "  " 
+				+ PluginManager::instance()->pluginName(s));
+		}
 
 		qDebug() << "New plugins for" << m_deviceName << m_supportedPlugins;
 	} else {
 		m_supportedPlugins = PluginManager::instance()->plugins().toSet();
 	}
+
+	for (const QString & n : m_supportedPlugins)
+		setPluginEnabled(n, true);
 
 	reloadPlugins();
 

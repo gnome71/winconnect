@@ -34,6 +34,7 @@
 
 class DeviceLink;
 class KdeConnectPlugin;
+class KdeConnectPluginConfig;
 
 /**
  * @brief The Device class
@@ -153,6 +154,7 @@ private: //Fields (TODO: dPointer!)
 	QString m_deviceName;
 	DeviceType m_deviceType;
 	int m_protocolVersion;
+	KdeConnectPluginConfig *m_plugin_config;
 
 	QVector<DeviceLink*> m_deviceLinks;
 
