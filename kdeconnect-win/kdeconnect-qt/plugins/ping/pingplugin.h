@@ -22,8 +22,6 @@
 #ifndef PINGPLUGIN_H
 #define PINGPLUGIN_H
 
-//#include <QObject>
-
 #include "pingpluginExport.h"
 #include "pingplugininterface.h"
 
@@ -46,7 +44,7 @@ public:
 	QString info(const QString& name) Q_DECL_OVERRIDE;
 
 public Q_SLOTS:
-    //bool receivePackage(const NetworkPackage& np) override;
+    bool receivePackage(const NetworkPackage& np) override;
     //void connected() override;
 
 private:

@@ -28,11 +28,10 @@ public:
 	virtual void sendPing(const QString& customMessage) const = 0;
 	virtual QString info(const QString& name) = 0;
 
-Q_SIGNALS:
-	//virtual void stateChanged(bool charging) = 0;
-	//virtual void chargeChanged(int charge) = 0;
+public Q_SLOTS:
+	virtual bool receivePackage(const NetworkPackage& np) = 0;
 };
 
 Q_DECLARE_INTERFACE(PingPluginInterface, "at.winconnect.PingPluginInterface")
 
-#endif // BATTERYPLUGININTERFACE_H
+#endif // PINGPLUGININTERFACE_H

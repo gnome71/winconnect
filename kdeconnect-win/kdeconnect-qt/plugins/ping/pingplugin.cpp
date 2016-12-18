@@ -27,7 +27,7 @@
 #include "core/kclogger.h"
 #include "core/networkpackage.h"
 
-/*
+
 bool PingPlugin::receivePackage(const NetworkPackage& np)
 {
 /*
@@ -38,9 +38,9 @@ bool PingPlugin::receivePackage(const NetworkPackage& np)
     notification->setText(np.get<QString>("message",i18n("Ping!"))); //This can be a source of spam
     notification->sendEvent();
 */
-//	qDebug() << "pingplugin" << device()->name() << np.get<QString>("message",tr("Ping!"));
-//    return true;
-//}
+	qDebug() << "pingplugin" << m_device->name() << np.get<QString>("message",tr("Ping!"));
+    return true;
+}
 
 void PingPlugin::sendPing() const
 {
