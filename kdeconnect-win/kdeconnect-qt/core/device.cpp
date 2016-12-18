@@ -67,7 +67,7 @@ Device::Device(QObject* parent, const QString& id)
 	// TODO: NotificationInterface* m_notificationInterface = new NotificationInterface(this, m_deviceId);
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	//m_supportedPlugins = PluginLoader::instance()->getPluginList().toSet();
-	PluginManager::instance()->initialize(this);
+	PluginManager::instance()->initialize();
 	m_supportedPlugins = PluginManager::instance()->plugins().toSet();
 	qDebug() << "m_supportedPlugins: " << m_supportedPlugins;
 

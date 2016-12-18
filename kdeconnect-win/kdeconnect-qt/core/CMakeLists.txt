@@ -66,6 +66,8 @@ add_library(coreLib SHARED
 	${coredll_be_HDRS}
 	${coredll_be_lan_SRCS}
 	${coredll_be_lan_HDRS}
+	${coredll_be_loop_SRCS}
+	${coredll_be_loop_HDRS}
 )
 
 target_include_directories(coreLib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -91,10 +93,14 @@ target_link_libraries(coreLib
 )
 
 # Visual Studio structure
-set_property(TARGET coreLib PROPERTY FOLDER "Libraries")
-source_group("Backends\\Header Files" FILES ${coredll_be_HDRS})
-source_group("Backends\\Source Files" FILES ${coredll_be_SRCS})
-source_group("Backends\\Lan\\Header Files" FILES ${coredll_be_lan_HDRS})
-source_group("Backends\\Lan\\Source Files" FILES ${coredll_be_lan_SRCS})
-source_group("Backends\\Loopback\\Header Files" FILES ${coredll_be_loop_HDRS})
-source_group("Backends\\Loopback\\Source Files" FILES ${coredll_be_loop_SRCS})
+set_property(TARGET coreLib 
+	PROPERTY FOLDER "Libraries")
+#source_group("Backends\\Header Files" FILES ${coredll_be_HDRS})
+source_group("Backends\\Source Files" 
+	FILES ${coredll_be_SRCS} ${coredll_be_HDRS})
+#source_group("Backends\\Lan\\Header Files" FILES ${coredll_be_lan_HDRS})
+source_group("Backends\\Lan\\Source Files" 
+	FILES ${coredll_be_lan_SRCS} ${coredll_be_lan_HDRS})
+#source_group("Backends\\Loopback\\Header Files" FILES ${coredll_be_loop_HDRS})
+source_group("Backends\\Loopback\\Source Files" 
+	FILES ${coredll_be_loop_SRCS} ${coredll_be_loop_HDRS})

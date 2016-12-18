@@ -150,9 +150,10 @@ target_link_libraries(${PROJECT_NAME}
 
 # VSConfig specific settings (show or hide console, ...)
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Binaries")
+source_group("Source Files" FILES ${SOURCES} ${HEADERS})
 source_group("Misc Files" FILES ${MISC})
-source_group("Core\\Header Files" FILES ${core_HDRS})
-source_group("Core\\Source Files" FILES ${core_SRCS})
+#source_group("Core\\Header Files" FILES ${core_HDRS})
+#source_group("Core\\Source Files" FILES ${core_SRCS})
   
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")

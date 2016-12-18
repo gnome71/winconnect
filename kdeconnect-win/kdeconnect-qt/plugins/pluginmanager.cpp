@@ -70,11 +70,8 @@ PluginManager *PluginManager::instance(void)
 	return s_instance;
 }
 
-void PluginManager::initialize(const Device *device)
+void PluginManager::initialize()
 {
-	m_device = const_cast<Device*>(device);
-	qDebug() << "PluginManager instance:" << s_instance << "initialize for" << m_device->name();
-
 	QDir path = qApp->applicationDirPath();
 	path.cd("plugins");
 	foreach(QFileInfo info, path.entryInfoList(QDir::Files | QDir::NoDotAndDotDot))
@@ -84,7 +81,7 @@ void PluginManager::initialize(const Device *device)
 		this->load(info.absoluteFilePath());
 }
 
-void PluginManager::uninitialize(const Device *device)
+void PluginManager::uninitialize()
 {
 	foreach(const QString &path, d->loaders.keys())
 		this->unload(path);
