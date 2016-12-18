@@ -87,14 +87,14 @@ target_link_libraries(coreLib
 	Qt5::Widgets
 	Qt5::Network
 	qca
-	#pluginManager
+	pluginManager
 )
 
 # Visual Studio structure
 set_property(TARGET coreLib PROPERTY FOLDER "Libraries")
-source_group("coreLib\\Backends\\Header Files" FILES ${coredll_be_HDRS})
-source_group("coreLib\\Backends\\Source Files" FILES ${coredll_be_SRCS})
-source_group("coreLib\\Backends\\Lan\\Header Files" FILES ${coredll_be_lan_HDRS})
-source_group("coreLib\\Backends\\Lan\\Source Files" FILES ${coredll_be_lan_SRCS})
-source_group("coreLib\\Backends\\Loopback\\Header Files" FILES ${coredll_be_loop_HDRS})
-source_group("coreLib\\Backends\\Loopback\\Source Files" FILES ${coredll_be_loop_SRCS})
+source_group("Backends\\Header Files" FILES ${coredll_be_HDRS})
+source_group("Backends\\Source Files" FILES ${coredll_be_SRCS})
+source_group("Backends\\Lan\\Header Files" FILES ${coredll_be_lan_HDRS})
+source_group("Backends\\Lan\\Source Files" FILES ${coredll_be_lan_SRCS})
+source_group("Backends\\Loopback\\Header Files" FILES ${coredll_be_loop_HDRS})
+source_group("Backends\\Loopback\\Source Files" FILES ${coredll_be_loop_SRCS})

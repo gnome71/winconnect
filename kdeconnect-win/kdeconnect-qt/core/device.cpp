@@ -21,11 +21,10 @@
 
 #include "device.h"
 
-#ifdef interface // MSVC language extension, QDBusConnection uses this as a variable name
-#undef interface
-#endif
+//#ifdef interface // MSVC language extension, QDBusConnection uses this as a variable name
+//#undef interface
+//#endif
 
-//#include <QDBusConnection>
 #include <QSslCertificate>
 #include <QDebug>
 

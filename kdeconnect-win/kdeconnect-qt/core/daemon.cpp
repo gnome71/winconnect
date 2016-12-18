@@ -37,7 +37,7 @@
 #include "device.h"
 #include "networkpackage.h"
 #include "backends/lan/lanlinkprovider.h"
-#include "backends/loopback/loopbacklinkprovider.h"
+//#include "backends/loopback/loopbacklinkprovider.h"
 #include "backends/devicelink.h"
 #include "backends/linkprovider.h"
 #include "interfaces/notificationinterface.h"
@@ -82,8 +82,8 @@ Daemon::Daemon(QObject *parent, bool testMode)
 	loadPlugins();
 
 	//Load backends
-	if (testMode)
-		d->mLinkProviders.insert(new LoopbackLinkProvider());
+	if (testMode);
+		//d->mLinkProviders.insert(new LoopbackLinkProvider());
 	else
 		d->mLinkProviders.insert(new LanLinkProvider());
 
