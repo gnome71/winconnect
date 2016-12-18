@@ -9,18 +9,17 @@ cmake_minimum_required(VERSION 3.2.2)
 
 ### Macros, functions, ...
 macro(copy_deploy FILES)
-	message("#DEBUG In copy_deploy_files")	#DEBUG
 	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying deploy files"
 	)
-		add_custom_command(
-			TARGET copy_deploy_files
-			POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory
-				"${PKG_BASE}/qca/crypto"
-				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-			COMMENT "Copying crypto folder"
-		)
+#		add_custom_command(
+#			TARGET copy_deploy_files
+#			POST_BUILD
+#			COMMAND ${CMAKE_COMMAND} -E copy_directory
+#				"${PKG_BASE}/qca/crypto"
+#				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+#			COMMENT "Copying crypto folder"
+#		)
 		add_custom_command(
 			TARGET copy_deploy_files
 			POST_BUILD
@@ -171,20 +170,6 @@ set(DEPLOY_FILES
 	${SSL_EAY_RELEASE}
 	${LIB_EAY_RELEASE}
 	${Qca_lib}
-#	${QT_DIR}/plugins/bearer/qgenericbearerd.dll
-#	${QT_DIR}/plugins/bearer/qnativewifibearerd.dll
-#	${QT_DIR}/plugins/iconengines/qsvgicond.dll
-#	${QT_DIR}/plugins/imageformats/qddsd.dll
-#	${QT_DIR}/plugins/imageformats/qgifd.dll
-#	${QT_DIR}/plugins/imageformats/qicnsd.dll
-#	${QT_DIR}/plugins/imageformats/qicod.dll
-#	${QT_DIR}/plugins/imageformats/qjpegd.dll
-#	${QT_DIR}/plugins/imageformats/qsvgd.dll
-#	${QT_DIR}/plugins/imageformats/qtgad.dll
-#	${QT_DIR}/plugins/imageformats/qtiffd.dll
-#	${QT_DIR}/plugins/imageformats/qwbmpd.dll
-#	${QT_DIR}/plugins/imageformats/qwebpd.dll
-#	${QT_DIR}/plugins/platforms/qwindowsd.dll
 )
 
 #message("#DEBUG DEPLOY_FILES:")

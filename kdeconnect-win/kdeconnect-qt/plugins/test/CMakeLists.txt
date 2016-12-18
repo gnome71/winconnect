@@ -34,4 +34,5 @@ set(MISC
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Plugins")
+source_group("Source Files" FILES testplugina.h testplugina.cpp)
 source_group("Misc Files" FILES ${MISC})
