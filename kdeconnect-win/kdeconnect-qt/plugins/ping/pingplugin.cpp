@@ -44,22 +44,22 @@ bool PingPlugin::receivePackage(const NetworkPackage& np)
 
 void PingPlugin::sendPing() const
 {
-    //NetworkPackage np(PACKAGE_TYPE_PING);
-    //bool success = sendPackage(np);
-	//qDebug() << "sendPing:" << success;
+    NetworkPackage np(PACKAGE_TYPE_PING);
+    bool success = m_device->sendPackage(np);
+	qDebug() << "sendPing:" << success;
 }
 
 void PingPlugin::sendPing(const QString& customMessage) const
 {
-    //NetworkPackage np(PACKAGE_TYPE_PING);
+    NetworkPackage np(PACKAGE_TYPE_PING);
     if (!customMessage.isEmpty()) {
-        //np.set("message", customMessage);
+        np.set("message", customMessage);
     }
-    //bool success = sendPackage(np);
-	//qDebug() << "sendPing:" << success;
+    bool success = m_device->sendPackage(np);
+	qDebug() << "sendPing:" << success;
 }
 
-void PingPlugin::initialize(const Device *device) {
+void PingPlugin::initialize(const Device *device, const QVariantList& args) {
 	m_device = const_cast<Device*>(device);
 }
 

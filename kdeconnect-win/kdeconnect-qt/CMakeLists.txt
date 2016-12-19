@@ -9,18 +9,17 @@ cmake_minimum_required(VERSION 3.2.2)
 
 ### Macros, functions, ...
 macro(copy_deploy FILES)
-	message("#DEBUG In copy_deploy_files")	#DEBUG
 	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying deploy files"
 	)
-		add_custom_command(
-			TARGET copy_deploy_files
-			POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory
-				"${PKG_BASE}/qca/crypto"
-				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-			COMMENT "Copying crypto folder"
-		)
+#		add_custom_command(
+#			TARGET copy_deploy_files
+#			POST_BUILD
+#			COMMAND ${CMAKE_COMMAND} -E copy_directory
+#				"${PKG_BASE}/qca/crypto"
+#				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+#			COMMENT "Copying crypto folder"
+#		)
 		add_custom_command(
 			TARGET copy_deploy_files
 			POST_BUILD

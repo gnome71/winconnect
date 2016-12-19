@@ -22,7 +22,7 @@ class PLUGINMANAGER_EXPORT PingPluginInterface
 public:
 	virtual ~PingPluginInterface(void) {}
 
-	virtual void initialize(const Device *device) = 0;
+	virtual void initialize(const Device *device, const QVariantList& args) = 0;
 	virtual void connected() = 0;
 	virtual void sendPing() const = 0;
 	virtual void sendPing(const QString& customMessage) const = 0;
