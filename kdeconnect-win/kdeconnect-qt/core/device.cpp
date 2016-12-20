@@ -68,7 +68,7 @@ Device::Device(QObject* parent, const QString& id)
 	//Assume every plugin is supported until addLink is called and we can get the actual list
 	PluginManager::instance()->initialize();
 	m_supportedPlugins = PluginManager::instance()->plugins().toSet();
-	qDebug() << "m_supportedPlugins: " << m_supportedPlugins;
+	qDebug() << "## m_supportedPlugins: " << m_supportedPlugins;
 
 	connect(this, &Device::pairingError, this, &warn);
 }
