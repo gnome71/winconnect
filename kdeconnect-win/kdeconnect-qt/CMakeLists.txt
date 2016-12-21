@@ -21,6 +21,39 @@ macro(copy_deploy FILES)
 			COMMENT "Copying plugins folder"
 		)
 endmacro(copy_deploy)
+
+macro(windeploy qt5core_dir)
+	get_filename_component(qt_dir "${qt5core_dir}/../../../" REALPATH)
+	set(windeploy_dir "${qt_dir}/tools")
+	set(debug_build $<$<CONFIG:Debug>:DEBUG_MODE>)
+	message(STATUS "qt_dir: ${qt_dir}")
+	message(STATUS "windeploy_dir ${windeploy_dir}")
+	#file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
+
+	add_custom_target(run_windeployqt
+		COMMENT "Run windeployqt"
+	)
+	add_custom_command(
+		TARGET run_windeployqt
+		COMMAND ${CMAKE_COMMAND} -E echo "$<$<CONFIG:Debug>:DEBUG_MODE>"
+	)
+	if(${debug_build})
+		message("dbg_build")
+		file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
+		add_custom_command(
+			TARGET run_windeployqt
+			COMMAND "${windeploy_dir}/windeployqt.exe ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.exe"
+		)
+	#	file(REMOVE)
+	elseif(${debug_build})
+		message("release_build")
+		add_custom_command(
+			TARGET run_windeployqt
+			COMMAND "${windeploy_dir}/windeploy.exe ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.exe"
+		)
+	endif(${debug_build})
+		
+endmacro(windeploy)
 ### End macros, functions, ...
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -199,4 +232,5 @@ install(FILES
 	DESTINATION bin/plugins
 )
 
+windeploy(${Qt5Core_DIR})
 #copy_deploy(${DEPLOY_FILES})
