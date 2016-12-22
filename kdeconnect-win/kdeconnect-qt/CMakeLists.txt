@@ -23,34 +23,27 @@ macro(copy_deploy FILES)
 endmacro(copy_deploy)
 
 macro(windeploy qt5core_dir)
-	get_filename_component(qt_dir "${qt5core_dir}/../../../" REALPATH)
-	set(windeploy_dir "${qt_dir}/tools")
-	message(STATUS "qt_dir: ${qt_dir}")
-	message(STATUS "windeploy_dir ${windeploy_dir}")
-
-	add_custom_target(run_windeployqt
+	add_custom_target(run_windeployqt ALL
 		COMMENT "Run windeployqt"
 	)
 
+	get_filename_component(qt_dir "${qt5core_dir}/../../../" REALPATH)
+	set(windeploy_dir "${qt_dir}/tools")
 	set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
+	
 	if(${buildtype} MATCHES "Debug")
 		file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
-		execute_process(
-			COMMAND ${windeploy_dir}/windeployqt.exe --list source ${CMAKE_CURRENT_BINARY_DIR}/Debug/${PROJECT_NAME}.exe
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug
-			RESULT_VARIABLE files
-		)
-		message(STATUS $files)
-	#	file(REMOVE)
-	elseif(${buildtype} MATCHES "Release")
-		add_custom_command(
-			TARGET run_windeployqt
-			POST_BUILD
-			COMMAND "${windeploy_dir}/windeploy.exe ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.exe"
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		)
 	endif()
-		
+
+	execute_process(
+		COMMAND ${windeploy_dir}/windeployqt.exe ${CMAKE_CURRENT_BINARY_DIR}/${buildtype}/${PROJECT_NAME}.exe
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${buildtype}
+		RESULT_VARIABLE files
+	)
+	message(STATUS ${files})
+	
+	file(REMOVE "${windeploy_dir}/qt.conf")
+			
 endmacro(windeploy)
 ### End macros, functions, ...
 
