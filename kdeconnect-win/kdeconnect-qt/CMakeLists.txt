@@ -22,7 +22,7 @@ macro(copy_deploy FILES)
 		)
 endmacro(copy_deploy)
 
-macro(windeploy qt5core_dir)
+function(windeploy qt5core_dir)
 	add_custom_target(run_windeployqt ALL
 		COMMENT "Run windeployqt"
 	)
@@ -35,8 +35,9 @@ macro(windeploy qt5core_dir)
 		file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
 	endif()
 
+	# TODO: hardcoded Debug string
 	execute_process(
-		COMMAND ${windeploy_dir}/windeployqt.exe ${CMAKE_CURRENT_BINARY_DIR}/${buildtype}/${PROJECT_NAME}.exe
+		COMMAND ${windeploy_dir}/windeployqt.exe ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${buildtype}
 		RESULT_VARIABLE files
 	)
@@ -44,7 +45,7 @@ macro(windeploy qt5core_dir)
 	
 	file(REMOVE "${windeploy_dir}/qt.conf")
 			
-endmacro(windeploy)
+endfunction(windeploy)
 ### End macros, functions, ...
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -186,26 +187,7 @@ set(DEPLOY_FILES
 	${SSL_EAY_RELEASE}
 	${LIB_EAY_RELEASE}
 	${Qca_lib}
-#	${QT_DIR}/plugins/bearer/qgenericbearerd.dll
-#	${QT_DIR}/plugins/bearer/qnativewifibearerd.dll
-#	${QT_DIR}/plugins/iconengines/qsvgicond.dll
-#	${QT_DIR}/plugins/imageformats/qddsd.dll
-#	${QT_DIR}/plugins/imageformats/qgifd.dll
-#	${QT_DIR}/plugins/imageformats/qicnsd.dll
-#	${QT_DIR}/plugins/imageformats/qicod.dll
-#	${QT_DIR}/plugins/imageformats/qjpegd.dll
-#	${QT_DIR}/plugins/imageformats/qsvgd.dll
-#	${QT_DIR}/plugins/imageformats/qtgad.dll
-#	${QT_DIR}/plugins/imageformats/qtiffd.dll
-#	${QT_DIR}/plugins/imageformats/qwbmpd.dll
-#	${QT_DIR}/plugins/imageformats/qwebpd.dll
-#	${QT_DIR}/plugins/platforms/qwindowsd.dll
 )
-
-#message("#DEBUG DEPLOY_FILES:")
-#foreach(f ${DEPLOY_FILES})
-#	message(" ${f}")
-#endforeach(f)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
@@ -224,4 +206,7 @@ install(FILES
 )
 
 windeploy(${Qt5Core_DIR})
+# Copying plugins is done by POST_BUILD_EVENT vs property
+#> mkdir $(SolutionDir)$(TargetedSDKConfiguration)\plugins
+#> copy $(ProjectDir)\Plugins\$(TargetedSDKConfiguration)\* $(SolutionDir)$(TargetedSDKConfiguration)\plugins\
 #copy_deploy(${DEPLOY_FILES})
