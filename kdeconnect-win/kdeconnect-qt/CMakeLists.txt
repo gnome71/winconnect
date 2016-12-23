@@ -23,7 +23,7 @@ macro(copy_deploy FILES)
 endmacro(copy_deploy)
 
 function(windeploy qt5core_dir)
-	add_custom_target(run_windeployqt ALL
+	add_custom_target(run_windeployqt
 		COMMENT "Run windeployqt"
 	)
 
@@ -37,9 +37,10 @@ function(windeploy qt5core_dir)
 
 	# TODO: hardcoded Debug string
 	execute_process(
-		COMMAND ${windeploy_dir}/windeployqt.exe ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${buildtype}
+		COMMAND ${windeploy_dir}/windeployqt.exe ${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/${PROJECT_NAME}.exe
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
 		RESULT_VARIABLE files
+		TIMEOUT 5
 	)
 	message(STATUS ${files})
 	
@@ -209,4 +210,4 @@ windeploy(${Qt5Core_DIR})
 # Copying plugins is done by POST_BUILD_EVENT vs property
 #> mkdir $(SolutionDir)$(TargetedSDKConfiguration)\plugins
 #> copy $(ProjectDir)\Plugins\$(TargetedSDKConfiguration)\* $(SolutionDir)$(TargetedSDKConfiguration)\plugins\
-#copy_deploy(${DEPLOY_FILES})
+copy_deploy(${DEPLOY_FILES})
