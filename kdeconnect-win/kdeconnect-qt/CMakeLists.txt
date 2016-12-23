@@ -22,7 +22,7 @@ macro(copy_deploy FILES)
 		)
 endmacro(copy_deploy)
 
-function(windeploy qt5core_dir)
+macro(windeploy qt5core_dir)
 	add_custom_target(run_windeployqt
 		COMMENT "Run windeployqt"
 	)
@@ -36,17 +36,28 @@ function(windeploy qt5core_dir)
 	endif()
 
 	# TODO: hardcoded Debug string
+	set(execute_command ${windeploy_dir}/windeployqt.exe --debug --compiler-runtime -network --list mapping ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
 	execute_process(
-		COMMAND ${windeploy_dir}/windeployqt.exe ${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/${PROJECT_NAME}.exe
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-		RESULT_VARIABLE files
+		COMMAND ${execute_command}
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug
+		OUTPUT_VARIABLE files
 		TIMEOUT 5
 	)
-	message(STATUS ${files})
-	
-	file(REMOVE "${windeploy_dir}/qt.conf")
+	message(List0: ${files})
+	foreach(file ${files})
+		if(NOT ${file} MATCHES "^Warning:")
+			string(REPLACE " " ";" fl ${file})
+			message(List1: ${fl})
+			list(GET fl 0 in)
+			list(GET fl 1 out)
+			message(STATUS "Copying file: " ${in} " to " ${out})
+			file(COPY /${in} DESTINATION ${CMAKE_BINARY_DIR}/Debug/${out})
+		endif(NOT ${file})
+	endforeach(file)
+
+	#file(REMOVE "${windeploy_dir}/qt.conf")
 			
-endfunction(windeploy)
+endmacro(windeploy)
 ### End macros, functions, ...
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -206,8 +217,7 @@ install(FILES
 	DESTINATION bin/plugins
 )
 
-windeploy(${Qt5Core_DIR})
-# Copying plugins is done by POST_BUILD_EVENT vs property
-#> mkdir $(SolutionDir)$(TargetedSDKConfiguration)\plugins
-#> copy $(ProjectDir)\Plugins\$(TargetedSDKConfiguration)\* $(SolutionDir)$(TargetedSDKConfiguration)\plugins\
+# Copy plugins folder
 copy_deploy(${DEPLOY_FILES})
+# Run windeployqt
+windeploy(${Qt5Core_DIR})
