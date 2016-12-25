@@ -239,9 +239,10 @@ add_custom_target(run_windeployqt
 set(windeploy_dir "${qt_dir}/tools")
 set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 	
-if(${buildtype} MATCHES "Debug")
+# TODO
+if($<CONFIG:Debug>)
 	file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
-endif()
+endif(${buildtype})
 
 set(execute_command ${windeploy_dir}/windeployqt.exe --debug --compiler-runtime -network --list mapping ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
 execute_process(
@@ -255,12 +256,14 @@ foreach(file ${files})
 		string(REPLACE " " ";" fl ${file})
 		list(GET fl 0 in)
 		list(GET fl 1 out)
-		add_custom_command(TARGET ${run_windeployqt} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				${in}
-				${CMAKE_BINARY_DIR}/${out}
-		)
+		if(${out})
+			add_custom_command(TARGET ${run_windeployqt} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+					${in}
+					${CMAKE_BINARY_DIR}/${out}
+			)
+		endif(${out})
 	endif(NOT ${file})
 endforeach(file)
 
-file(REMOVE "${windeploy_dir}/qt.conf")
+#file(REMOVE "${windeploy_dir}/qt.conf")
