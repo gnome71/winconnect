@@ -8,34 +8,36 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 cmake_minimum_required(VERSION 3.2.2)
 
 ### Macros, functions, ...
-macro(copy_deploy FILES)
+macro(copy_deploy qt5core_dir)
+	get_filename_component(qt_dir "${qt5core_dir}/../../../" REALPATH)
+
 	add_custom_target(copy_deploy_files ALL
 		COMMENT "Copying deploy files"
 	)
-		add_custom_command(
-			TARGET copy_deploy_files
-			POST_BUILD
+		add_custom_command(TARGET copy_deploy_files POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_directory
 				"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>"
 				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins"
-			COMMENT "Copying plugins folder"
+			COMMAND ${CMAKE_COMMAND} -E copy_directory
+				"${qt_dir}/$<$<CONFIG:Debug>:debug/>bin/Qca/crypto"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+			COMMENT "Copying folders"
 		)
 endmacro(copy_deploy)
 
 macro(windeploy qt5core_dir)
-	add_custom_target(run_windeployqt
-		COMMENT "Run windeployqt"
-	)
-
 	get_filename_component(qt_dir "${qt5core_dir}/../../../" REALPATH)
 	set(windeploy_dir "${qt_dir}/tools")
 	set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 	
+	add_custom_target(run_windeployqt 
+		COMMENT "Run windeployqt"
+	)
+
 	if(${buildtype} MATCHES "Debug")
 		file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
 	endif()
 
-	# TODO: hardcoded Debug string
 	set(execute_command ${windeploy_dir}/windeployqt.exe --debug --compiler-runtime -network --list mapping ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
 	execute_process(
 		COMMAND ${execute_command}
@@ -49,14 +51,15 @@ macro(windeploy qt5core_dir)
 			list(GET fl 0 in)
 			list(GET fl 1 out)
 			message(STATUS Copying file: ${in} to ${out})
-			// ERROR:
-			${CMAKE_COMMAND} -E copy ${in} ${CMAKE_BINARY_DIR}/Debug/${out}
-#			file(COPY ${in} DESTINATION ${CMAKE_BINARY_DIR}/Debug/${out})
+			add_custom_command(TARGET run_windeployqt POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+					${in}
+					${CMAKE_BINARY_DIR}/${out}
+			)
 		endif(NOT ${file})
 	endforeach(file)
 
 	file(REMOVE "${windeploy_dir}/qt.conf")
-			
 endmacro(windeploy)
 ### End macros, functions, ...
 
@@ -217,7 +220,47 @@ install(FILES
 	DESTINATION bin/plugins
 )
 
-# Copy plugins folder
-copy_deploy(${DEPLOY_FILES})
+# Copy plugin and crypto folder
+get_filename_component(qt_dir "${Qt5Core_DIR}/../../../" REALPATH)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+		"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>"
+		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+		"${qt_dir}/$<$<CONFIG:Debug>:debug/>bin/Qca/crypto"
+		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
+	COMMENT "Copying folders"
+)
+
 # Run windeployqt
-windeploy(${Qt5Core_DIR})
+add_custom_target(run_windeployqt
+	COMMENT "Run windeployqt"
+)
+set(windeploy_dir "${qt_dir}/tools")
+set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
+	
+if(${buildtype} MATCHES "Debug")
+	file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
+endif()
+
+set(execute_command ${windeploy_dir}/windeployqt.exe --debug --compiler-runtime -network --list mapping ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
+execute_process(
+	COMMAND ${execute_command}
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug
+	OUTPUT_VARIABLE files
+	TIMEOUT 5
+)
+foreach(file ${files})
+	if(NOT ${file} MATCHES "^Warning:")
+		string(REPLACE " " ";" fl ${file})
+		list(GET fl 0 in)
+		list(GET fl 1 out)
+		add_custom_command(TARGET ${run_windeployqt} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				${in}
+				${CMAKE_BINARY_DIR}/${out}
+		)
+	endif(NOT ${file})
+endforeach(file)
+
+file(REMOVE "${windeploy_dir}/qt.conf")
