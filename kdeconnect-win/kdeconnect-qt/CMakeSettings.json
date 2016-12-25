@@ -10,7 +10,7 @@
         "variables": [
           {
             "name": "CMAKE_TOOLCHAIN_FILE",
-            "value": "C:\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+            "value": "D:\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
           }
         ],
         "buildCommandArgs": "-m -v:minimal"
@@ -24,7 +24,7 @@
         "variables": [
           {
             "name": "CMAKE_TOOLCHAIN_FILE",
-            "value": "C:\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+            "value": "D:\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
           }
         ],
         "buildCommandArgs": "-m -v:minimal"

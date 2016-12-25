@@ -43,19 +43,19 @@ macro(windeploy qt5core_dir)
 		OUTPUT_VARIABLE files
 		TIMEOUT 5
 	)
-	message(List0: ${files})
 	foreach(file ${files})
 		if(NOT ${file} MATCHES "^Warning:")
 			string(REPLACE " " ";" fl ${file})
-			message(List1: ${fl})
 			list(GET fl 0 in)
 			list(GET fl 1 out)
-			message(STATUS "Copying file: " ${in} " to " ${out})
-			file(COPY /${in} DESTINATION ${CMAKE_BINARY_DIR}/Debug/${out})
+			message(STATUS Copying file: ${in} to ${out})
+			// ERROR:
+			${CMAKE_COMMAND} -E copy ${in} ${CMAKE_BINARY_DIR}/Debug/${out}
+#			file(COPY ${in} DESTINATION ${CMAKE_BINARY_DIR}/Debug/${out})
 		endif(NOT ${file})
 	endforeach(file)
 
-	#file(REMOVE "${windeploy_dir}/qt.conf")
+	file(REMOVE "${windeploy_dir}/qt.conf")
 			
 endmacro(windeploy)
 ### End macros, functions, ...
