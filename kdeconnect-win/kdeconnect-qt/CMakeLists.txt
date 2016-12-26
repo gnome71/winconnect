@@ -239,31 +239,33 @@ add_custom_target(run_windeployqt
 set(windeploy_dir "${qt_dir}/tools")
 set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 	
-# TODO
-if($<CONFIG:Debug>)
+if(${buildtype} MATCHES "Debug")
 	file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
 endif(${buildtype})
 
-set(execute_command ${windeploy_dir}/windeployqt.exe --debug --compiler-runtime -network --list mapping ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
+set(execute_command ${windeploy_dir}/windeployqt.exe --compiler-runtime -network --list mapping ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
 execute_process(
 	COMMAND ${execute_command}
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debug
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
 	OUTPUT_VARIABLE files
 	TIMEOUT 5
 )
+message(STATUS "###" ${files})
 foreach(file ${files})
 	if(NOT ${file} MATCHES "^Warning:")
 		string(REPLACE " " ";" fl ${file})
 		list(GET fl 0 in)
 		list(GET fl 1 out)
 		if(${out})
-			add_custom_command(TARGET ${run_windeployqt} POST_BUILD
+			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 				COMMAND ${CMAKE_COMMAND} -E copy_if_different
 					${in}
-					${CMAKE_BINARY_DIR}/${out}
+					${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/${out}
+				COMMAND ${CMAKE_COMMAND} -E echo 
+					"Copying: " ${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/${out}
 			)
 		endif(${out})
 	endif(NOT ${file})
 endforeach(file)
 
-#file(REMOVE "${windeploy_dir}/qt.conf")
+file(REMOVE "${windeploy_dir}/qt.conf")
