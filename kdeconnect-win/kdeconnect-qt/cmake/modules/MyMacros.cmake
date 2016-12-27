@@ -1,0 +1,17 @@
+macro(run_windeployqt)
+    get_target_property(qmake_exe ${Qt5Core_QMAKE_EXECUTABLE} LOCATION)
+	get_filename_component(windeployqt_dir ${qmake_exe} DIRECTORY)
+    set(windeployqt_exe ${windeployqt_dir}/windeployqt.exe)
+	message(STATUS "wd: " ${windeployqt_exe})
+	message(STATUS "qt: " ${qt_dir})
+	set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
+	
+    if(${buildtype} MATCHES "Debug")
+		file(WRITE "${windeployqt_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug\nArchData = ${qt_dir}/share/qt5/mkspecs")
+		exec_program(${windeployqt_exe} ARGS "-network ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe")
+	elseif()
+		exec_program(${windeployqt_exe} ARGS "-network ${CMAKE_BINARY_DIR}/Release/${PROJECT_NAME}.exe")
+    endif(${buildtype})
+
+	#file(REMOVE "${windeployqt_dir}/qt.conf")
+endmacro(run_windeployqt)

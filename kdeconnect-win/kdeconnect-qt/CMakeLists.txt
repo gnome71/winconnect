@@ -7,9 +7,6 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 
 cmake_minimum_required(VERSION 3.2.2)
 
-### Macros, functions, ...
-### End macros, functions, ...
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -Wno-microsoft-enum-value")
 endif()
@@ -21,6 +18,7 @@ set(CMAKE_AUTORCC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_SHARED_LIBS ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 #set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 # For VS Solution Explorer
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -179,19 +177,5 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMENT "Copying folders"
 )
 
-set(windeploy_dir "${qt_dir}/tools")
-set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
-	
-if(${buildtype} MATCHES "Debug")
-	file(WRITE "${windeploy_dir}/qt.conf" "[Paths]\nPrefix = ${qt_dir}/debug")
-endif(${buildtype})
-
-set(execute_command ${windeploy_dir}/windeployqt.exe --compiler-runtime -network ${CMAKE_BINARY_DIR}/Debug/${PROJECT_NAME}.exe)
-execute_process(
-	COMMAND ${execute_command}
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-	OUTPUT_VARIABLE wd_out
-)
-message(STATUS "### " ${wd_out})
-
-file(REMOVE "${windeploy_dir}/qt.conf")
+include(MyMacros)
+run_windeployqt()
