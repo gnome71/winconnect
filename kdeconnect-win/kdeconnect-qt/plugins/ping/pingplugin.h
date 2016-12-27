@@ -22,8 +22,6 @@
 #ifndef PINGPLUGIN_H
 #define PINGPLUGIN_H
 
-//#include <QObject>
-
 #include "pingpluginExport.h"
 #include "pingplugininterface.h"
 
@@ -40,13 +38,13 @@ class PINGPLUGIN_EXPORT PingPlugin
 	Q_INTERFACES(PingPluginInterface)
 
 public:
-	void initialize(const Device *device) Q_DECL_OVERRIDE;	void connected() Q_DECL_OVERRIDE;
+	void initialize(const Device *device, const QVariantList& args) Q_DECL_OVERRIDE;	void connected() Q_DECL_OVERRIDE;
 	void sendPing() const Q_DECL_OVERRIDE;
     void sendPing(const QString& customMessage) const Q_DECL_OVERRIDE;
 	QString info(const QString& name) Q_DECL_OVERRIDE;
 
 public Q_SLOTS:
-    //bool receivePackage(const NetworkPackage& np) override;
+    bool receivePackage(const NetworkPackage& np) override;
     //void connected() override;
 
 private:

@@ -14,14 +14,11 @@ class PluginManagerPrivate
 public:
 	bool check(const QString& path);
 
-public:
 	QHash<QString, QVariant> names;
 	QHash<QString, QVariant> versions;
 	QHash<QString, QVariantList> dependencies;
 	QHash<QString, QVariantList> outgoing;
 	QHash<QString, QVariantList> supported;
-
-public:
 	QHash<QString, QPluginLoader *> loaders;
 };
 
@@ -155,7 +152,7 @@ QSet<QString> PluginManager::pluginsForCapabilities(
 	const QSet<QString> &outgoing)
 {
 	QSet<QString> ret;
-	QSet<QString> pluginIncomingCapabilities;
+	QSet<QString> pluginIncomingCapabilities;	// TODO: move down
 	QSet<QString> pluginOutgoingCapabilities;
 
 	// Iterating plugins
@@ -196,7 +193,20 @@ QSet<QString> PluginManager::pluginsForCapabilities(
 	return ret;
 }
 
-PluginManager::PluginManager(void) : d(new PluginManagerPrivate)
+QSet<QString> PluginManager::getInPluginInfo(const QString& path) 	
+{
+	QSet<QString> info;
+	info.insert(d->names.value(path).toString());
+	for (QVariantList::const_iterator j = d->supported.value(path).begin(); j != d->supported.value(path).end(); j++) {
+		qDebug() << "## Supported:" << (*j).toString();
+		info.insert((*j).toString());
+	}
+
+	return info;
+}
+
+PluginManager::PluginManager(void) 
+	: d(new PluginManagerPrivate)
 {
 
 }
@@ -204,7 +214,6 @@ PluginManager::PluginManager(void) : d(new PluginManagerPrivate)
 PluginManager::~PluginManager(void)
 {
 	delete d;
-
 	d = NULL;
 }
 

@@ -27,7 +27,7 @@
 #include "core/kclogger.h"
 #include "core/networkpackage.h"
 
-/*
+
 bool PingPlugin::receivePackage(const NetworkPackage& np)
 {
 /*
@@ -38,28 +38,28 @@ bool PingPlugin::receivePackage(const NetworkPackage& np)
     notification->setText(np.get<QString>("message",i18n("Ping!"))); //This can be a source of spam
     notification->sendEvent();
 */
-//	qDebug() << "pingplugin" << device()->name() << np.get<QString>("message",tr("Ping!"));
-//    return true;
-//}
+	qDebug() << "pingplugin" << m_device->name() << np.get<QString>("message",tr("Ping!"));
+    return true;
+}
 
 void PingPlugin::sendPing() const
 {
-    //NetworkPackage np(PACKAGE_TYPE_PING);
-    //bool success = sendPackage(np);
-	//qDebug() << "sendPing:" << success;
+    NetworkPackage np(PACKAGE_TYPE_PING);
+    bool success = m_device->sendPackage(np);
+	qDebug() << "sendPing:" << success;
 }
 
 void PingPlugin::sendPing(const QString& customMessage) const
 {
-    //NetworkPackage np(PACKAGE_TYPE_PING);
+    NetworkPackage np(PACKAGE_TYPE_PING);
     if (!customMessage.isEmpty()) {
-        //np.set("message", customMessage);
+        np.set("message", customMessage);
     }
-    //bool success = sendPackage(np);
-	//qDebug() << "sendPing:" << success;
+    bool success = m_device->sendPackage(np);
+	qDebug() << "sendPing:" << success;
 }
 
-void PingPlugin::initialize(const Device *device) {
+void PingPlugin::initialize(const Device *device, const QVariantList& args) {
 	m_device = const_cast<Device*>(device);
 }
 

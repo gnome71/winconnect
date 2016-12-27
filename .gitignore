@@ -250,3 +250,6 @@ _deploy*/
 doc/
 /kdeconnect-android/
 /kdeconnect-kde/
+/kdeconnect-win/3rdparty/deploy_dbg
+/kdeconnect-win/3rdparty/deploy_dbg
+/kdeconnect-win/kdeconnect-qt/qt.conf
