@@ -166,16 +166,28 @@ install(FILES
 )
 
 # Copy plugin and crypto folder
-get_filename_component(qt_dir "${Qt5Core_DIR}/../../../" REALPATH)
+get_filename_component(QT_DIR "${Qt5Core_DIR}/../../../" REALPATH CACHE)
+get_target_property(qmake_exe ${Qt5Core_QMAKE_EXECUTABLE} LOCATION)
+get_filename_component(WINDEPLOYQT_DIR ${qmake_exe} DIRECTORY CACHE)
+set(WINDEPLOYQT_EXE ${WINDEPLOYQT_DIR}/windeployqt.exe CACHE FILEPATH "windeployqt executable")
+set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
+	
+# Write qt.conf file
+if(${buildtype} MATCHES "Debug")
+	file(WRITE "${CMAKE_SOURCE_DIR}/qt.conf" "[Paths]\nPrefix = ${QT_DIR}/debug\nArchData = ${QT_DIR}/share/qt5/mkspecs")
+endif(${buildtype})
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 		"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>"
 		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins"
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
-		"${qt_dir}/$<$<CONFIG:Debug>:debug/>bin/Qca/crypto"
+		"${QT_DIR}/$<$<CONFIG:Debug>:debug/>bin/Qca/crypto"
 		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-	COMMENT "Copying folders"
+	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/qt.conf ${WINDEPLOYQT_DIR}/qt.conf 
+	COMMAND ${WINDEPLOYQT_EXE} -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
+	COMMAND ${CMAKE_COMMAND} -E remove ${WINDEPLOYQT_DIR}/qt.conf
+	COMMENT "Running post build commands"
 )
 
-include(MyMacros)
-run_windeployqt()
+file(REMOVE "${WINDEPLOYQT_DIR}/qt.conf")
