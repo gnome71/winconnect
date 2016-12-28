@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+      <file>icons/AppIcon.png</file>
+        <file>icons/smartphone-connected.png</file>
+        <file>icons/smartphone-disconnected.png</file>
+        <file>icons/smartphone-trusted.png</file>
+        <file>icons/tablet-connected.png</file>
+        <file>icons/tablet-disconnected.png</file>
+        <file>icons/tablet-trusted.png</file>
+    </qresource>
+</RCC>

@@ -1,8 +1,0 @@
-{
-  "dependencies": [],
-  "name": "PluginA",
-  "version": "0.0.1",
-  "X-WinConnect-OutgoingPackageType": [ "kdeconnect.testplugin.request" ],
-  "X-WinConnect-SupportedPackageType": [ "kdeconnect.testplugin" ]
-}
-

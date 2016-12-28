@@ -1,8 +1,0 @@
-{
-  "dependencies": [],
-  "name": "PingPlugin",
-  "version": "0.0.1",
-  "X-WinConnect-OutgoingPackageType": [ "kdeconnect.ping" ],
-  "X-WinConnect-SupportedPackageType": [ "kdeconnect.ping" ]
-}
-

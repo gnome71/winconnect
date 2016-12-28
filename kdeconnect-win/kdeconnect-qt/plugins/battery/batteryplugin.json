@@ -1,8 +1,0 @@
-{
-  "dependencies": [],
-  "name": "BatteryPlugin",
-  "version": "0.0.1",
-  "X-WinConnect-OutgoingPackageType": [ "kdeconnect.battery.request" ],
-  "X-WinConnect-SupportedPackageType": [ "kdeconnect.battery" ]
-}
-
