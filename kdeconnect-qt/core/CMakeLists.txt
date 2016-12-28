@@ -95,11 +95,7 @@ target_link_libraries(coreLib
 # Visual Studio structure
 set_property(TARGET coreLib 
 	PROPERTY FOLDER "Libraries")
-source_group("Source Files" 
-	FILES ${coredll_SRCS} ${coredll_HDRS})
-source_group("Backends\\Source Files" 
-	FILES ${coredll_be_SRCS} ${coredll_be_HDRS})
-source_group("Backends\\Lan\\Source Files" 
-	FILES ${coredll_be_lan_SRCS} ${coredll_be_lan_HDRS})
-source_group("Backends\\Loopback\\Source Files" 
-	FILES ${coredll_be_loop_SRCS} ${coredll_be_loop_HDRS})
+source_group("Sources Files" FILES ${coredll_SRCS} ${coredll_HDRS})
+source_group("Backends\\Source Files" FILES ${coredll_be_SRCS} ${coredll_be_HDRS})
+source_group("Backends\\Lan\\Source Files" FILES ${coredll_be_lan_SRCS} ${coredll_be_lan_HDRS})
+source_group("Backends\\Loopback\\Source Files" FILES ${coredll_be_loop_SRCS} ${coredll_be_loop_HDRS})

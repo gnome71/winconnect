@@ -80,14 +80,14 @@ add_subdirectory(core)
 add_subdirectory(plugins)
 
 # Set files
-set(SOURCES
+set(SRCS
     main.cpp
     mainwindow.cpp
 	interfaces/devicesmodel.cpp
 	interfaces/notificationinterface.cpp
 	)
 
-set(HEADERS
+set(HDRS
     mainwindow.h
 	interfaces/devicesmodel.h
 	interfaces/notificationinterface.h
@@ -109,7 +109,7 @@ set(MISC
 include(GenerateExportHeader)
 
 # Build the project (headers included here for IDEs)
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${FORMS} ${RESOURCES})
 
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
@@ -126,10 +126,8 @@ target_link_libraries(${PROJECT_NAME}
 
 # VSConfig specific settings (show or hide console, ...)
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Binaries")
-source_group("Source Files" FILES ${SOURCES} ${HEADERS})
+source_group("Source Files" FILES ${SRCS} ${HDRS})
 source_group("Misc Files" FILES ${MISC})
-#source_group("Core\\Header Files" FILES ${core_HDRS})
-#source_group("Core\\Source Files" FILES ${core_SRCS})
   
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
@@ -138,7 +136,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBI
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS")
 
-# Install targets to deploy dir
+# TODO: Install targets to deploy dir
 get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
 set(PKG_BASE ${_PKG_BASE})
 
@@ -163,7 +161,7 @@ install(FILES
 	DESTINATION bin/plugins
 )
 
-# Copy plugin and crypto folder
+# Setting stuff for post build
 get_filename_component(QT_DIR "${Qt5Core_DIR}/../../../" REALPATH CACHE)
 get_target_property(qmake_exe ${Qt5Core_QMAKE_EXECUTABLE} LOCATION)
 get_filename_component(WINDEPLOYQT_DIR ${qmake_exe} DIRECTORY CACHE)
@@ -181,13 +179,10 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 		${QT_DIR}/$<$<CONFIG:Debug>:debug/>bin/ssleay32.dll 
 		${QT_DIR}/$<$<CONFIG:Debug>:debug/>bin/libeay32.dll 
 		"$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-	COMMENT "Running post build commands"
-)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E echo "Build type: " $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
 	COMMAND ${CMAKE_COMMAND} -E echo "[Paths]" > ${WINDEPLOYQT_DIR}/qt.conf
 	COMMAND ${CMAKE_COMMAND} -E echo "Prefix = ${QT_DIR}$<$<CONFIG:Debug>:/debug>" >> ${WINDEPLOYQT_DIR}/qt.conf
 	COMMAND ${WINDEPLOYQT_EXE} $<$<CONFIG:Debug>:--pdb> $<$<CONFIG:Debug>:--debug>$<$<CONFIG:Release>:--release> -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
 	COMMAND ${CMAKE_COMMAND} -E remove ${WINDEPLOYQT_DIR}/qt.conf
+	COMMENT "Running post build commands"
 )
