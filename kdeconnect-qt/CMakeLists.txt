@@ -184,22 +184,10 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMENT "Running post build commands"
 )
 
-set(build_type $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
-	COMMAND ${CMAKE_COMMAND} -E echo "Build type: " ${build_type}
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "Build type: " $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+	COMMAND ${CMAKE_COMMAND} -E echo "[Paths]" > ${WINDEPLOYQT_DIR}/qt.conf
+	COMMAND ${CMAKE_COMMAND} -E echo "Prefix = ${QT_DIR}$<$<CONFIG:Debug>:/debug>" >> ${WINDEPLOYQT_DIR}/qt.conf
+	COMMAND ${WINDEPLOYQT_EXE} $<$<CONFIG:Debug>:--pdb> $<$<CONFIG:Debug>:--debug>$<$<CONFIG:Release>:--release> -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
+	COMMAND ${CMAKE_COMMAND} -E remove ${WINDEPLOYQT_DIR}/qt.conf
 )
-if(build_type MATCHES "Debug")
-	file(WRITE "${CMAKE_SOURCE_DIR}/qt.conf" "[Paths]\nPrefix = ${QT_DIR}/debug\nArchData = ${QT_DIR}/share/qt5/mkspecs")
-	add_custom_target(windeploy ALL #POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "Build type Debug in if(debug): " ${debug}
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/qt.conf ${WINDEPLOYQT_DIR}/qt.conf 
-		COMMAND ${WINDEPLOYQT_EXE} --pdb --debug -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
-		COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/qt.conf ${WINDEPLOYQT_DIR}/qt.conf
-	)
-elseif(build_type MATCHES "Release")
-	add_custom_target(windeploy ALL #POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E echo "Build type Debug in if(NOT debug): " ${debug}
-		COMMAND ${WINDEPLOYQT_EXE} --release -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
-	)
-endif(build_type)
