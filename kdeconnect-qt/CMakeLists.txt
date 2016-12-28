@@ -143,10 +143,8 @@ get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
 set(PKG_BASE ${_PKG_BASE})
 
 set(DEPLOY_FILES
-	${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
 	${SSL_EAY_RELEASE}
 	${LIB_EAY_RELEASE}
-	${Qca_lib}
 )
 
 install(TARGETS ${PROJECT_NAME}
@@ -170,13 +168,8 @@ get_filename_component(QT_DIR "${Qt5Core_DIR}/../../../" REALPATH CACHE)
 get_target_property(qmake_exe ${Qt5Core_QMAKE_EXECUTABLE} LOCATION)
 get_filename_component(WINDEPLOYQT_DIR ${qmake_exe} DIRECTORY CACHE)
 set(WINDEPLOYQT_EXE ${WINDEPLOYQT_DIR}/windeployqt.exe CACHE FILEPATH "windeployqt executable")
-set(buildtype $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
-	
-# Write qt.conf file
-if(${buildtype} MATCHES "Debug")
-	file(WRITE "${CMAKE_SOURCE_DIR}/qt.conf" "[Paths]\nPrefix = ${QT_DIR}/debug\nArchData = ${QT_DIR}/share/qt5/mkspecs")
-endif(${buildtype})
 
+# The command to copy all the needed files and folders
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 		"${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>"
@@ -184,10 +177,17 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 		"${QT_DIR}/$<$<CONFIG:Debug>:debug/>bin/Qca/crypto"
 		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/crypto"
-	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/qt.conf ${WINDEPLOYQT_DIR}/qt.conf 
-	COMMAND ${WINDEPLOYQT_EXE} -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
-	COMMAND ${CMAKE_COMMAND} -E remove ${WINDEPLOYQT_DIR}/qt.conf
+	COMMAND ${CMAKE_COMMAND} -E copy 
+		${QT_DIR}/$<$<CONFIG:Debug>:debug/>bin/ssleay32.dll 
+		${QT_DIR}/$<$<CONFIG:Debug>:debug/>bin/libeay32.dll 
+		"$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 	COMMENT "Running post build commands"
 )
 
-file(REMOVE "${WINDEPLOYQT_DIR}/qt.conf")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "Build type: " $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+	COMMAND ${CMAKE_COMMAND} -E echo "[Paths]" > ${WINDEPLOYQT_DIR}/qt.conf
+	COMMAND ${CMAKE_COMMAND} -E echo "Prefix = ${QT_DIR}$<$<CONFIG:Debug>:/debug>" >> ${WINDEPLOYQT_DIR}/qt.conf
+	COMMAND ${WINDEPLOYQT_EXE} $<$<CONFIG:Debug>:--pdb> $<$<CONFIG:Debug>:--debug>$<$<CONFIG:Release>:--release> -network $<TARGET_FILE_DIR:${PROJECT_NAME}>
+	COMMAND ${CMAKE_COMMAND} -E remove ${WINDEPLOYQT_DIR}/qt.conf
+)
