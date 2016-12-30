@@ -25,6 +25,25 @@
     </Expand>
   </Type>
 
+  <!-- LanLinkProvider -->
+  <Type Name="LanLinkProvider&lt;*&gt;">
+    <DisplayString>mUdpSocket={mUdpSocket} mTcpPort={mTcpPort} mTestMode={mTestMode}</DisplayString>
+    <Expand>
+      <Item Name="mId">mUdpSocket</Item>
+      <Item Name="mType">mTcpPort</Item>
+      <Item Name="mBody">mTestMode</Item>
+    </Expand>
+  </Type>
+
+  <!-- DeviceLink -->
+  <Type Name="DeviceLink&lt;*&gt;">
+    <DisplayString>mDeviceId={mDeviceId} mPairStatus={mPairStatus}</DisplayString>
+    <Expand>
+      <Item Name="mId">mDeviceId</Item>
+      <Item Name="mType">mPairStatus</Item>
+    </Expand>
+  </Type>
+
   <!-- DaemonPrivate -->
   <Type Name="DaemonPrivate&lt;*&gt;">
     <DisplayString>mDevices={mDevices} mDiscoveryModeAcquisitions={mDiscoveryModeAcquisitions}</DisplayString>

@@ -135,7 +135,7 @@ void Daemon::loadPlugins()
 			else if (pName == "PingPlugin") {
 				pingPlugin = qobject_cast<PingPluginInterface*>(plugin);
 				if (pingPlugin) {
-					//TODO: qDebug() << "From pingPlugin: " << pingPlugin->info(fileName);
+					qDebug() << "From pingPlugin: " << pingPlugin->info(fileName);
 				}
 			}
 			else if (pName == "TestPluginA") {
@@ -146,6 +146,7 @@ void Daemon::loadPlugins()
 			}
 		}
 	}
+
 	qDebug() << "Plugins:" << pluginFileNames;
 }
 

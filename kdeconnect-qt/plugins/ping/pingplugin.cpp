@@ -69,6 +69,7 @@ void PingPlugin::connected()
 }
 
 QString PingPlugin::info(const QString& name) {
-	QString info = "PingPlugin for: " + m_device->name();
+//	QString info = "PingPlugin for: " + m_device->name();
+	QString info = "PingPlugin: " + name;
 	return info;
 }
