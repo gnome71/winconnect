@@ -104,6 +104,8 @@ set(RESOURCES
 set(MISC
     mainwindow.ui
 	res/resources.qrc
+	vstools/qt5.natvis
+	vstools/winconnect.natvis
 )
 
 include(GenerateExportHeader)

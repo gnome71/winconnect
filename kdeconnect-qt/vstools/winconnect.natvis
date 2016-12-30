@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- Device -->
+  <Type Name="Device&lt;*,&gt;">
+    <DisplayString>m_deviceName={m_deviceName} m_deviceId={m_deviceId} m_deviceType={m_deviceType}</DisplayString>
+    <Expand>
+      <Item Name="m_deviceName">m_deviceName</Item>
+      <Item Name="m_deviceType">m_deviceType</Item>
+      <Item Name="m_deviceId">m_deviceId</Item>
+      <Item Name="m_supportedPlugins">m_supportedPlugins</Item>
+      <!--<Item Name="availableLinks">availableLinks</Item>-->
+    </Expand>
+  </Type>
+
+  <!-- NetworkPackage -->
+  <Type Name="NetworkPackage&lt;*&gt;">
+    <DisplayString>mId={mId} mType={mType} mBody={mBody} mPayload={mPayload}</DisplayString>
+    <Expand>
+      <Item Name="mId">mId</Item>
+      <Item Name="mType">mType</Item>
+      <Item Name="mBody">mBody</Item>
+      <Item Name="mPayload">mPayload</Item>
+      <Item Name="mPayloadSize">mPayloadSize</Item>
+      <Item Name="mPayloadTransferInfo">mPayloadTransferInfo</Item>
+    </Expand>
+  </Type>
+
+  <!-- DaemonPrivate -->
+  <Type Name="DaemonPrivate&lt;*&gt;">
+    <DisplayString>mDevices={mDevices} mDiscoveryModeAcquisitions={mDiscoveryModeAcquisitions}</DisplayString>
+    <Expand>
+      <Item Name="mDevices">mDevices</Item>
+      <Item Name="mDiscoveryModeAcquisitions">mDiscoveryModeAcquisitions</Item>
+    </Expand>
+  </Type>
+
+  <!-- KdeConnectPluginConfigPrivate -->
+  <Type Name="KdeConnectPluginConfigPrivate&lt;*&gt;">
+    <DisplayString>mConfigDir={mConfigDir} mConfig={mConfig}</DisplayString>
+    <Expand>
+      <Item Name="mConfigDir">mConfigDir</Item>
+      <Item Name="mConfig">mConfig</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

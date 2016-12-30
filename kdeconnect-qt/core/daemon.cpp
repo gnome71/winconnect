@@ -132,6 +132,12 @@ void Daemon::loadPlugins()
 					qDebug() << "From batteryPlugin: " << batteryPlugin->charge();
 				}
 			}
+			else if (pName == "PingPlugin") {
+				pingPlugin = qobject_cast<PingPluginInterface*>(plugin);
+				if (pingPlugin) {
+					//TODO: qDebug() << "From pingPlugin: " << pingPlugin->info(fileName);
+				}
+			}
 			else if (pName == "TestPluginA") {
 				testPlugin = qobject_cast<PluginInterface*>(plugin);
 				if (testPlugin) {

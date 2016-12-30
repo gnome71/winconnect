@@ -31,6 +31,7 @@
 #include "device.h"
 #include "plugins/plugininterface.h"
 #include "plugins/battery/batteryplugininterface.h"
+#include "plugins/ping/pingplugininterface.h"
 
 class NetworkPackage;
 class DeviceLink;
@@ -97,6 +98,7 @@ private:
 	void loadPlugins();
 
 	BatteryPluginInterface* batteryPlugin;
+	PingPluginInterface* pingPlugin;
 	PluginInterface* testPlugin;
 	QStringList pluginFileNames;
 	QScopedPointer<struct DaemonPrivate> d;	//! LinkProviders, Devices and DiscoveryModeAcquisitions
