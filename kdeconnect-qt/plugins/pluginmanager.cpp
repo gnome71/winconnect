@@ -141,6 +141,8 @@ QStringList PluginManager::plugins(void)
 QString PluginManager::pluginName(const QString& path)
 {
 	//qDebug() << "Loaders:" << d->loaders;
+	//return d->names.value(path).toString();
+	qDebug() << d->names.value(path).toString();
 	return d->names.value(path).toString();
 }
 

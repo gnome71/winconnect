@@ -149,7 +149,7 @@ void Device::reloadPlugins()
 		
 			if (pluginEnabled) {
 				loader->load(pluginName);
-				qDebug() << "!!!!" << m_plugins;
+				qDebug() << "Device:m_plugins" << m_plugins;
 				KdeConnectPlugin* plugin = m_plugins.take(pluginName);
 			}
 		}

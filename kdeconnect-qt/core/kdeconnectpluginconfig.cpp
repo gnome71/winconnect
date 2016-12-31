@@ -38,6 +38,7 @@ KdeConnectPluginConfig::KdeConnectPluginConfig(const QString& deviceId, const QS
     : d(new KdeConnectPluginConfigPrivate())
 {
 	d->mConfigDir = KdeConnectConfig::instance()->pluginConfigDir(deviceId, pluginName);
+	qDebug() << "mConfigDir:" << d->mConfigDir;
 
 	QDir().mkpath(d->mConfigDir.path());
 
@@ -83,19 +84,23 @@ QVariantList KdeConnectPluginConfig::getList(const QString& key,
 
 void KdeConnectPluginConfig::set(const QString& key, const QVariant& value)
 {
-    d->mConfig->setValue(key, value);
+	d->mConfig->beginGroup("Plugins");
+	d->mConfig->setValue(key, value);
+	d->mConfig->endGroup();
     d->mConfig->sync();
 	//TODO: QDBusConnection::sessionBus().send(d->signal);
 }
 
 void KdeConnectPluginConfig::setList(const QString& key, const QVariantList& list)
 {
-    d->mConfig->beginWriteArray(key);
+	d->mConfig->beginGroup("Plugins");
+	d->mConfig->beginWriteArray(key);
     for (int i = 0; i < list.size(); ++i) {
         d->mConfig->setArrayIndex(i);
         d->mConfig->setValue("value", list.at(i));
     }
     d->mConfig->endArray();
+	d->mConfig->endGroup();
     d->mConfig->sync();
 	//QDBusConnection::sessionBus().send(d->signal);
 }

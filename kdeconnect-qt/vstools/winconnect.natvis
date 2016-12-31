@@ -61,4 +61,24 @@
       <Item Name="mConfig">mConfig</Item>
     </Expand>
   </Type>
+
+  <!-- KdeConnectPluginConfig -->
+  <Type Name="KdeConnectPluginConfig&lt;*&gt;">
+    <DisplayString>deviceId={deviceId} pluginName={pluginName}</DisplayString>
+    <Expand>
+      <Item Name="deviceId">deviceId</Item>
+      <Item Name="pluginName">pluginName</Item>
+    </Expand>
+  </Type>
+
+  <!-- PluginManagerPrivate -->
+  <Type Name="PluginManagerPrivate&lt;*&gt;">
+    <DisplayString>names={names}</DisplayString>
+    <Expand>
+      <Item Name="names">names</Item>
+      <Item Name="versions">versions</Item>
+      <Item Name="outgoing">outgoing</Item>
+      <Item Name="supported">supported</Item>
+    </Expand>
+  </Type>
 </AutoVisualizer>
