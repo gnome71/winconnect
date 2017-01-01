@@ -111,7 +111,7 @@ set(MISC
 include(GenerateExportHeader)
 
 # Build the project (headers included here for IDEs)
-add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${FORMS} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${FORMS} ${RESOURCES} ${MISC})
 
 # Linker commands
 target_link_libraries(${PROJECT_NAME}

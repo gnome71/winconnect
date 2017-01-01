@@ -11,7 +11,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-set(${PROJECT_NAME}_HEADERS
+set(${PROJECT_NAME}_HDRS
 	battery/batteryplugininterface.h
 	ping/pingplugininterface.h
 	test/testpluginainterface.h
@@ -19,12 +19,12 @@ set(${PROJECT_NAME}_HEADERS
 	pluginmanager.h
 )
 
-set(${PROJECT_NAME}_SOURCES
+set(${PROJECT_NAME}_SRCS
 	pluginmanager.cpp)
 
 add_library(${PROJECT_NAME} SHARED
-	${${PROJECT_NAME}_SOURCES}
-	${${PROJECT_NAME}_HEADERS})
+	${${PROJECT_NAME}_SRCS}
+	${${PROJECT_NAME}_HDRS})
 
 generate_export_header(${PROJECT_NAME}
 	EXPORT_FILE_NAME "${PROJECT_NAME}Export.h")
@@ -43,3 +43,4 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Libraries")
+source_group("Source Files" FILES ${${PROJECT_NAME}_SRCS} ${${PROJECT_NAME}_HDRS})

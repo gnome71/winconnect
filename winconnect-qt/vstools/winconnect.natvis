@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <!-- Device -->
-  <Type Name="Device&lt;*,&gt;">
-    <DisplayString>m_deviceName={m_deviceName} m_deviceId={m_deviceId} m_deviceType={m_deviceType}</DisplayString>
+  <Type Name="Device">
+    <DisplayString>{{ m_deviceName = {m_deviceName, sb}, m_deviceId = {m_deviceId, sb} }}</DisplayString>
     <Expand>
       <Item Name="m_deviceName">m_deviceName</Item>
       <Item Name="m_deviceType">m_deviceType</Item>
@@ -13,21 +13,20 @@
   </Type>
 
   <!-- NetworkPackage -->
-  <Type Name="NetworkPackage&lt;*&gt;">
-    <DisplayString>mId={mId} mType={mType} mBody={mBody} mPayload={mPayload}</DisplayString>
+  <Type Name="NetworkPackage">
+    <DisplayString>{{ mId = {mId}, mType = {mType}, mBody = {mBody}, mPayload = {mPayload} }}</DisplayString>
     <Expand>
       <Item Name="mId">mId</Item>
       <Item Name="mType">mType</Item>
       <Item Name="mBody">mBody</Item>
-      <Item Name="mPayload">mPayload</Item>
       <Item Name="mPayloadSize">mPayloadSize</Item>
       <Item Name="mPayloadTransferInfo">mPayloadTransferInfo</Item>
     </Expand>
   </Type>
 
   <!-- LanLinkProvider -->
-  <Type Name="LanLinkProvider&lt;*&gt;">
-    <DisplayString>mUdpSocket={mUdpSocket} mTcpPort={mTcpPort} mTestMode={mTestMode}</DisplayString>
+  <Type Name="LanLinkProvider">
+    <DisplayString>{{ mUdpSocket = {mUdpSocket}, mTcpPort = {mTcpPort}, mTestMode = {mTestMode} }}</DisplayString>
     <Expand>
       <Item Name="mId">mUdpSocket</Item>
       <Item Name="mType">mTcpPort</Item>
@@ -36,8 +35,8 @@
   </Type>
 
   <!-- DeviceLink -->
-  <Type Name="DeviceLink&lt;*&gt;">
-    <DisplayString>mDeviceId={mDeviceId} mPairStatus={mPairStatus}</DisplayString>
+  <Type Name="DeviceLink">
+    <DisplayString>{{ mDeviceId = {mDeviceId}, mPairStatus = {mPairStatus} }}</DisplayString>
     <Expand>
       <Item Name="mId">mDeviceId</Item>
       <Item Name="mType">mPairStatus</Item>
@@ -45,8 +44,8 @@
   </Type>
 
   <!-- DaemonPrivate -->
-  <Type Name="DaemonPrivate&lt;*&gt;">
-    <DisplayString>mDevices={mDevices} mDiscoveryModeAcquisitions={mDiscoveryModeAcquisitions}</DisplayString>
+  <Type Name="DaemonPrivate">
+    <DisplayString>{{ mDevices = {mDevices}, mDiscoveryModeAcquisitions = {mDiscoveryModeAcquisitions}</DisplayString>
     <Expand>
       <Item Name="mDevices">mDevices</Item>
       <Item Name="mDiscoveryModeAcquisitions">mDiscoveryModeAcquisitions</Item>
@@ -54,8 +53,8 @@
   </Type>
 
   <!-- KdeConnectPluginConfigPrivate -->
-  <Type Name="KdeConnectPluginConfigPrivate&lt;*&gt;">
-    <DisplayString>mConfigDir={mConfigDir} mConfig={mConfig}</DisplayString>
+  <Type Name="KdeConnectPluginConfigPrivate">
+    <DisplayString>{{ mConfigDir = {mConfigDir}, mConfig = {mConfig} }}</DisplayString>
     <Expand>
       <Item Name="mConfigDir">mConfigDir</Item>
       <Item Name="mConfig">mConfig</Item>
@@ -63,8 +62,8 @@
   </Type>
 
   <!-- KdeConnectPluginConfig -->
-  <Type Name="KdeConnectPluginConfig&lt;*&gt;">
-    <DisplayString>deviceId={deviceId} pluginName={pluginName}</DisplayString>
+  <Type Name="KdeConnectPluginConfig">
+    <DisplayString>{{ deviceId = {deviceId}, pluginName = {pluginName} }}</DisplayString>
     <Expand>
       <Item Name="deviceId">deviceId</Item>
       <Item Name="pluginName">pluginName</Item>
@@ -72,8 +71,8 @@
   </Type>
 
   <!-- PluginManagerPrivate -->
-  <Type Name="PluginManagerPrivate&lt;*&gt;">
-    <DisplayString>names={names}</DisplayString>
+  <Type Name="PluginManagerPrivate">
+    <DisplayString>{{ names = {names} }}</DisplayString>
     <Expand>
       <Item Name="names">names</Item>
       <Item Name="versions">versions</Item>

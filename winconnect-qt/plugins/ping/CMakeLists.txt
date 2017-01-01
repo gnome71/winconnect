@@ -9,6 +9,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins)
 
 add_definitions(-DQT_PLUGIN)
 
+set(pingPlugin_HDRS pinglugin.h)
+set(pingPlugin_SRCS pingplugin.cpp)
+set(pingPlugin_MISC	pingPlugin.json)
+
 add_library(${PROJECT_NAME} SHARED
   pingplugin.h
   pingplugin.cpp
@@ -29,10 +33,6 @@ target_link_libraries(${PROJECT_NAME}
 	pluginManager
 )
 
-set(MISC
-	pingPlugin.json
-)
-
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Plugins")
-source_group("Source Files" FILES pinglugin.h pingplugin.cpp)
-source_group("Misc Files" FILES ${MISC})
+source_group("Source Files" FILES pingplugin.h ${PROJECT_NAME}Export.h pingplugin.cpp)
+source_group("Misc Files" FILES pingPlugin.json)
