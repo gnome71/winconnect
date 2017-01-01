@@ -198,6 +198,7 @@ QSet<QString> PluginManager::pluginsForCapabilities(
 QSet<QString> PluginManager::getInPluginInfo(const QString& path) 	
 {
 	QSet<QString> info;
+	//info.insert(d->names.value(path).toString());
 	info.insert(d->names.value(path).toString());
 	for (QVariantList::const_iterator j = d->supported.value(path).begin(); j != d->supported.value(path).end(); j++) {
 		qDebug() << "## Supported:" << (*j).toString();

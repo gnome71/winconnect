@@ -80,4 +80,12 @@
       <Item Name="supported">supported</Item>
     </Expand>
   </Type>
+
+  <!-- PluginManager -->
+  <Type Name="PluginManager">
+    <DisplayString>{{ PluginManagerPrivate = {d} }}</DisplayString>
+    <Expand>
+      <Item Name="PluginManagerPrivate">d</Item>
+    </Expand>
+  </Type>
 </AutoVisualizer>

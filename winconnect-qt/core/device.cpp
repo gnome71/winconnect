@@ -21,16 +21,8 @@
 
 #include "device.h"
 
-//#ifdef interface // MSVC language extension, QDBusConnection uses this as a variable name
-//#undef interface
-//#endif
-
 #include <QSslCertificate>
 #include <QDebug>
-
-//#include <KSharedConfig>
-//#include <KConfigGroup>
-//#include <KLocalizedString>
 
 #include "kclogger.h"
 #include "kdeconnectplugin.h"
@@ -131,12 +123,12 @@ bool Device::isPluginEnabled(const QString& pluginName) const
 
 	//return (pluginStates.hasKey(enabledKey) ? pluginStates.readEntry(enabledKey, false)
 	//	: PluginLoader::instance()->getPluginInfo(pluginName).isEnabledByDefault());
-	return true;	// TODO:
+	return true;	// TODO: isPluginEnabled
 }
 
 void Device::reloadPlugins()
 {
-	QHash<QString, KdeConnectPlugin*> newPluginMap, oldPluginMap = m_plugins;
+	QHash<QString, KdeConnectPlugin*> newPluginMap, oldPluginMap = m_plugins; //TODO: m_plugins=0
 	QMultiMap<QString, KdeConnectPlugin*> newPluginsByIncomingCapability;
 
 	if (isTrusted() && isReachable()) {
