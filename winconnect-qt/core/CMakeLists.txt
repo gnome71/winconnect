@@ -85,10 +85,14 @@ add_custom_command(TARGET coreLib PRE_BUILD
 )
 
 target_link_libraries(coreLib
-	${QtCore_location}
-	${QtWidgets_location}
-	${QtNetwork_location}
-	${Qca_location}
+	#${QtCore_location}
+	#${QtWidgets_location}
+	#${QtNetwork_location}
+	#${Qca_location}
+	Qt5::Core
+	Qt5::Widgets
+	Qt5::Network
+	qca
 	pluginManager
 )
 

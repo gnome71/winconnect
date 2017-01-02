@@ -29,7 +29,9 @@ if(Qt5Core_FOUND)
 	get_target_property(QtCore_location Qt5::Core LOCATION)
 	include_directories(${Qt5Core_INCLUDE_DIRS})
 	add_definitions(${Qt5Core_DEFINITIONS})
-	#message(STATUS ${Qt5Core_INCLUDE_DIRS} | ${Qt5Core_DEFINITIONS})
+	message(STATUS ${QtCore_location})
+	#message(STATUS ${Qt5Core_INCLUDE_DIRS})
+	message(STATUS ${Qt5Core_DEFINITIONS})
 endif(Qt5Core_FOUND)
 
 find_package(Qt5Widgets REQUIRED)
@@ -38,7 +40,9 @@ if(Qt5Widgets_FOUND)
 	get_target_property(QtWidgets_location Qt5::Widgets LOCATION)
 	include_directories(${Qt5Widgets_INCLUDE_DIRS})
 	add_definitions(${Qt5Widgets_DEFINITIONS})
-	#message(STATUS ${Qt5Widgets_INCLUDE_DIRS} | ${Qt5Widgets_DEFINITIONS})
+	message(STATUS ${QtWidgets_location})
+	#message(STATUS ${Qt5Widgets_INCLUDE_DIRS})
+	message(STATUS ${Qt5Widgets_DEFINITIONS})
 endif(Qt5Widgets_FOUND)
 
 find_package(Qt5Network REQUIRED)
@@ -47,7 +51,9 @@ if(Qt5Network_FOUND)
 	get_target_property(QtNetwork_location Qt5::Network LOCATION)
 	include_directories(${Qt5Network_INCLUDE_DIRS})
 	add_definitions(${Qt5Network_DEFINITIONS})
-	#message(STATUS ${Qt5Network_INCLUDE_DIRS} | ${Qt5Network_DEFINITIONS})
+	message(STATUS ${QtNetwork_location})
+	#message(STATUS ${Qt5Network_INCLUDE_DIRS})
+	message(STATUS ${Qt5Network_DEFINITIONS})
 endif(Qt5Network_FOUND)
 
 find_package(Qt5Concurrent REQUIRED)
@@ -56,7 +62,9 @@ if(Qt5Concurrent_FOUND)
 	get_target_property(QtConcurrent_location Qt5::Concurrent LOCATION)
 	include_directories(${Qt5Concurrent_INCLUDE_DIRS})
 	add_definitions(${Qt5Concurrent_DEFINITIONS})
-	#message(STATUS ${Qt5Concurrent_INCLUDE_DIRS} | ${Qt5Concurrent_DEFINITIONS})
+	message(STATUS ${QtConcurrent_location})
+	#message(STATUS ${Qt5Concurrent_INCLUDE_DIRS})
+	message(STATUS ${Qt5Concurrent_DEFINITIONS})
 endif(Qt5Concurrent_FOUND)
 
 find_package(OpenSSL)
@@ -70,6 +78,7 @@ if(Qca_FOUND)
 	get_target_property(Qca_location qca LOCATION)
 	get_target_property(Qca_INCLUDE_DIRS qca INTERFACE_INCLUDE_DIRECTORIES)
 	include_directories(${Qca_INCLUDE_DIRS})
+	message(STATUS ${Qca_location})
 	#message(STATUS ${Qca_INCLUDE_DIRS})
 endif(Qca_FOUND)
 
@@ -111,12 +120,18 @@ add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${FORMS} ${RESOURCES} ${MISC})
 
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
-	${QtCore_location}
-	${QtWidgets_location}
-	${QtNetwork_location}
-	${QtConcurrent_location}
-	${Qca_location}
-#	pluginManager
+	#${QtCore_location}
+	#${QtWidgets_location}
+	#${QtNetwork_location}
+	#${QtConcurrent_location}
+	#${Qca_location}
+	Qt5::Core
+	Qt5::Widgets
+	Qt5::Network
+	Qt5::Concurrent
+	Qt5::WinMain
+	qca
+	pluginManager
 	coreLib
 )
 
