@@ -7,10 +7,6 @@ set(KDECONNECT_VERSION "${KDECONNECT_VERSION_MAJOR}.${KDECONNECT_VERSION_MINOR}.
 
 cmake_minimum_required(VERSION 3.2.2)
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -Wno-microsoft-enum-value")
-endif()
-
 # Instruct CMake to run moc/uic automatically when needed.
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -18,43 +14,52 @@ set(CMAKE_AUTORCC ON)
 # As moc files are generated in the binary dir:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(BUILD_SHARED_LIBS ON)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 # For VS Solution Explorer
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_INSTALL_DEBUG_LIBRARIES ON)
 include(InstallRequiredSystemLibraries)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Search needed libs
 find_package(Qt5Core REQUIRED)
 if(Qt5Core_FOUND)
 	message(STATUS "Qt5Core found v" ${Qt5Core_VERSION})
+	get_target_property(QtCore_location Qt5::Core LOCATION)
+	include_directories(${Qt5Core_INCLUDE_DIRS})
+	add_definitions(${Qt5Core_DEFINITIONS})
+	#message(STATUS ${Qt5Core_INCLUDE_DIRS} | ${Qt5Core_DEFINITIONS})
 endif(Qt5Core_FOUND)
-include_directories(${Qt5Core_INCLUDES})
-add_definitions(${Qt5Core_DEFINITIONS})
 
 find_package(Qt5Widgets REQUIRED)
 if(Qt5Widgets_FOUND)
 	message(STATUS "Qt5Widgets found v" ${Qt5Widgets_VERSION})
+	get_target_property(QtWidgets_location Qt5::Widgets LOCATION)
+	include_directories(${Qt5Widgets_INCLUDE_DIRS})
+	add_definitions(${Qt5Widgets_DEFINITIONS})
+	#message(STATUS ${Qt5Widgets_INCLUDE_DIRS} | ${Qt5Widgets_DEFINITIONS})
 endif(Qt5Widgets_FOUND)
-include_directories(${Qt5Widgets_INCLUDES})
-add_definitions(${Qt5Widgets_DEFINITIONS})
 
 find_package(Qt5Network REQUIRED)
 if(Qt5Network_FOUND)
 	message(STATUS "Qt5Network found v" ${Qt5Network_VERSION})
+	get_target_property(QtNetwork_location Qt5::Network LOCATION)
+	include_directories(${Qt5Network_INCLUDE_DIRS})
+	add_definitions(${Qt5Network_DEFINITIONS})
+	#message(STATUS ${Qt5Network_INCLUDE_DIRS} | ${Qt5Network_DEFINITIONS})
 endif(Qt5Network_FOUND)
-include_directories(${Qt5Network_INCLUDES})
-add_definitions(${Qt5Network_DEFINITIONS})
 
 find_package(Qt5Concurrent REQUIRED)
 if(Qt5Concurrent_FOUND)
 	message(STATUS "Qt5Concurrent found v" ${Qt5Concurrent_VERSION})
+	get_target_property(QtConcurrent_location Qt5::Concurrent LOCATION)
+	include_directories(${Qt5Concurrent_INCLUDE_DIRS})
+	add_definitions(${Qt5Concurrent_DEFINITIONS})
+	#message(STATUS ${Qt5Concurrent_INCLUDE_DIRS} | ${Qt5Concurrent_DEFINITIONS})
 endif(Qt5Concurrent_FOUND)
-include_directories(${Qt5Concurrent_INCLUDES})
-add_definitions(${Qt5Concurrent_DEFINITIONS})
 
-find_package(OpenSSL REQUIRED)
+find_package(OpenSSL)
 if(OpenSSL_FOUND)
 	message(STATUS "OpenSSL found v" ${OPENSSL_VERSION})
 endif(OpenSSL_FOUND)
@@ -62,17 +67,14 @@ endif(OpenSSL_FOUND)
 find_package(Qca REQUIRED)
 if(Qca_FOUND)
     message(STATUS "Qca found v" ${Qca_VERSION})
-	get_target_property(Qca_lib qca LOCATION)
-	get_target_property(Qca_inc qca INTERFACE_INCLUDE_DIRECTORIES)
+	get_target_property(Qca_location qca LOCATION)
+	get_target_property(Qca_INCLUDE_DIRS qca INTERFACE_INCLUDE_DIRECTORIES)
+	include_directories(${Qca_INCLUDE_DIRS})
+	#message(STATUS ${Qca_INCLUDE_DIRS})
 endif(Qca_FOUND)
-include_directories(${Qca_inc})
-add_definitions(${Qca_DEFINITIONS})
 
 include(GenerateExportHeader)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}
-)
 configure_file(winconnect-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/winconnect-version.h)
 
 # Include subdirectories
@@ -86,21 +88,17 @@ set(SRCS
 	interfaces/devicesmodel.cpp
 	interfaces/notificationinterface.cpp
 	)
-
 set(HDRS
     mainwindow.h
 	interfaces/devicesmodel.h
 	interfaces/notificationinterface.h
 )
-
 set(FORMS
 	mainwindow.ui
 )
-
 set(RESOURCES
 	res/resources.qrc
 )
-
 set(MISC
     mainwindow.ui
 	res/resources.qrc
@@ -108,21 +106,17 @@ set(MISC
 	vstools/winconnect.natvis
 )
 
-include(GenerateExportHeader)
-
 # Build the project (headers included here for IDEs)
 add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${FORMS} ${RESOURCES} ${MISC})
 
 # Linker commands
 target_link_libraries(${PROJECT_NAME}
-	Qt5::Core
-	Qt5::Gui
-	Qt5::Widgets
-	Qt5::Network
-	Qt5::Concurrent
-	Qt5::WinMain
-	qca
-	pluginManager
+	${QtCore_location}
+	${QtWidgets_location}
+	${QtNetwork_location}
+	${QtConcurrent_location}
+	${Qca_location}
+#	pluginManager
 	coreLib
 )
 
@@ -139,29 +133,29 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS")
 
 # TODO: Install targets to deploy dir
-get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
-set(PKG_BASE ${_PKG_BASE})
+#get_filename_component(_PKG_BASE ${Qca_lib} DIRECTORY)
+#set(PKG_BASE ${_PKG_BASE})
 
-set(DEPLOY_FILES
-	${SSL_EAY_RELEASE}
-	${LIB_EAY_RELEASE}
-)
+#set(DEPLOY_FILES
+#	${SSL_EAY_RELEASE}
+#	${LIB_EAY_RELEASE}
+#)
 
-install(TARGETS ${PROJECT_NAME}
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ${PKG_BASE}/Qca/crypto/ DESTINATION bin/crypto)
-install(FILES
-	${DEPLOY_FILES}
-	${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/pluginManager.dll
-	DESTINATION bin
-)
-install(FILES
-	${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/testPluginA.dll
-	DESTINATION bin/plugins
-)
+#install(TARGETS ${PROJECT_NAME}
+#	RUNTIME DESTINATION bin
+#	LIBRARY DESTINATION lib
+#	ARCHIVE DESTINATION lib
+#)
+#install(DIRECTORY ${PKG_BASE}/Qca/crypto/ DESTINATION bin/crypto)
+#install(FILES
+#	${DEPLOY_FILES}
+#	${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/pluginManager.dll
+#	DESTINATION bin
+#)
+#install(FILES
+#	${CMAKE_BINARY_DIR}/plugins/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/testPluginA.dll
+#	DESTINATION bin/plugins
+#)
 
 # Setting stuff for post build
 get_filename_component(QT_DIR "${Qt5Core_DIR}/../../../" REALPATH CACHE)

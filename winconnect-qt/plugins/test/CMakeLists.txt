@@ -24,7 +24,7 @@ add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
 )
 
 target_link_libraries(${PROJECT_NAME}
-	Qt5::Core
+	${QtCore_location}
 	coreLib
 	pluginManager
 )

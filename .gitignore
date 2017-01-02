@@ -248,3 +248,4 @@ ModelManifest.xml
 _build*/
 _deploy*/
 doc/
+CMakeBuild/

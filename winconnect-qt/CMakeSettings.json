@@ -1,0 +1,33 @@
+{
+  // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
+  "configurations": [
+    {
+      "buildCommandArgs": "-m -v:minimal",
+      "buildRoot": "${projectDir}\\CMakeBuild\\${workspaceHash}\\${name}",
+      "cmakeCommandArgs": "-Wno-dev",
+      "configurationType": "Debug",
+      "generator": "Visual Studio 15 2017 Win64",
+      "name": "x64-Debug",
+      "variables": [
+        {
+          "name": "CMAKE_TOOLCHAIN_FILE",
+          "value": "D:\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+        }
+      ]
+    },
+    {
+      "buildCommandArgs": "-m -v:minimal",
+      "buildRoot": "${projectDir}\\CMakeBuild\\${workspaceHash}\\${name}",
+      "cmakeCommandArgs": "-Wno-Dev",
+      "configurationType": "Release",
+      "generator": "Visual Studio 15 2017 Win64",
+      "name": "x64-Release",
+      "variables": [
+        {
+          "name": "CMAKE_TOOLCHAIN_FILE",
+          "value": "D:\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+        }
+      ]
+    }
+  ]
+}

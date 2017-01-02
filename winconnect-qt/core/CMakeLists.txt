@@ -85,16 +85,15 @@ add_custom_command(TARGET coreLib PRE_BUILD
 )
 
 target_link_libraries(coreLib
-	Qt5::Core
-	Qt5::Widgets
-	Qt5::Network
-	qca
+	${QtCore_location}
+	${QtWidgets_location}
+	${QtNetwork_location}
+	${Qca_location}
 	pluginManager
 )
 
 # Visual Studio structure
-set_property(TARGET coreLib 
-	PROPERTY FOLDER "Libraries")
+set_property(TARGET coreLib PROPERTY FOLDER "Libraries")
 source_group("Source Files" FILES ${coredll_SRCS} ${coredll_HDRS})
 source_group("Backends\\Source Files" FILES ${coredll_be_SRCS} ${coredll_be_HDRS})
 source_group("Backends\\Lan\\Source Files" FILES ${coredll_be_lan_SRCS} ${coredll_be_lan_HDRS})

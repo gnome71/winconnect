@@ -1,9 +1,5 @@
 project(pluginManager)
 
-# Do not automatically link Qt executables to qtmain target on Windows.
-# Plugins use console mode only. Not need to link against qtmain.lib.
-#cmake_policy(SET CMP0020 OLD)
-
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
@@ -39,7 +35,7 @@ add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
 )
 
 target_link_libraries(${PROJECT_NAME}
-	Qt5::Core
+	${QtCore_location}
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Libraries")
