@@ -247,4 +247,5 @@ ModelManifest.xml
 **/Generated*
 _build*/
 _deploy*/
+CMakeBuild/
 doc/
